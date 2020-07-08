@@ -1,0 +1,113 @@
+.PrimaryPanel {
+    box-sizing: border-box;
+    text-align: center;
+    width: 20%;
+    background-color: blueviolet;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+.Tab {
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: rgb(226, 91, 12);
+    height: 100%;
+    
+  }
+
+.PointContainer {
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    background-color: rgb(122, 78, 52);
+    flex-direction: column;
+}
+
+.Header {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    background-color: crimson;
+}
+
+.PathPoint {
+    padding: 1%;
+    display: flex;
+    flex-direction: row;
+}
+
+.ConstraintContainer {
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    background-color: rgb(226, 164, 128);
+    flex-direction: column;
+}
+
+.Constraint {
+    padding: 1%;
+}
+
+.HeaderOption{
+    height: 48px;
+    display: inline-block;
+white-space: nowrap;
+border: none;
+color: #6b7580;
+padding: 0;
+background-color: #f1f1f1;
+text-decoration: none;
+width: 33.33%;
+position: relative;
+margin: 0;
+}
+
+.HeaderOption.active {
+    color: #fff;
+    background: #29ac07;
+    position: relative;
+}
+
+.HeaderOption:hover {background-color: #3e8e41}
+
+
+.ImportContainer {
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    background-color: rgb(226, 164, 128);
+    flex-direction: column;
+}
+
+.Import {
+    padding: 1%;
+}
+
+.ExportContainer {
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    background-color: rgb(226, 164, 128);
+    flex-direction: column;
+}
+
+.Export {
+    padding: 1%;
+}
+
+.SearchContainer {
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    background-color: rgb(226, 164, 128);
+    flex-direction: column;
+}
+
+.Search {
+    padding: 1%;
+}
+  
