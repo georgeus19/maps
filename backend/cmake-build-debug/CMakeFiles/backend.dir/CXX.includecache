@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/hrubyk/projects/maps/backend/DatabaseHelper.cpp
+DatabaseHelper.h
+/home/hrubyk/projects/maps/backend/DatabaseHelper.h
+
+/home/hrubyk/projects/maps/backend/DatabaseHelper.h
+string
+-
+string_view
+-
+pqxx/pqxx
+-
+iostream
+-
+
