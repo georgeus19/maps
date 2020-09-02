@@ -54,10 +54,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /snap/clion/123/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /snap/clion/124/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /snap/clion/123/bin/cmake/linux/bin/cmake -E rm -f
+RM = /snap/clion/124/bin/cmake/linux/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -77,45 +77,60 @@ include CMakeFiles/backend.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/backend.dir/flags.make
 
-CMakeFiles/backend.dir/library.cpp.o: CMakeFiles/backend.dir/flags.make
-CMakeFiles/backend.dir/library.cpp.o: ../library.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/backend.dir/library.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend.dir/library.cpp.o -c /home/hrubyk/projects/maps/backend/library.cpp
+CMakeFiles/backend.dir/src/library.cpp.o: CMakeFiles/backend.dir/flags.make
+CMakeFiles/backend.dir/src/library.cpp.o: ../src/library.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/backend.dir/src/library.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend.dir/src/library.cpp.o -c /home/hrubyk/projects/maps/backend/src/library.cpp
 
-CMakeFiles/backend.dir/library.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend.dir/library.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/library.cpp > CMakeFiles/backend.dir/library.cpp.i
+CMakeFiles/backend.dir/src/library.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend.dir/src/library.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/src/library.cpp > CMakeFiles/backend.dir/src/library.cpp.i
 
-CMakeFiles/backend.dir/library.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend.dir/library.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/library.cpp -o CMakeFiles/backend.dir/library.cpp.s
+CMakeFiles/backend.dir/src/library.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend.dir/src/library.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/src/library.cpp -o CMakeFiles/backend.dir/src/library.cpp.s
 
-CMakeFiles/backend.dir/DatabaseHelper.cpp.o: CMakeFiles/backend.dir/flags.make
-CMakeFiles/backend.dir/DatabaseHelper.cpp.o: ../DatabaseHelper.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backend.dir/DatabaseHelper.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend.dir/DatabaseHelper.cpp.o -c /home/hrubyk/projects/maps/backend/DatabaseHelper.cpp
+CMakeFiles/backend.dir/src/test.cpp.o: CMakeFiles/backend.dir/flags.make
+CMakeFiles/backend.dir/src/test.cpp.o: ../src/test.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backend.dir/src/test.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend.dir/src/test.cpp.o -c /home/hrubyk/projects/maps/backend/src/test.cpp
 
-CMakeFiles/backend.dir/DatabaseHelper.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend.dir/DatabaseHelper.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/DatabaseHelper.cpp > CMakeFiles/backend.dir/DatabaseHelper.cpp.i
+CMakeFiles/backend.dir/src/test.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend.dir/src/test.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/src/test.cpp > CMakeFiles/backend.dir/src/test.cpp.i
 
-CMakeFiles/backend.dir/DatabaseHelper.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend.dir/DatabaseHelper.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/DatabaseHelper.cpp -o CMakeFiles/backend.dir/DatabaseHelper.cpp.s
+CMakeFiles/backend.dir/src/test.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend.dir/src/test.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/src/test.cpp -o CMakeFiles/backend.dir/src/test.cpp.s
+
+CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o: CMakeFiles/backend.dir/flags.make
+CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o: ../src/database_helper/DatabaseHelper.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o -c /home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp
+
+CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp > CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.i
+
+CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp -o CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.s
 
 # Object files for target backend
 backend_OBJECTS = \
-"CMakeFiles/backend.dir/library.cpp.o" \
-"CMakeFiles/backend.dir/DatabaseHelper.cpp.o"
+"CMakeFiles/backend.dir/src/library.cpp.o" \
+"CMakeFiles/backend.dir/src/test.cpp.o" \
+"CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o"
 
 # External object files for target backend
 backend_EXTERNAL_OBJECTS =
 
-libbackend.a: CMakeFiles/backend.dir/library.cpp.o
-libbackend.a: CMakeFiles/backend.dir/DatabaseHelper.cpp.o
+libbackend.a: CMakeFiles/backend.dir/src/library.cpp.o
+libbackend.a: CMakeFiles/backend.dir/src/test.cpp.o
+libbackend.a: CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o
 libbackend.a: CMakeFiles/backend.dir/build.make
 libbackend.a: CMakeFiles/backend.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libbackend.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libbackend.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/backend.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/backend.dir/link.txt --verbose=$(VERBOSE)
 

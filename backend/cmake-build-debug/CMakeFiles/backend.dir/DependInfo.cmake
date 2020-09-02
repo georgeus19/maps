@@ -4,13 +4,28 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/hrubyk/projects/maps/backend/DatabaseHelper.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend.dir/DatabaseHelper.cpp.o"
-  "/home/hrubyk/projects/maps/backend/library.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend.dir/library.cpp.o"
+  "/home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o"
+  "/home/hrubyk/projects/maps/backend/src/library.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend.dir/src/library.cpp.o"
+  "/home/hrubyk/projects/maps/backend/src/test.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend.dir/src/test.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
+# Preprocessor definitions for this target.
+set(CMAKE_TARGET_DEFINITIONS_CXX
+  "_FILE_OFFSET_BITS=64"
+  "_LARGEFILE_SOURCE"
+  )
+
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../src/osm_parser"
+  "../src/tile_rendering"
+  "../src/database_helper"
+  "../include"
+  "../include/osm_parser"
+  "../include/tile_rendering"
+  "../include/database_helper"
+  "/usr/include/python3.8"
   "/usr/local/include/mapnik/agg"
   "/usr/local/include/mapnik"
   "/usr/include/freetype2"

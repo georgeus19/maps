@@ -4,10 +4,11 @@ import './primaryPanel.css';
 import SERVER_ADDRESS from './serverConsts';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl'
-
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
+import Select from "react-select";
+import AsyncSelect from "react-select/async"
+import Dropdown from 'react-bootstrap/Dropdown'
 const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
 
 function PrimaryPanel(props) {
@@ -17,7 +18,10 @@ function PrimaryPanel(props) {
     let tab;
 
     if (currentTab === TabEnum.searchTab) {
-        tab = <SearchTab currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}></SearchTab>;
+        tab = <SearchTab
+                currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
+                searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
+        ></SearchTab>;
     } else if (currentTab === TabEnum.routeTab) {
         tab = <RoutingTab currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint} pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}></RoutingTab>;
     } else if (currentTab === TabEnum.exportTab) {
@@ -134,7 +138,9 @@ function SearchTab(props) {
 
     return (
         <div className="Tab">
-            <SearchContainer></SearchContainer>
+            <SearchContainer
+                searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
+            ></SearchContainer>
         </div>
     );
 }
@@ -143,27 +149,88 @@ function SearchContainer(props) {
     return (
         <div className="SearchContainer">
             <p>Search map:</p>
-            <Search></Search>
+            <Search
+                searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
+            ></Search>
         </div>
     );
 }
 
 function Search(props) {
 
-    const [tmp, setTemp] = useState("nothing received.");
+    const [text, setText] = useState('');
+    //const [predictedObjects, setPredictedObjects] = useState([]);
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [buttonClicked, setButtonClicked] = useState(false);
+    const [key, setKey] = useState(1);
+//
+    //useEffect(() => {
+    //    if (text === '') return;
+    //    const options = {
+    //        method: 'GET'
+    //    };
+    //    fetch('https://nominatim.openstreetmap.org/search?q=' + text + '&format=json', options)
+    //        .then((response) => { console.log("data received"); return response.json();})
+    //        .then((data) => {setPredictedObjects(data); console.log(predictedObjects)});
+    //}, [text]);
+    //let placeOptions = [];
+    //predictedObjects.forEach((obj, index) => {
+    //    placeOptions.push({value: 'index', label:obj.display_name})
+    //});
+    //const options = [
+    //    { value: 'chocolate', label: 'Chocolate' },
+    //    { value: 'strawberry', label: 'Strawberry' },
+    //    { value: 'vanilla', label: 'Vanilla' },
+    //  ];
+//
+    //  const [selectedOption, setSelectedOption] = useState(null);
 
-    function GetData() {
-
+    function fetchPlaces(inputValue) {
+        if (buttonClicked === false) {
+            console.log("NO fetch.");
+            return [];
+        }
+        setButtonClicked(false);
+        console.log("fetch start");
+        if (!inputValue) {
+            return [];
+        }
         const options = {
             method: 'GET'
         };
-        fetch('test', options).then((response) => { console.log("data received"); return response.json()}).then((data) => setTemp(data.hello));
+        return fetch('https://nominatim.openstreetmap.org/search?q=' + inputValue + '&format=json', options)
+            .then((response) => { console.log("DATA FETCHED"); return response.json();})
+            .then((data) => {
+                console.log(data); 
+                return data.map((obj) => { return { value:obj, label:obj.display_name} });
+            });
     }
 
+    function showOnMap(place) {
+        //console.log("Selected place ", place);
+        props.dispatchSearchPoint({type:'render', place:place.value});
+    }
+
+//<FormControl type='select' value={text} onChange={(e) => setText(e.target.value)}></FormControl>
+//            <Button onClick={() => props.dispatchSearchPoint({type:'render'})}>Go</Button>
+//<Select
+//                defaultValue={selectedOption}
+//                onChange={setSelectedOption}
+//                options={placeOptions}
+//            />
     return (
         <div>
-            <FormControl value={tmp} onChange={(e) => setTemp(e.target.value)}></FormControl>
-            <Button onClick={() => GetData()}>GetData</Button>
+            <AsyncSelect
+                cacheOptions   
+                defaultOptions
+                loadOptions={fetchPlaces}
+                onChange={(place) => { setSelectedPlace(place); showOnMap(place) }}
+                inputValue={text}
+                onInputChange={(t) => {if (t !== '') setText(t);} }
+            />
+            <Button onClick={() => { setText(''); }}>X</Button>
+            <Button onClick={() => { setButtonClicked(true); }}>Search</Button>
+            <Button onClick={() => { if (!selectedPlace) { showOnMap(selectedPlace) } }}>Show</Button>
         </div>
     );
 }
@@ -214,3 +281,14 @@ function Export(props) {
 }
 
 export default PrimaryPanel;
+
+
+//    function GetData() {
+//        
+//        const options = {
+//            method: 'GET'
+//        };
+//        fetch('/maps/12/2197/1392.png', options).then((response) => { console.log("data received"); return response.json()}).then((data) => setTemp(data.hello));
+//    }
+//<FormControl value={props.searchPoint.address} onChange={(e) => props.dispatchSearchPoint({type:'set', value:e.target.value})}></FormControl>
+  

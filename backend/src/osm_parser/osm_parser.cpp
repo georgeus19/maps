@@ -2,7 +2,8 @@
 // Created by hrubyk on 31.08.20.
 //
 
-#include "osm_parser.h"
+#include "link_counter.h"
+#include "graph_generator.h"
 #include <osmium/io/any_input.hpp>
 #include "DatabaseHelper.h"
 #include <osmium/io/any_output.hpp>
@@ -28,8 +29,9 @@ using namespace std;
 const string kInputPath = "/home/hrubyk/Downloads/luxembourg-latest.osm.pbf";
 const string kOutputPath = "/home/hrubyk/projects/maps/backend/graph.sql";
 static size_t size_tDefault;
-using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, size_t>;
+// using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, size_t>;
 
+/*
 class Writer {
     ofstream f_;
 public:
@@ -60,67 +62,9 @@ public:
 
 
 };
+*/
+/*
 
-
-class LinkCounter : public osmium::handler::Handler {
-    index_type & nodes_ptr_;
-public:
-
-    LinkCounter(index_type & index_ptr) : nodes_ptr_(index_ptr) {}
-
-    void way(const osmium::Way& way) {
-        // Skip invalid ways.
-        // if (way.id() <= 0) {
-        //     return;
-        // }
-
-        // Skip all ways that are not roads.
-        if (way.tags().get_value_by_key("highway") == nullptr) {
-            return;
-        }
-
-
-        // std::cout << "way " << way.id() << '\n';
-
-        osmium::unsigned_object_id_type  id = way.id();
-
-        for (const osmium::NodeRef& nr : way.nodes()) {
-            // if (nr.ref() > 0) {
-
-                osmium::unsigned_object_id_type node_id = nr.positive_ref();
-                if (way.id() == 4015956) {
-                    //std::cout << "node size" << way.nodes().size() << std::endl;
-                }
-                if (node_id == 73014444146) {
-                    std::cout << "HELLO\n";
-                }
-
-                size_t value = nodes_ptr_.get_noexcept(node_id);
-                // std::cout << value << std::endl;
-                bool is_in_index = value == osmium::index::empty_value<size_t>();
-                if (is_in_index) {
-                    nodes_ptr_.set(node_id,1);
-                } else {
-                    nodes_ptr_.set(node_id,value + 1);
-                }
-                // std::cout << "Node_index_size "<< nodes_ptr_.size() << std::endl;
-                // std::cout << "AFTER INCREMENT " << nodes_ptr_.get_noexcept(node_id) << std::endl;
-            // }
-        }
-    }
-
-    void node(const osmium::Node& node) {
-        // Skip invalid nodes.
-        /*
-        if (node.id() <= 0) {
-            return;
-        }
-
-        nodes_ptr_.set(node.id(), 0);
-        std::cout << "node " << node.id() << '\n';
-        */
-    }
-};
 template <typename GeomFactory>
 class GraphGenerator : public osmium::handler::Handler {
     index_type & nodes_ptr_;
@@ -217,12 +161,11 @@ private:
     }
 };
 
-
+*/
 
 void CalculateNodeLinks(index_type & node_index) {
     auto otypes = osmium::osm_entity_bits::way; //osmium::osm_entity_bits::node |
     osmium::io::Reader reader{kInputPath, otypes};
-
 
     LinkCounter link_handler{node_index};
     osmium::apply(reader, link_handler);
@@ -262,17 +205,8 @@ int main() {
     CalculateNodeLinks(node_index);
     osmium::geom::WKBFactory<> factory{osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex};
     osmium::geom::WKTFactory<> factoryWKT{};
-    GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT};
+    GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, kOutputPath};
     //GraphGenerator<osmium::geom::WKBFactory<>> graph_generator_handler{node_index, factory};
     osmium::apply(reader, location_handler, graph_generator_handler);
     reader.close();
 }
-
-/*
-int main() {
-    osmium::io::File input_file{kInputPath}; // PBF format
-    osmium::io::Reader reader{input_file};
-
-    return 1;
-}
- */

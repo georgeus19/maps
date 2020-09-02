@@ -254,6 +254,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[landuse_gen0]]></Parameter>
@@ -392,6 +393,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[landuse_gen1]]></Parameter>
@@ -511,6 +513,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[landuse]]></Parameter>
@@ -559,6 +562,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[waterway]]></Parameter>
@@ -623,6 +627,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>
@@ -816,6 +821,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>
@@ -841,6 +847,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[water_gen0]]></Parameter>
@@ -871,6 +878,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[water_gen1]]></Parameter>
@@ -900,6 +908,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[water]]></Parameter>
@@ -976,6 +985,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[landuse_overlays]]></Parameter>
@@ -1023,6 +1033,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[admin]]></Parameter>
@@ -1113,6 +1124,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>
@@ -1244,6 +1256,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[aeroway]]></Parameter>
@@ -15163,6 +15176,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[tunnel]]></Parameter>
@@ -15227,6 +15241,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[turning_circle_case]]></Parameter>
@@ -29087,6 +29102,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[roads_high]]></Parameter>
@@ -29199,6 +29215,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>
@@ -29267,6 +29284,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>
@@ -29311,6 +29329,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>
@@ -43227,6 +43246,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[bridge]]></Parameter>
@@ -43613,6 +43633,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[place]]></Parameter>
@@ -45863,6 +45884,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[landuse_label]]></Parameter>
@@ -48801,6 +48823,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[motorway_label]]></Parameter>
@@ -49030,6 +49053,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[mainroad_label]]></Parameter>
@@ -49110,6 +49134,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[minorroad_label]]></Parameter>
@@ -49173,6 +49198,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="id"><![CDATA[waterway_label]]></Parameter>
@@ -49206,6 +49232,7 @@
     <Datasource>
       <Parameter name="dbname"><![CDATA[gis_stylesheet]]></Parameter>
       <Parameter name="extent"><![CDATA[-20037508.34,-20037508.34,20037508.34,20037508.34]]></Parameter>
+      <Parameter name="geometry_columns"><![CDATA[way]]></Parameter>
       <Parameter name="geometry_field"><![CDATA[way]]></Parameter>
       <Parameter name="host"><![CDATA[127.0.0.1]]></Parameter>
       <Parameter name="key_field"><![CDATA[]]></Parameter>

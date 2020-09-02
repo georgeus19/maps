@@ -59,10 +59,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /snap/clion/123/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /snap/clion/124/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /snap/clion/123/bin/cmake/linux/bin/cmake -E rm -f
+RM = /snap/clion/124/bin/cmake/linux/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -79,7 +79,7 @@ CMAKE_BINARY_DIR = /home/hrubyk/projects/maps/backend/cmake-build-debug
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/snap/clion/123/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/snap/clion/124/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -90,7 +90,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/snap/clion/123/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/snap/clion/124/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -131,6 +131,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named backend
+
+# Build rule for target.
+backend: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 backend
+.PHONY : backend
+
+# fast build rule for target.
+backend/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/build
+.PHONY : backend/fast
+
+#=============================================================================
 # Target rules for targets named backend_test
 
 # Build rule for target.
@@ -144,101 +157,282 @@ backend_test/fast:
 .PHONY : backend_test/fast
 
 #=============================================================================
-# Target rules for targets named backend
+# Target rules for targets named render
 
 # Build rule for target.
-backend: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 backend
-.PHONY : backend
+render: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 render
+.PHONY : render
 
 # fast build rule for target.
-backend/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/build
-.PHONY : backend/fast
+render/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/build
+.PHONY : render/fast
 
-DatabaseHelper.o: DatabaseHelper.cpp.o
+#=============================================================================
+# Target rules for targets named graph_builder
 
-.PHONY : DatabaseHelper.o
+# Build rule for target.
+graph_builder: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 graph_builder
+.PHONY : graph_builder
 
-# target to build an object file
-DatabaseHelper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/DatabaseHelper.cpp.o
-.PHONY : DatabaseHelper.cpp.o
+# fast build rule for target.
+graph_builder/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/build
+.PHONY : graph_builder/fast
 
-DatabaseHelper.i: DatabaseHelper.cpp.i
+src/database_helper/DatabaseHelper.o: src/database_helper/DatabaseHelper.cpp.o
 
-.PHONY : DatabaseHelper.i
-
-# target to preprocess a source file
-DatabaseHelper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/DatabaseHelper.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/DatabaseHelper.cpp.i
-.PHONY : DatabaseHelper.cpp.i
-
-DatabaseHelper.s: DatabaseHelper.cpp.s
-
-.PHONY : DatabaseHelper.s
-
-# target to generate assembly for a file
-DatabaseHelper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/DatabaseHelper.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/DatabaseHelper.cpp.s
-.PHONY : DatabaseHelper.cpp.s
-
-library.o: library.cpp.o
-
-.PHONY : library.o
+.PHONY : src/database_helper/DatabaseHelper.o
 
 # target to build an object file
-library.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/library.cpp.o
-.PHONY : library.cpp.o
+src/database_helper/DatabaseHelper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o
+.PHONY : src/database_helper/DatabaseHelper.cpp.o
 
-library.i: library.cpp.i
+src/database_helper/DatabaseHelper.i: src/database_helper/DatabaseHelper.cpp.i
 
-.PHONY : library.i
+.PHONY : src/database_helper/DatabaseHelper.i
 
 # target to preprocess a source file
-library.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/library.cpp.i
-.PHONY : library.cpp.i
+src/database_helper/DatabaseHelper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.i
+.PHONY : src/database_helper/DatabaseHelper.cpp.i
 
-library.s: library.cpp.s
+src/database_helper/DatabaseHelper.s: src/database_helper/DatabaseHelper.cpp.s
 
-.PHONY : library.s
+.PHONY : src/database_helper/DatabaseHelper.s
 
 # target to generate assembly for a file
-library.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/library.cpp.s
-.PHONY : library.cpp.s
+src/database_helper/DatabaseHelper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.s
+.PHONY : src/database_helper/DatabaseHelper.cpp.s
 
-test.o: test.cpp.o
+src/library.o: src/library.cpp.o
 
-.PHONY : test.o
+.PHONY : src/library.o
 
 # target to build an object file
-test.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/test.cpp.o
-.PHONY : test.cpp.o
+src/library.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/library.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/library.cpp.o
+.PHONY : src/library.cpp.o
 
-test.i: test.cpp.i
+src/library.i: src/library.cpp.i
 
-.PHONY : test.i
+.PHONY : src/library.i
 
 # target to preprocess a source file
-test.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/test.cpp.i
-.PHONY : test.cpp.i
+src/library.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/library.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/library.cpp.i
+.PHONY : src/library.cpp.i
 
-test.s: test.cpp.s
+src/library.s: src/library.cpp.s
 
-.PHONY : test.s
+.PHONY : src/library.s
 
 # target to generate assembly for a file
-test.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/test.cpp.s
-.PHONY : test.cpp.s
+src/library.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/library.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/library.cpp.s
+.PHONY : src/library.cpp.s
+
+src/osm_parser/link_counter.o: src/osm_parser/link_counter.cpp.o
+
+.PHONY : src/osm_parser/link_counter.o
+
+# target to build an object file
+src/osm_parser/link_counter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/link_counter.cpp.o
+.PHONY : src/osm_parser/link_counter.cpp.o
+
+src/osm_parser/link_counter.i: src/osm_parser/link_counter.cpp.i
+
+.PHONY : src/osm_parser/link_counter.i
+
+# target to preprocess a source file
+src/osm_parser/link_counter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/link_counter.cpp.i
+.PHONY : src/osm_parser/link_counter.cpp.i
+
+src/osm_parser/link_counter.s: src/osm_parser/link_counter.cpp.s
+
+.PHONY : src/osm_parser/link_counter.s
+
+# target to generate assembly for a file
+src/osm_parser/link_counter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/link_counter.cpp.s
+.PHONY : src/osm_parser/link_counter.cpp.s
+
+src/osm_parser/osm_parser.o: src/osm_parser/osm_parser.cpp.o
+
+.PHONY : src/osm_parser/osm_parser.o
+
+# target to build an object file
+src/osm_parser/osm_parser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/osm_parser.cpp.o
+.PHONY : src/osm_parser/osm_parser.cpp.o
+
+src/osm_parser/osm_parser.i: src/osm_parser/osm_parser.cpp.i
+
+.PHONY : src/osm_parser/osm_parser.i
+
+# target to preprocess a source file
+src/osm_parser/osm_parser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/osm_parser.cpp.i
+.PHONY : src/osm_parser/osm_parser.cpp.i
+
+src/osm_parser/osm_parser.s: src/osm_parser/osm_parser.cpp.s
+
+.PHONY : src/osm_parser/osm_parser.s
+
+# target to generate assembly for a file
+src/osm_parser/osm_parser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/osm_parser.cpp.s
+.PHONY : src/osm_parser/osm_parser.cpp.s
+
+src/osm_parser/writer.o: src/osm_parser/writer.cpp.o
+
+.PHONY : src/osm_parser/writer.o
+
+# target to build an object file
+src/osm_parser/writer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/writer.cpp.o
+.PHONY : src/osm_parser/writer.cpp.o
+
+src/osm_parser/writer.i: src/osm_parser/writer.cpp.i
+
+.PHONY : src/osm_parser/writer.i
+
+# target to preprocess a source file
+src/osm_parser/writer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/writer.cpp.i
+.PHONY : src/osm_parser/writer.cpp.i
+
+src/osm_parser/writer.s: src/osm_parser/writer.cpp.s
+
+.PHONY : src/osm_parser/writer.s
+
+# target to generate assembly for a file
+src/osm_parser/writer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/writer.cpp.s
+.PHONY : src/osm_parser/writer.cpp.s
+
+src/test.o: src/test.cpp.o
+
+.PHONY : src/test.o
+
+# target to build an object file
+src/test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/test.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/test.cpp.o
+.PHONY : src/test.cpp.o
+
+src/test.i: src/test.cpp.i
+
+.PHONY : src/test.i
+
+# target to preprocess a source file
+src/test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/test.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/test.cpp.i
+.PHONY : src/test.cpp.i
+
+src/test.s: src/test.cpp.s
+
+.PHONY : src/test.s
+
+# target to generate assembly for a file
+src/test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/test.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/test.cpp.s
+.PHONY : src/test.cpp.s
+
+src/tile_rendering/mapnik_rule_test.o: src/tile_rendering/mapnik_rule_test.cpp.o
+
+.PHONY : src/tile_rendering/mapnik_rule_test.o
+
+# target to build an object file
+src/tile_rendering/mapnik_rule_test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/mapnik_rule_test.cpp.o
+.PHONY : src/tile_rendering/mapnik_rule_test.cpp.o
+
+src/tile_rendering/mapnik_rule_test.i: src/tile_rendering/mapnik_rule_test.cpp.i
+
+.PHONY : src/tile_rendering/mapnik_rule_test.i
+
+# target to preprocess a source file
+src/tile_rendering/mapnik_rule_test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/mapnik_rule_test.cpp.i
+.PHONY : src/tile_rendering/mapnik_rule_test.cpp.i
+
+src/tile_rendering/mapnik_rule_test.s: src/tile_rendering/mapnik_rule_test.cpp.s
+
+.PHONY : src/tile_rendering/mapnik_rule_test.s
+
+# target to generate assembly for a file
+src/tile_rendering/mapnik_rule_test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/mapnik_rule_test.cpp.s
+.PHONY : src/tile_rendering/mapnik_rule_test.cpp.s
+
+src/tile_rendering/mapnik_xml_test.o: src/tile_rendering/mapnik_xml_test.cpp.o
+
+.PHONY : src/tile_rendering/mapnik_xml_test.o
+
+# target to build an object file
+src/tile_rendering/mapnik_xml_test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/mapnik_xml_test.cpp.o
+.PHONY : src/tile_rendering/mapnik_xml_test.cpp.o
+
+src/tile_rendering/mapnik_xml_test.i: src/tile_rendering/mapnik_xml_test.cpp.i
+
+.PHONY : src/tile_rendering/mapnik_xml_test.i
+
+# target to preprocess a source file
+src/tile_rendering/mapnik_xml_test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/mapnik_xml_test.cpp.i
+.PHONY : src/tile_rendering/mapnik_xml_test.cpp.i
+
+src/tile_rendering/mapnik_xml_test.s: src/tile_rendering/mapnik_xml_test.cpp.s
+
+.PHONY : src/tile_rendering/mapnik_xml_test.s
+
+# target to generate assembly for a file
+src/tile_rendering/mapnik_xml_test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/mapnik_xml_test.cpp.s
+.PHONY : src/tile_rendering/mapnik_xml_test.cpp.s
+
+src/tile_rendering/rendermodule.o: src/tile_rendering/rendermodule.cpp.o
+
+.PHONY : src/tile_rendering/rendermodule.o
+
+# target to build an object file
+src/tile_rendering/rendermodule.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/rendermodule.cpp.o
+.PHONY : src/tile_rendering/rendermodule.cpp.o
+
+src/tile_rendering/rendermodule.i: src/tile_rendering/rendermodule.cpp.i
+
+.PHONY : src/tile_rendering/rendermodule.i
+
+# target to preprocess a source file
+src/tile_rendering/rendermodule.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/rendermodule.cpp.i
+.PHONY : src/tile_rendering/rendermodule.cpp.i
+
+src/tile_rendering/rendermodule.s: src/tile_rendering/rendermodule.cpp.s
+
+.PHONY : src/tile_rendering/rendermodule.s
+
+# target to generate assembly for a file
+src/tile_rendering/rendermodule.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/render.dir/build.make CMakeFiles/render.dir/src/tile_rendering/rendermodule.cpp.s
+.PHONY : src/tile_rendering/rendermodule.cpp.s
 
 # Help Target
 help:
@@ -250,15 +444,35 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... backend"
 	@echo "... backend_test"
-	@echo "... DatabaseHelper.o"
-	@echo "... DatabaseHelper.i"
-	@echo "... DatabaseHelper.s"
-	@echo "... library.o"
-	@echo "... library.i"
-	@echo "... library.s"
-	@echo "... test.o"
-	@echo "... test.i"
-	@echo "... test.s"
+	@echo "... graph_builder"
+	@echo "... render"
+	@echo "... src/database_helper/DatabaseHelper.o"
+	@echo "... src/database_helper/DatabaseHelper.i"
+	@echo "... src/database_helper/DatabaseHelper.s"
+	@echo "... src/library.o"
+	@echo "... src/library.i"
+	@echo "... src/library.s"
+	@echo "... src/osm_parser/link_counter.o"
+	@echo "... src/osm_parser/link_counter.i"
+	@echo "... src/osm_parser/link_counter.s"
+	@echo "... src/osm_parser/osm_parser.o"
+	@echo "... src/osm_parser/osm_parser.i"
+	@echo "... src/osm_parser/osm_parser.s"
+	@echo "... src/osm_parser/writer.o"
+	@echo "... src/osm_parser/writer.i"
+	@echo "... src/osm_parser/writer.s"
+	@echo "... src/test.o"
+	@echo "... src/test.i"
+	@echo "... src/test.s"
+	@echo "... src/tile_rendering/mapnik_rule_test.o"
+	@echo "... src/tile_rendering/mapnik_rule_test.i"
+	@echo "... src/tile_rendering/mapnik_rule_test.s"
+	@echo "... src/tile_rendering/mapnik_xml_test.o"
+	@echo "... src/tile_rendering/mapnik_xml_test.i"
+	@echo "... src/tile_rendering/mapnik_xml_test.s"
+	@echo "... src/tile_rendering/rendermodule.o"
+	@echo "... src/tile_rendering/rendermodule.i"
+	@echo "... src/tile_rendering/rendermodule.s"
 .PHONY : help
 
 

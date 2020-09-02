@@ -2,10 +2,37 @@ cmake_minimum_required(VERSION 3.17)
 project(backend)
 
 set(CMAKE_CXX_STANDARD 20)
+file(GLOB OsmParserGlob src/osm_parser/*.cpp include/osm_parser/*.h)
+file(GLOB DatabaseHelperGlob src/database_helper/*.cpp include/database_helper/*.h)
+file(GLOB TileRenderingGlob src/tile_rendering/*.cpp include/tile_rendering/*.h)
+file(GLOB OthersGlob src/*.cpp include/*.h)
 
-add_library(backend library.cpp library.h DatabaseHelper.cpp DatabaseHelper.h)
-add_executable(backend_test test.cpp DatabaseHelper.cpp DatabaseHelper.h)
+add_library(backend ${OthersGlob} ${DatabaseHelperGlob})
+add_executable(backend_test ${OthersGlob} ${DatabaseHelperGlob})
+add_library(render ${TileRenderingGlob})
+add_executable(graph_builder ${OsmParserGlob})
 
+include_directories(src/osm_parser/)
+include_directories(src/tile_rendering/)
+include_directories(src/database_helper/)
+
+include_directories(include/)
+include_directories(include/osm_parser/)
+include_directories(include/tile_rendering/)
+include_directories(include/database_helper/)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package(Osmium REQUIRED)
+if(NOT OSMIUM_FOUND)
+    message(WARNING "Libosmium not found!\n")
+endif()
+include_directories(${OSMIUM_INCLUDE_DIRS})
+
+target_link_libraries(graph_builder -lpthread -lz -lexpat -lbz2)
+
+include_directories(/usr/include/python3.8/)
+
+link_directories(render /usr/local/li)
 
 include_directories(/usr/local/include)
 include_directories(/usr/local/include/mapnik/agg /usr/local/include/mapnik)

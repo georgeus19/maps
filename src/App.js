@@ -4,16 +4,25 @@ import './App.css';
 import PrimaryPanel from './primaryPanel.js';
 import MapSection from './mapSection.js';
 
+
 function App() {
 
 	const [currentPoint, setCurrentPoint] = useState(-1);
 	const [pathPoints, dispatchPoints] = useReducer(pathPointsReducer, [{name:'', latLon:[null, null]}, {name:'', latLon:[null, null]}])
-
+	const [searchPoint, dispatchSearchPoint] = useReducer(searchPointReducer, {address:'', latLon:[49.7315809334801,13.384550088168409], zoom:13, render:false})
 
 	return (
     	<div className="App">
-        	<MapSection currentPoint={currentPoint} setCurrentPoint={setCurrentPoint} pathPoints={pathPoints} dispatchPoints={dispatchPoints}/>
-        	<PrimaryPanel currentPoint={currentPoint} setCurrentPoint={setCurrentPoint} pathPoints={pathPoints} dispatchPoints={dispatchPoints}/>
+        	<MapSection 
+				currentPoint={currentPoint} setCurrentPoint={setCurrentPoint}
+				pathPoints={pathPoints} dispatchPoints={dispatchPoints}
+				searchPoint={searchPoint} dispatchSearchPoint={dispatchSearchPoint}
+			/>
+        	<PrimaryPanel 
+				currentPoint={currentPoint} setCurrentPoint={setCurrentPoint}
+				pathPoints={pathPoints} dispatchPoints={dispatchPoints}
+				searchPoint={searchPoint} dispatchSearchPoint={dispatchSearchPoint}
+			/>
     {/*
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -31,6 +40,36 @@ function App() {
       </header>*/}
 		</div>
 	);	
+}
+
+function searchPointReducer(searchPoint, action) {
+	switch (action.type) {
+		case 'set':
+			return {address:action.value, latLon:searchPoint.latLon, zoom:searchPoint.zoom, render:false}
+		case 'render':
+			// TODO: nominatim find latlong
+			// right now we get latlong !
+			// var obj = findObject(searchPoint.address);
+			// console.log(obj);
+			return {address:action.place.display_text, latLon:[action.place.lat, action.place.lon], zoom:16, render:true}
+			//var latlon = searchPoint.address.split(',');
+			//var tmp = {address:searchPoint.address, latLon:[parseFloat(latlon[0]), parseFloat(latlon[1])], zoom:13, render:true};
+			////console.log(tmp);
+			//return tmp;
+		case 'off':
+			return {address:searchPoint.address, latLon:searchPoint.latLon, zoom:searchPoint.zoom, render:false};
+
+	}
+}
+
+
+async function findObject(address) {
+	const options = {
+		method: 'GET'
+	};
+	return await fetch('https://nominatim.openstreetmap.org/search?q=' + address + '&format=json', options)
+		.then((response) => { console.log("data received"); return response.json();})
+		.then((data) =>{console.log ("DD", data); return data;});
 }
 
 function pathPointsReducer(pathPoints, action) {

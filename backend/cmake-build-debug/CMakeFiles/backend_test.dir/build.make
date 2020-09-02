@@ -54,10 +54,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /snap/clion/123/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /snap/clion/124/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /snap/clion/123/bin/cmake/linux/bin/cmake -E rm -f
+RM = /snap/clion/124/bin/cmake/linux/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -77,45 +77,60 @@ include CMakeFiles/backend_test.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/backend_test.dir/flags.make
 
-CMakeFiles/backend_test.dir/test.cpp.o: CMakeFiles/backend_test.dir/flags.make
-CMakeFiles/backend_test.dir/test.cpp.o: ../test.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/backend_test.dir/test.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend_test.dir/test.cpp.o -c /home/hrubyk/projects/maps/backend/test.cpp
+CMakeFiles/backend_test.dir/src/library.cpp.o: CMakeFiles/backend_test.dir/flags.make
+CMakeFiles/backend_test.dir/src/library.cpp.o: ../src/library.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/backend_test.dir/src/library.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend_test.dir/src/library.cpp.o -c /home/hrubyk/projects/maps/backend/src/library.cpp
 
-CMakeFiles/backend_test.dir/test.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend_test.dir/test.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/test.cpp > CMakeFiles/backend_test.dir/test.cpp.i
+CMakeFiles/backend_test.dir/src/library.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend_test.dir/src/library.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/src/library.cpp > CMakeFiles/backend_test.dir/src/library.cpp.i
 
-CMakeFiles/backend_test.dir/test.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend_test.dir/test.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/test.cpp -o CMakeFiles/backend_test.dir/test.cpp.s
+CMakeFiles/backend_test.dir/src/library.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend_test.dir/src/library.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/src/library.cpp -o CMakeFiles/backend_test.dir/src/library.cpp.s
 
-CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o: CMakeFiles/backend_test.dir/flags.make
-CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o: ../DatabaseHelper.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o -c /home/hrubyk/projects/maps/backend/DatabaseHelper.cpp
+CMakeFiles/backend_test.dir/src/test.cpp.o: CMakeFiles/backend_test.dir/flags.make
+CMakeFiles/backend_test.dir/src/test.cpp.o: ../src/test.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/backend_test.dir/src/test.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend_test.dir/src/test.cpp.o -c /home/hrubyk/projects/maps/backend/src/test.cpp
 
-CMakeFiles/backend_test.dir/DatabaseHelper.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend_test.dir/DatabaseHelper.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/DatabaseHelper.cpp > CMakeFiles/backend_test.dir/DatabaseHelper.cpp.i
+CMakeFiles/backend_test.dir/src/test.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend_test.dir/src/test.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/src/test.cpp > CMakeFiles/backend_test.dir/src/test.cpp.i
 
-CMakeFiles/backend_test.dir/DatabaseHelper.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend_test.dir/DatabaseHelper.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/DatabaseHelper.cpp -o CMakeFiles/backend_test.dir/DatabaseHelper.cpp.s
+CMakeFiles/backend_test.dir/src/test.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend_test.dir/src/test.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/src/test.cpp -o CMakeFiles/backend_test.dir/src/test.cpp.s
+
+CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o: CMakeFiles/backend_test.dir/flags.make
+CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o: ../src/database_helper/DatabaseHelper.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o -c /home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp
+
+CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp > CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.i
+
+CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp -o CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.s
 
 # Object files for target backend_test
 backend_test_OBJECTS = \
-"CMakeFiles/backend_test.dir/test.cpp.o" \
-"CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o"
+"CMakeFiles/backend_test.dir/src/library.cpp.o" \
+"CMakeFiles/backend_test.dir/src/test.cpp.o" \
+"CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o"
 
 # External object files for target backend_test
 backend_test_EXTERNAL_OBJECTS =
 
-backend_test: CMakeFiles/backend_test.dir/test.cpp.o
-backend_test: CMakeFiles/backend_test.dir/DatabaseHelper.cpp.o
+backend_test: CMakeFiles/backend_test.dir/src/library.cpp.o
+backend_test: CMakeFiles/backend_test.dir/src/test.cpp.o
+backend_test: CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o
 backend_test: CMakeFiles/backend_test.dir/build.make
 backend_test: CMakeFiles/backend_test.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable backend_test"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable backend_test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/backend_test.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
