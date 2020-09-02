@@ -45,6 +45,7 @@ int main() {
     auto otypes = osmium::osm_entity_bits::node | osmium::osm_entity_bits::way;
     osmium::io::Reader reader{kInputPath, otypes};
     string index_type_name = "sparse_mem_map";
+    string table_name = "edges";
     //const auto& map_factory = osmium::index::SparseMemMapFactory<osmium::unsigned_object_id_type, size_t>::instance();
     using location_index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
     using location_handler_type = osmium::handler::NodeLocationsForWays<location_index_type>;
@@ -56,7 +57,8 @@ int main() {
     CalculateNodeLinks(node_index);
     osmium::geom::WKBFactory<> factory{osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex};
     osmium::geom::WKTFactory<> factoryWKT{};
-    GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, kOutputPath};
+    FileWriter sql_writer{kOutputPath};
+    GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, sql_writer, table_name};
     //GraphGenerator<osmium::geom::WKBFactory<>> graph_generator_handler{node_index, factory};
     osmium::apply(reader, location_handler, graph_generator_handler);
     reader.close();

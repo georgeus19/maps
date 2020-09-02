@@ -242,6 +242,33 @@ src/library.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/library.cpp.s
 .PHONY : src/library.cpp.s
 
+src/osm_parser/edge.o: src/osm_parser/edge.cpp.o
+
+.PHONY : src/osm_parser/edge.o
+
+# target to build an object file
+src/osm_parser/edge.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/edge.cpp.o
+.PHONY : src/osm_parser/edge.cpp.o
+
+src/osm_parser/edge.i: src/osm_parser/edge.cpp.i
+
+.PHONY : src/osm_parser/edge.i
+
+# target to preprocess a source file
+src/osm_parser/edge.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/edge.cpp.i
+.PHONY : src/osm_parser/edge.cpp.i
+
+src/osm_parser/edge.s: src/osm_parser/edge.cpp.s
+
+.PHONY : src/osm_parser/edge.s
+
+# target to generate assembly for a file
+src/osm_parser/edge.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/src/osm_parser/edge.cpp.s
+.PHONY : src/osm_parser/edge.cpp.s
+
 src/osm_parser/link_counter.o: src/osm_parser/link_counter.cpp.o
 
 .PHONY : src/osm_parser/link_counter.o
@@ -452,6 +479,9 @@ help:
 	@echo "... src/library.o"
 	@echo "... src/library.i"
 	@echo "... src/library.s"
+	@echo "... src/osm_parser/edge.o"
+	@echo "... src/osm_parser/edge.i"
+	@echo "... src/osm_parser/edge.s"
 	@echo "... src/osm_parser/link_counter.o"
 	@echo "... src/osm_parser/link_counter.i"
 	@echo "... src/osm_parser/link_counter.s"

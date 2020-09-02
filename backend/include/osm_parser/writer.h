@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include "edge.h"
 #include <osmium/handler.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/way.hpp>
@@ -20,15 +20,24 @@
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/geom/wkt.hpp>
 
-class Writer {
+class IWriter{
+public:
+    virtual void WriteCreateTableSql(const std::string& table_name) = 0;
+
+    virtual void WriteCreateInsertSql(const std::string & table_name, const Edge & edge) = 0;
+
+    virtual ~IWriter() {}
+};
+
+class FileWriter : public IWriter {
     std::ofstream f_;
 public:
-    Writer(const std::string & file_name);
+    FileWriter(const std::string & file_name);
 
-    ~Writer();
+    virtual ~FileWriter();
 
     void WriteCreateTableSql(const std::string& table_name);
 
-    void WriteCreateInsertSql(const std::string & table_name, const std::string & osm_id, const std::string & geog, const std::string & from, const std::string & to);
+    void WriteCreateInsertSql(const std::string & table_name, const Edge & edge);
 };
 #endif //BACKEND_WRITER_H

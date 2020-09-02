@@ -4,16 +4,16 @@
 #include "writer.h"
 using namespace std;
 
-Writer::Writer(const string & file_name) {
+FileWriter::FileWriter(const string & file_name) {
     f_ = ofstream{};
     f_.open(file_name);
 }
 
-Writer::~Writer() {
+FileWriter::~FileWriter() {
     f_.close();
 }
 
-void Writer::WriteCreateTableSql(const string& table_name) {
+void FileWriter::WriteCreateTableSql(const string& table_name) {
     string sql = "CREATE TABLE " + table_name + "("  \
         "id serial   NOT NULL," \
         "osm_id INT   NOT NULL," \
@@ -23,8 +23,8 @@ void Writer::WriteCreateTableSql(const string& table_name) {
     f_ << sql << std::endl;
 }
 
-void Writer::WriteCreateInsertSql(const string & table_name, const string & osm_id, const string & geog, const string & from, const string & to) {
+void FileWriter::WriteCreateInsertSql(const string & table_name, const Edge & edge) {
     string sql = "INSERT INTO " + table_name + " (osm_id, geog, from, to) "  \
-         "VALUES (" + osm_id + ", " + geog + ", " + from + ", " + to + " );";
+         "VALUES (" + edge.get_osm_id() + ", " + edge.get_geography() + ", " + edge.get_from() + ", " + edge.get_to() + " );";
     f_ << sql << std::endl;
 }

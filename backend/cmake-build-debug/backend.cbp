@@ -382,13 +382,13 @@
 			<Option target="backend"/>
 			<Option target="backend_test"/>
 		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/osm_parser/edge.h">
+			<Option target="graph_builder"/>
+		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/osm_parser/graph_generator.h">
 			<Option target="graph_builder"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/osm_parser/link_counter.h">
-			<Option target="graph_builder"/>
-		</Unit>
-		<Unit filename="/home/hrubyk/projects/maps/backend/include/osm_parser/osm_parser.h">
 			<Option target="graph_builder"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/osm_parser/writer.h">
@@ -404,6 +404,9 @@
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/library.cpp">
 			<Option target="backend"/>
 			<Option target="backend_test"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/osm_parser/edge.cpp">
+			<Option target="graph_builder"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/osm_parser/link_counter.cpp">
 			<Option target="graph_builder"/>

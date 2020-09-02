@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/graph_builder.dir/src/osm_parser/edge.cpp.o"
   "CMakeFiles/graph_builder.dir/src/osm_parser/link_counter.cpp.o"
   "CMakeFiles/graph_builder.dir/src/osm_parser/osm_parser.cpp.o"
   "CMakeFiles/graph_builder.dir/src/osm_parser/writer.cpp.o"

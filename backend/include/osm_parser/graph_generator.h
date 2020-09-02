@@ -8,6 +8,7 @@
 #include <osmium/io/any_input.hpp>
 #include "DatabaseHelper.h"
 #include "writer.h"
+#include "edge.h"
 #include <osmium/io/any_output.hpp>
 #include <string>
 
@@ -31,13 +32,15 @@ template <typename GeomFactory>
 class GraphGenerator : public osmium::handler::Handler {
     index_type & nodes_ptr_;
     GeomFactory factory_;
-    Writer writer_;
+    IWriter& writer_;
+    std::string table_name_;
 
     using const_nodelist_iterator = osmium::WayNodeList::const_iterator;
 
 public:
 
-    GraphGenerator(index_type & index_ptr, const GeomFactory & factory, std::string output_path) : nodes_ptr_(index_ptr), factory_{factory}, writer_{output_path} {}
+    GraphGenerator(index_type & index_ptr, const GeomFactory & factory, IWriter & w, const std::string & table_name)
+        : nodes_ptr_(index_ptr), factory_{factory}, writer_{w},  table_name_{table_name} {}
 
     void way(const osmium::Way& way) {
         // Skip all ways that are not roads.
@@ -61,9 +64,12 @@ public:
             }
             std::cout << std::endl;
         }
-        const_nodelist_iterator it1 = nodes.cbegin();
-        const_nodelist_iterator it2 = nodes.cend();
-        SaveEdge(it1, it2);
+        {
+            const_nodelist_iterator it1 = nodes.cbegin();
+            const_nodelist_iterator it2 = nodes.cend();
+            Edge edge{way.positive_id(), it1->positive_ref(), it2->positive_ref()};
+            SaveEdge(it1, it2, edge);
+        }
 
         const_nodelist_iterator first = nodes.cbegin();
         const_nodelist_iterator second = nodes.cbegin();
@@ -85,7 +91,9 @@ public:
             if (is_intersection) {
                 const_nodelist_iterator to = second;
                 // Incrementing `to` since we include the intersection point in the linestring.
-                SaveEdge(first, ++to);
+                ++to;
+                Edge edge{way.positive_id(), first->positive_ref(), to->positive_ref()};
+                SaveEdge(first, to, edge);
                 first = second;
             }
             ++i;
@@ -98,18 +106,20 @@ public:
         // way segment.
         const_nodelist_iterator it = first;
         if (++it != nodes.cend()) {
-            SaveEdge(first, second);
+            Edge edge{way.positive_id(), first->positive_ref(), second->positive_ref()};
+            SaveEdge(first, second, edge);
         }
         first = second;
     }
 
 private:
 
-    void SaveEdge(const_nodelist_iterator & from, const_nodelist_iterator & to) {
+    void SaveEdge(const_nodelist_iterator & from, const_nodelist_iterator & to, Edge & edge) {
         auto&& linestring = CreateLineString(from, to);
-        // std::cout << linestring << std::endl;
+        edge.set_geography(std::move(linestring));
         // Write sql command to insert row.
-        //writer_.WriteCreateInsertSql()
+        writer_.WriteCreateInsertSql(table_name_, edge);
+
     }
 
     std::string CreateLineString(const_nodelist_iterator from, const_nodelist_iterator to) {

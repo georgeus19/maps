@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/hrubyk/projects/maps/backend/src/osm_parser/edge.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/graph_builder.dir/src/osm_parser/edge.cpp.o"
   "/home/hrubyk/projects/maps/backend/src/osm_parser/link_counter.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/graph_builder.dir/src/osm_parser/link_counter.cpp.o"
   "/home/hrubyk/projects/maps/backend/src/osm_parser/osm_parser.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/graph_builder.dir/src/osm_parser/osm_parser.cpp.o"
   "/home/hrubyk/projects/maps/backend/src/osm_parser/writer.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/graph_builder.dir/src/osm_parser/writer.cpp.o"
