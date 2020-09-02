@@ -1,2 +1,0 @@
-/usr/bin/ar qc libbackend.a  CMakeFiles/backend.dir/library.cpp.o CMakeFiles/backend.dir/DatabaseHelper.cpp.o
-/usr/bin/ranlib libbackend.a
