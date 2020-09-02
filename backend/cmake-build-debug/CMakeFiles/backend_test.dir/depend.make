@@ -5,5 +5,6 @@ CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o: ../src/dat
 
 CMakeFiles/backend_test.dir/src/library.cpp.o: ../src/library.cpp
 
+CMakeFiles/backend_test.dir/src/test.cpp.o: ../include/database_helper/DatabaseHelper.h
 CMakeFiles/backend_test.dir/src/test.cpp.o: ../src/test.cpp
 

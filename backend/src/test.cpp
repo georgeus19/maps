@@ -86,7 +86,7 @@ int CRender(int tile_x, int tile_y, int zoom, const string& tile_path) {
 }
 
 int main() {
-    return CRender(2197, 1392, 12, "/home/hrubyk/projects/maps/tiles/t2197_1392_12.png");
+    return CRender(2197, 1392, 12, "/home/hrubyk/projects/maps/test_tile.png");
 /*
     mapnik::datasource_cache::instance().register_datasources("/usr/local/lib/mapnik/input");
     mapnik::Map m(600,300);
