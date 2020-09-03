@@ -36,13 +36,13 @@ class InsertWriter : public IWriter {
 public:
     InsertWriter(const std::string & file_name);
 
-    virtual ~InsertWriter();
+    ~InsertWriter() override;
 
-    void WriteInitSql(const std::string& table_name);
+    void WriteInitSql(const std::string& table_name) override;
 
-    void WriteEdge(const std::string & table_name, const Edge & edge);
+    void WriteEdge(const std::string & table_name, const Edge & edge) override;
 
-    void WriteFinishSql(const std::string& table_name);
+    void WriteFinishSql(const std::string& table_name) override;
 };
 
 class CopyWriter : public IWriter {
@@ -53,13 +53,13 @@ class CopyWriter : public IWriter {
 public:
     CopyWriter(const std::string & sql_path, const std::string & data_path);
 
-    virtual ~CopyWriter();
+    ~CopyWriter() override;
 
-    void WriteInitSql(const std::string& table_name);
+    void WriteInitSql(const std::string& table_name) override;
 
-    void WriteEdge(const std::string & table_name, const Edge & edge);
+    void WriteEdge(const std::string & table_name, const Edge & edge) override;
 
-    void WriteFinishSql(const std::string& table_name);
+    void WriteFinishSql(const std::string& table_name) override;
 };
 
 #endif //BACKEND_WRITER_H
