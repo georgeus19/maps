@@ -1,0 +1,10 @@
+run apache - or just reload
+sudo service apache2 start
+sudo service apache2 stop
+sudo service apache2 reload
+
+run renderd in background : sudo /etc/init.d/renderd start
+
+run yarn start
+
+run yarn start api
