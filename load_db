@@ -1,2 +1,0 @@
-osm2pgsql -c --slim --hstore -G --username postgres --database gis_stylesheet czech_republic-2020-07-11.osm.pbf 
-

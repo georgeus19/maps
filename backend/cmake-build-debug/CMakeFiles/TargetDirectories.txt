@@ -1,6 +1,0 @@
-/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend.dir
-/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend_test.dir
-/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/render.dir
-/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/graph_builder.dir
