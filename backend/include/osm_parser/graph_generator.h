@@ -66,17 +66,18 @@ public:
         const_nodelist_iterator first = nodes.cbegin();
         const_nodelist_iterator second = nodes.cbegin();
         ++second;
-        size_t i = 0;
         for(; second != nodes.cend(); ++second) {
 
             size_t value = nodes_ptr_.get_noexcept(second->positive_ref());
             bool not_in_index = value == osmium::index::empty_value<size_t>();
             // All of these nodes should definitely be in the index.
+
             if (not_in_index) {
                 std::cout << "Node not found in link index??" << std::endl;
                 std::cout << second->positive_ref() << std::endl;
                 throw 1;
             }
+
             bool is_intersection = value > 1 && value != osmium::index::empty_value<size_t>();
             if (is_intersection) {
                 const_nodelist_iterator to = second;
@@ -86,7 +87,6 @@ public:
                 SaveEdge(first, to, edge);
                 first = second;
             }
-            ++i;
         }
 
         // Create a way segment from first to the last point in `nodes`.

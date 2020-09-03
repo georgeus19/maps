@@ -28,13 +28,13 @@ using location_index_type = osmium::index::map::SparseMemArray<osmium::unsigned_
 using location_handler_type = osmium::handler::NodeLocationsForWays<location_index_type>;
 
 void CalculateNodeLinks(index_type & node_index, const std::string & input_path) {
-    auto otypes = osmium::osm_entity_bits::way; //osmium::osm_entity_bits::node |
+    auto otypes = osmium::osm_entity_bits::way;
     osmium::io::Reader reader{input_path, otypes};
 
     LinkCounter link_handler{node_index};
     osmium::apply(reader, link_handler);
     reader.close();
-    std::cout << "Node links calculated" << std::endl;
+    std::cout << "Node links calculated." << std::endl;
 }
 
 void GenerateGraph(index_type & node_index, const std::string & input_path, const string & table_name,  const string & output_sql_path, const string & output_data_path) {

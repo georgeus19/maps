@@ -30,8 +30,6 @@ public:
     LinkCounter(index_type & index_ptr);
 
     void way(const osmium::Way& way);
-
-    void node(const osmium::Node& node);
 };
 
 #endif //BACKEND_LINK_COUNTER_H

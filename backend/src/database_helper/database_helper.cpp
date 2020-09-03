@@ -76,3 +76,4 @@ void DatabaseHelper::LoadGraph(double lon, double lat, double radius, const stri
 std::string DatabaseHelper::MakeSTPoint(double lon, double lat) {
     return "POINT(" + to_string(lon) + " " + to_string(lat) + ")"; // e.g. POINT(13.3915000 49.7262000)
 }
+
