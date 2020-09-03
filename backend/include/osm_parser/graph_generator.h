@@ -6,7 +6,7 @@
 #define BACKEND_GRAPH_GENERATOR_H
 #include "link_counter.h"
 #include <osmium/io/any_input.hpp>
-#include "DatabaseHelper.h"
+
 #include "writer.h"
 #include "edge.h"
 #include <osmium/io/any_output.hpp>
@@ -48,36 +48,26 @@ public:
             return;
         }
 
-        // std::cout << "way " << way.id() << '\n';
-
-        // std::cout << "Node_index_size "<< nodes_ptr_.size() << std::endl;
         const osmium::WayNodeList & nodes = way.nodes();
-        // std::cout << "nodes size " << nodes.size() << '\n';
         if (nodes.size() < 2) {
             std::cout << "Way consists of less than 2 points." << std::endl;
-            throw 2;
+            return;
         }
-        if (way.id() == 10903355) {
-            std::cout << "HELLO\n";
-            for(auto&& nr : nodes) {
-                std::cout << nr.positive_ref() << " " << nr.ref() << " ";
-            }
-            std::cout << std::endl;
-        }
+
+        /* Save original way.
         {
             const_nodelist_iterator it1 = nodes.cbegin();
             const_nodelist_iterator it2 = nodes.cend();
             Edge edge{way.positive_id(), it1->positive_ref(), it2->positive_ref()};
             SaveEdge(it1, it2, edge);
         }
+         */
 
         const_nodelist_iterator first = nodes.cbegin();
         const_nodelist_iterator second = nodes.cbegin();
         ++second;
         size_t i = 0;
         for(; second != nodes.cend(); ++second) {
-            // Skip invalid nodes. - TOOD what is such a node is a first or last one???
-            // if (second->ref() < 0) continue;
 
             size_t value = nodes_ptr_.get_noexcept(second->positive_ref());
             bool not_in_index = value == osmium::index::empty_value<size_t>();
@@ -116,10 +106,11 @@ private:
 
     void SaveEdge(const_nodelist_iterator & from, const_nodelist_iterator & to, Edge & edge) {
         auto&& linestring = CreateLineString(from, to);
-        edge.set_geography(std::move(linestring));
-        // Write sql command to insert row.
-        writer_.WriteCreateInsertSql(table_name_, edge);
-
+        if (linestring != "") {
+            edge.set_geography(std::move(linestring));
+            // Write sql command to insert row.
+            writer_.WriteEdge(table_name_, edge);
+        }
     }
 
     std::string CreateLineString(const_nodelist_iterator from, const_nodelist_iterator to) {
@@ -127,7 +118,8 @@ private:
         size_t point_count = factory_.fill_linestring_unique(from, to);
         if (point_count < 2) {
             std::cout << "Way segment consists of less than 2 points." << std::endl;
-            //throw 2;
+            factory_.linestring_finish(point_count);
+            return "";
         }
         return factory_.linestring_finish(point_count);
     }

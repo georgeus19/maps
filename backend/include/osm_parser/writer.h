@@ -22,22 +22,44 @@
 
 class IWriter{
 public:
-    virtual void WriteCreateTableSql(const std::string& table_name) = 0;
+    virtual void WriteInitSql(const std::string& table_name) = 0;
 
-    virtual void WriteCreateInsertSql(const std::string & table_name, const Edge & edge) = 0;
+    virtual void WriteEdge(const std::string & table_name, const Edge & edge) = 0;
+
+    virtual void WriteFinishSql(const std::string& table_name) = 0;
 
     virtual ~IWriter() {}
 };
 
-class FileWriter : public IWriter {
+class InsertWriter : public IWriter {
     std::ofstream f_;
 public:
-    FileWriter(const std::string & file_name);
+    InsertWriter(const std::string & file_name);
 
-    virtual ~FileWriter();
+    virtual ~InsertWriter();
 
-    void WriteCreateTableSql(const std::string& table_name);
+    void WriteInitSql(const std::string& table_name);
 
-    void WriteCreateInsertSql(const std::string & table_name, const Edge & edge);
+    void WriteEdge(const std::string & table_name, const Edge & edge);
+
+    void WriteFinishSql(const std::string& table_name);
 };
+
+class CopyWriter : public IWriter {
+    std::ofstream f_init_table_;
+    std::ofstream f_data_;
+    std::string data_path_;
+
+public:
+    CopyWriter(const std::string & sql_path, const std::string & data_path);
+
+    virtual ~CopyWriter();
+
+    void WriteInitSql(const std::string& table_name);
+
+    void WriteEdge(const std::string & table_name, const Edge & edge);
+
+    void WriteFinishSql(const std::string& table_name);
+};
+
 #endif //BACKEND_WRITER_H

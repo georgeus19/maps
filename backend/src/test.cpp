@@ -1,4 +1,4 @@
-#include "DatabaseHelper.h"
+#include "database_helper.h"
 #include <iostream>
 #include <string>
 #include <mapnik/map.hpp>

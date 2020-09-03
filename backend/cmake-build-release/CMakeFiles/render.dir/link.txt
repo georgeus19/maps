@@ -1,0 +1,2 @@
+/usr/bin/ar qc librender.a  CMakeFiles/render.dir/src/tile_rendering/mapnik_rule_test.cpp.o CMakeFiles/render.dir/src/tile_rendering/mapnik_xml_test.cpp.o CMakeFiles/render.dir/src/tile_rendering/rendermodule.cpp.o
+/usr/bin/ranlib librender.a

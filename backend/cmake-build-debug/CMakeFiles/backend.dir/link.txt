@@ -1,2 +1,2 @@
-/usr/bin/ar qc libbackend.a  CMakeFiles/backend.dir/src/library.cpp.o CMakeFiles/backend.dir/src/test.cpp.o CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o
+/usr/bin/ar qc libbackend.a  CMakeFiles/backend.dir/src/library.cpp.o CMakeFiles/backend.dir/src/test.cpp.o CMakeFiles/backend.dir/src/database_helper/database_helper.cpp.o
 /usr/bin/ranlib libbackend.a

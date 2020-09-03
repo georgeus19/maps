@@ -182,35 +182,35 @@ graph_builder/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/graph_builder.dir/build.make CMakeFiles/graph_builder.dir/build
 .PHONY : graph_builder/fast
 
-src/database_helper/DatabaseHelper.o: src/database_helper/DatabaseHelper.cpp.o
+src/database_helper/database_helper.o: src/database_helper/database_helper.cpp.o
 
-.PHONY : src/database_helper/DatabaseHelper.o
+.PHONY : src/database_helper/database_helper.o
 
 # target to build an object file
-src/database_helper/DatabaseHelper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o
-.PHONY : src/database_helper/DatabaseHelper.cpp.o
+src/database_helper/database_helper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/database_helper.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/database_helper.cpp.o
+.PHONY : src/database_helper/database_helper.cpp.o
 
-src/database_helper/DatabaseHelper.i: src/database_helper/DatabaseHelper.cpp.i
+src/database_helper/database_helper.i: src/database_helper/database_helper.cpp.i
 
-.PHONY : src/database_helper/DatabaseHelper.i
+.PHONY : src/database_helper/database_helper.i
 
 # target to preprocess a source file
-src/database_helper/DatabaseHelper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.i
-.PHONY : src/database_helper/DatabaseHelper.cpp.i
+src/database_helper/database_helper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/database_helper.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/database_helper.cpp.i
+.PHONY : src/database_helper/database_helper.cpp.i
 
-src/database_helper/DatabaseHelper.s: src/database_helper/DatabaseHelper.cpp.s
+src/database_helper/database_helper.s: src/database_helper/database_helper.cpp.s
 
-.PHONY : src/database_helper/DatabaseHelper.s
+.PHONY : src/database_helper/database_helper.s
 
 # target to generate assembly for a file
-src/database_helper/DatabaseHelper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.s
-.PHONY : src/database_helper/DatabaseHelper.cpp.s
+src/database_helper/database_helper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/src/database_helper/database_helper.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend_test.dir/build.make CMakeFiles/backend_test.dir/src/database_helper/database_helper.cpp.s
+.PHONY : src/database_helper/database_helper.cpp.s
 
 src/library.o: src/library.cpp.o
 
@@ -473,9 +473,9 @@ help:
 	@echo "... backend_test"
 	@echo "... graph_builder"
 	@echo "... render"
-	@echo "... src/database_helper/DatabaseHelper.o"
-	@echo "... src/database_helper/DatabaseHelper.i"
-	@echo "... src/database_helper/DatabaseHelper.s"
+	@echo "... src/database_helper/database_helper.o"
+	@echo "... src/database_helper/database_helper.i"
+	@echo "... src/database_helper/database_helper.s"
 	@echo "... src/library.o"
 	@echo "... src/library.i"
 	@echo "... src/library.s"

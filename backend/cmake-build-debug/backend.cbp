@@ -374,7 +374,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/hrubyk/projects/maps/backend/include/database_helper/DatabaseHelper.h">
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/database_helper/database_helper.h">
 			<Option target="backend"/>
 			<Option target="backend_test"/>
 		</Unit>
@@ -397,7 +397,7 @@
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/tile_rendering/rendermodule.h">
 			<Option target="render"/>
 		</Unit>
-		<Unit filename="/home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp">
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/database_helper/database_helper.cpp">
 			<Option target="backend"/>
 			<Option target="backend_test"/>
 		</Unit>

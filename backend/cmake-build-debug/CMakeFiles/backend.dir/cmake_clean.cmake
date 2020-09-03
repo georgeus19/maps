@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/backend.dir/src/database_helper/DatabaseHelper.cpp.o"
+  "CMakeFiles/backend.dir/src/database_helper/database_helper.cpp.o"
   "CMakeFiles/backend.dir/src/library.cpp.o"
   "CMakeFiles/backend.dir/src/test.cpp.o"
   "libbackend.a"

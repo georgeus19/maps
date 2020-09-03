@@ -5,7 +5,6 @@
 #ifndef BACKEND_LINK_COUNTER_H
 #define BACKEND_LINK_COUNTER_H
 #include <osmium/io/any_input.hpp>
-#include "DatabaseHelper.h"
 #include <osmium/io/any_output.hpp>
 #include <string>
 

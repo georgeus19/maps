@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/hrubyk/projects/maps/backend/src/database_helper/DatabaseHelper.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend_test.dir/src/database_helper/DatabaseHelper.cpp.o"
+  "/home/hrubyk/projects/maps/backend/src/database_helper/database_helper.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend_test.dir/src/database_helper/database_helper.cpp.o"
   "/home/hrubyk/projects/maps/backend/src/library.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend_test.dir/src/library.cpp.o"
   "/home/hrubyk/projects/maps/backend/src/test.cpp" "/home/hrubyk/projects/maps/backend/cmake-build-debug/CMakeFiles/backend_test.dir/src/test.cpp.o"
   )
