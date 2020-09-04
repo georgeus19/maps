@@ -20,27 +20,33 @@
 #include <osmium/geom/wkb.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/geom/wkt.hpp>
-using unsigned_id_type = osmium::unsigned_object_id_type;
-class Edge{
-private:
-    unsigned_id_type osm_id_;
-    std::string geography_;
-    unsigned_id_type from_;
-    unsigned_id_type to_;
-public:
-    Edge(unsigned_id_type osm_id, std::string && geography, unsigned_id_type from, unsigned_id_type to);
+namespace osm_parser {
 
-    Edge(unsigned_id_type osm_id, unsigned_id_type from, unsigned_id_type to);
+    using unsigned_id_type = osmium::unsigned_object_id_type;
 
-    std::string get_osm_id() const;
+    class Edge {
+    private:
+        unsigned_id_type osm_id_;
+        std::string geography_;
+        unsigned_id_type from_;
+        unsigned_id_type to_;
+    public:
+        Edge(unsigned_id_type osm_id, std::string &&geography, unsigned_id_type from, unsigned_id_type to);
 
-    const std::string & get_geography() const;
+        Edge(unsigned_id_type osm_id, unsigned_id_type from, unsigned_id_type to);
 
-    void set_geography(std::string && geog);
+        std::string get_osm_id() const;
 
-    std::string get_from() const;
+        const std::string &get_geography() const;
 
-    std::string get_to() const;
+        void set_geography(std::string &&geog);
 
-};
+        std::string get_from() const;
+
+        std::string get_to() const;
+
+    };
+}
+
 #endif //BACKEND_EDGE_H
+

@@ -2,8 +2,8 @@
 // Created by hrubyk on 31.08.20.
 //
 
-#include "link_counter.h"
-#include "graph_generator.h"
+#include "osm_parser/link_counter.h"
+#include "osm_parser/graph_generator.h"
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/any_output.hpp>
 #include <string>
@@ -23,43 +23,47 @@
 #include <osmium/geom/wkt.hpp>
 #include <osmium/geom/mercator_projection.hpp>
 using namespace std;
+namespace osm_parser {
+    using location_index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
+    using location_handler_type = osmium::handler::NodeLocationsForWays<location_index_type>;
 
-using location_index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
-using location_handler_type = osmium::handler::NodeLocationsForWays<location_index_type>;
+    void CalculateNodeLinks(index_type &node_index, const std::string &input_path) {
+        auto otypes = osmium::osm_entity_bits::way;
+        osmium::io::Reader reader{input_path, otypes};
 
-void CalculateNodeLinks(index_type & node_index, const std::string & input_path) {
-    auto otypes = osmium::osm_entity_bits::way;
-    osmium::io::Reader reader{input_path, otypes};
+        LinkCounter link_handler{node_index};
+        osmium::apply(reader, link_handler);
+        reader.close();
+        std::cout << "Node links calculated." << std::endl;
+    }
 
-    LinkCounter link_handler{node_index};
-    osmium::apply(reader, link_handler);
-    reader.close();
-    std::cout << "Node links calculated." << std::endl;
+    void GenerateGraph(index_type &node_index, const std::string &input_path, const string &table_name,
+                       const string &output_sql_path, const string &output_data_path) {
+        auto otypes = osmium::osm_entity_bits::node | osmium::osm_entity_bits::way;
+        osmium::io::Reader reader{input_path, otypes};
+        location_index_type location_index;
+        location_handler_type location_handler{location_index};
+
+        //osmium::geom::WKBFactory<> factoryWKB{osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex};
+        osmium::geom::WKTFactory<> factoryWKT{};
+        // InsertWriter writer{output_sql_path};
+        CopyWriter writer{output_sql_path, output_data_path};
+        writer.WriteInitSql(table_name);
+
+        GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, writer, table_name};
+        //GraphGenerator<osmium::geom::WKBFactory<>> graph_generator_handler{node_index, factoryWKB, writer, table_name};
+
+        osmium::apply(reader, location_handler, graph_generator_handler);
+        writer.WriteFinishSql(table_name);
+        reader.close();
+    }
 }
 
-void GenerateGraph(index_type & node_index, const std::string & input_path, const string & table_name,  const string & output_sql_path, const string & output_data_path) {
-    auto otypes = osmium::osm_entity_bits::node | osmium::osm_entity_bits::way;
-    osmium::io::Reader reader{input_path, otypes};
-    location_index_type location_index;
-    location_handler_type location_handler{location_index};
-
-    //osmium::geom::WKBFactory<> factoryWKB{osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex};
-    osmium::geom::WKTFactory<> factoryWKT{};
-    // InsertWriter writer{output_sql_path};
-    CopyWriter writer{output_sql_path, output_data_path};
-    writer.WriteInitSql(table_name);
-
-    GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, writer, table_name};
-    //GraphGenerator<osmium::geom::WKBFactory<>> graph_generator_handler{node_index, factoryWKB, writer, table_name};
-
-    osmium::apply(reader, location_handler, graph_generator_handler);
-    writer.WriteFinishSql(table_name);
-    reader.close();
-}
-
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[]) {
+    using namespace osm_parser;
     if (argc != 5) {
-        std::cout << "There must be 4 arguments: input_path table_name output_sql_path output_data_path." << std::endl;
+        std::cout << "There must be 4 arguments: input_path table_name output_sql_path output_data_path."
+                  << std::endl;
         return 1;
     }
 

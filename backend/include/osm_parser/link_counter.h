@@ -20,16 +20,17 @@
 #include <osmium/geom/wkb.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/geom/wkt.hpp>
+namespace osm_parser {
 
-using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, size_t>;
+    using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, size_t>;
 
-class LinkCounter : public osmium::handler::Handler {
-    index_type & nodes_ptr_;
-public:
+    class LinkCounter : public osmium::handler::Handler {
+        index_type &nodes_ptr_;
+    public:
 
-    LinkCounter(index_type & index_ptr);
+        LinkCounter(index_type &index_ptr);
 
-    void way(const osmium::Way& way);
-};
-
+        void way(const osmium::Way &way);
+    };
+}
 #endif //BACKEND_LINK_COUNTER_H

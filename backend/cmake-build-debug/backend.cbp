@@ -37,6 +37,94 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="route">
+				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/route" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D_LARGEFILE_SOURCE"/>
+					<Add option="-D_FILE_OFFSET_BITS=64"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
+					<Add directory="/usr/include/python3.8"/>
+					<Add directory="/usr/local/include/mapnik/agg"/>
+					<Add directory="/usr/local/include/mapnik"/>
+					<Add directory="/usr/include/freetype2"/>
+					<Add directory="/usr/include/postgresql"/>
+					<Add directory="/usr/include/cairo"/>
+					<Add directory="/usr/include/glib-2.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+					<Add directory="/usr/include/pixman-1"/>
+					<Add directory="/usr/include/uuid"/>
+					<Add directory="/usr/include/libpng16"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 route"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="route/fast">
+				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/route" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D_LARGEFILE_SOURCE"/>
+					<Add option="-D_FILE_OFFSET_BITS=64"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
+					<Add directory="/usr/include/python3.8"/>
+					<Add directory="/usr/local/include/mapnik/agg"/>
+					<Add directory="/usr/local/include/mapnik"/>
+					<Add directory="/usr/include/freetype2"/>
+					<Add directory="/usr/include/postgresql"/>
+					<Add directory="/usr/include/cairo"/>
+					<Add directory="/usr/include/glib-2.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+					<Add directory="/usr/include/pixman-1"/>
+					<Add directory="/usr/include/uuid"/>
+					<Add directory="/usr/include/libpng16"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 route/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="backend">
 				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/libbackend.a" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-debug"/>
@@ -49,10 +137,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -91,10 +181,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -133,10 +225,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -175,10 +269,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -217,10 +313,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -259,10 +357,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -301,10 +401,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -343,10 +445,12 @@
 					<Add directory="/home/hrubyk/projects/maps/backend/src/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/src/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/src/routing"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/osm_parser"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/tile_rendering"/>
 					<Add directory="/home/hrubyk/projects/maps/backend/include/database_helper"/>
+					<Add directory="/home/hrubyk/projects/maps/backend/include/routing"/>
 					<Add directory="/usr/include/python3.8"/>
 					<Add directory="/usr/local/include/mapnik/agg"/>
 					<Add directory="/usr/local/include/mapnik"/>
@@ -416,6 +520,9 @@
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/osm_parser/writer.cpp">
 			<Option target="graph_builder"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/routing_module.cpp">
+			<Option target="route"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/test.cpp">
 			<Option target="backend"/>
