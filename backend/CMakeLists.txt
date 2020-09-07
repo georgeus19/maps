@@ -12,7 +12,7 @@ add_library(backend ${OthersGlob} ${DatabaseHelperGlob})
 add_executable(backend_test ${OthersGlob} ${DatabaseHelperGlob})
 add_library(render ${TileRenderingGlob})
 add_executable(graph_builder ${OsmParserGlob})
-add_executable(route src/routing/routing_module.cpp)
+add_executable(routing ${RoutingGLob} ${DatabaseHelperGlob})
 
 include_directories(src/osm_parser/)
 include_directories(src/tile_rendering/)
@@ -45,6 +45,8 @@ include_directories(/usr/lib/x86_64-linux-gnu/glib-2.0/include /usr/include/pixm
 
 link_directories(backend_test /usr/local/lib)
 
+target_link_libraries(routing pqxx)
+target_link_libraries(routing pq)
 
 target_link_libraries(backend pqxx)
 target_link_libraries(backend pq)

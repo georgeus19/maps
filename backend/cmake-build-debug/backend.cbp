@@ -37,8 +37,8 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="route">
-				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/route" prefix_auto="0" extension_auto="0"/>
+			<Target title="routing">
+				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/routing" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -75,14 +75,14 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 route"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 routing"/>
 					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="route/fast">
-				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/route" prefix_auto="0" extension_auto="0"/>
+			<Target title="routing/fast">
+				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-debug/routing" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -119,7 +119,7 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 route/fast"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 routing/fast"/>
 					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j8 -f &quot;/home/hrubyk/projects/maps/backend/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
@@ -479,6 +479,7 @@
 			</Target>
 		</Build>
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/database_helper/database_helper.h">
+			<Option target="routing"/>
 			<Option target="backend"/>
 			<Option target="backend_test"/>
 		</Unit>
@@ -498,10 +499,26 @@
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/osm_parser/writer.h">
 			<Option target="graph_builder"/>
 		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/routing/algorithm.h">
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/routing/dijkstra.h">
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/routing/edge.h">
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/routing/graph.h">
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/include/routing/vertex.h">
+			<Option target="routing"/>
+		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/tile_rendering/rendermodule.h">
 			<Option target="render"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/database_helper/database_helper.cpp">
+			<Option target="routing"/>
 			<Option target="backend"/>
 			<Option target="backend_test"/>
 		</Unit>
@@ -521,8 +538,20 @@
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/osm_parser/writer.cpp">
 			<Option target="graph_builder"/>
 		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/dijkstra.cpp">
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/edge.cpp">
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/graph.cpp">
+			<Option target="routing"/>
+		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/routing_module.cpp">
-			<Option target="route"/>
+			<Option target="routing"/>
+		</Unit>
+		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/vertex.cpp">
+			<Option target="routing"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/test.cpp">
 			<Option target="backend"/>

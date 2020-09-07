@@ -43,37 +43,30 @@ void DatabaseHelper::SearchFor(const string & s) {
     }
 }
 
-void DatabaseHelper::FindClosestEdge(double lon, double lat, const string & table_name){
+EdgeDbRow DatabaseHelper::FindClosestEdge(double lon, double lat, const string & table_name){
     string point = MakeSTPoint(lon, lat);
     // "Closest" 100 streets to Broad Street station are?long 13.391480 lat 49.726250   49.7262000N, 13.3915000E
     string closest_edge_sql = "WITH closest_candidates AS ( " \
-                                  "SELECT e.osm_id, e.geog " \
+                                  "SELECT e.osm_id, e.geog, e.from_node, e.to_node, e.length " \
                                   "FROM " + table_name + " as e " \
                                   "ORDER BY e.geog <-> 'SRID=4326;" + point + "'::geography " \
                                   "LIMIT 100 " \
                               ") " \
-                              "SELECT osm_id, geog " \
+                              "SELECT osm_id, geog, from_node, to_node, length " \
                               "FROM closest_candidates " \
                               "ORDER BY ST_Distance(geog, 'SRID=4326;" + point + "'::geography) " \
                               "LIMIT 1; ";
     pqxx::nontransaction n{connection_};
     pqxx::result result{n.exec(closest_edge_sql)};
 
+    pqxx::result::const_iterator c = result.begin();
+    return EdgeDbRow{c};
     // do sth with the result...
 }
 
-void DatabaseHelper::LoadGraph(double lon, double lat, double radius, const string & table_name) {
-    string center = MakeSTPoint(lon, lat);
-    string load_graph_sql = "select * " \
-                            "from " + table_name + " as e " \
-                            "where ST_DWithin('SRID=4326;" + center + "'::geography, e.geog, " + to_string(radius) + ") ";
-    pqxx::nontransaction n{connection_};
-    pqxx::result result{n.exec(load_graph_sql)};
-
-    // do sth with the result...
-}
 
 std::string DatabaseHelper::MakeSTPoint(double lon, double lat) {
     return "POINT(" + to_string(lon) + " " + to_string(lat) + ")"; // e.g. POINT(13.3915000 49.7262000)
 }
+
 

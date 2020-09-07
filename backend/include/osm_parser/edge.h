@@ -25,13 +25,15 @@ namespace osm_parser {
     using unsigned_id_type = osmium::unsigned_object_id_type;
 
     class Edge {
-    private:
+    public:
         unsigned_id_type osm_id_;
         std::string geography_;
         unsigned_id_type from_;
         unsigned_id_type to_;
-    public:
+
         Edge(unsigned_id_type osm_id, std::string &&geography, unsigned_id_type from, unsigned_id_type to);
+
+        Edge(unsigned_id_type osm_id, const std::string & geography, unsigned_id_type from, unsigned_id_type to);
 
         Edge(unsigned_id_type osm_id, unsigned_id_type from, unsigned_id_type to);
 
