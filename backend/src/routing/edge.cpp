@@ -9,7 +9,7 @@ namespace routing {
         length_(r.get<double>(3)) {}
 
     BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
-            uid_(uid), from_(std::move(from)), to_(to), length_(length) {}
+            uid_(uid), from_(from), to_(to), length_(length) {}
 
     BasicEdge::BasicEdge(const BasicEdge & other) {
         uid_ = other.uid_;

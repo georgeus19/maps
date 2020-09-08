@@ -52,6 +52,12 @@ public:
 
     std::string MakeSTPoint(double lon, double lat);
 
+//    template <typename Edge>
+//    std::string GetRouteCoordinates(std::vector<Edge> edges) {
+//
+//        std::string sql_select = "select "
+//    }
+
     template <typename Graph>
     void LoadGraph(double lon, double lat, double radius, const std::string & table_name, Graph & graph) {
 

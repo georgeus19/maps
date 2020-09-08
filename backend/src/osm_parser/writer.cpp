@@ -60,7 +60,7 @@ namespace osm_parser {
         "geog geography(LINESTRING) NOT NULL, " \
         "from_node BIGINT NOT NULL, " \
         "to_node BIGINT NOT NULL);";
-        string copy = "COPY " + table_name + " FROM '" + data_path_ + "' DELIMITER ';' CSV HEADER;";
+        string copy = "COPY " + table_name + " FROM '" + data_path_ + "' DELIMITER ';' CSV;";
         string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length double precision;";
         string fill_length_column = "UPDATE " + table_name + " set length = st_length(geog);";
         string create_index = "CREATE INDEX " + table_name + "_gix ON " + table_name + " USING GIST (geog);";
