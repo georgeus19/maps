@@ -7,6 +7,9 @@ namespace routing {
     BasicVertex::BasicVertex(unsigned_id_type osm_id, std::vector<BasicEdge> && outgoing_edges)
         : osm_id_(osm_id), outgoing_edges_(std::move(outgoing_edges)), cost_(numeric_limits<double>::max()), previous_(0) {}
 
+    BasicVertex::BasicVertex(unsigned_id_type osm_id, const std::vector<BasicEdge> & outgoing_edges)
+            : osm_id_(osm_id), outgoing_edges_(outgoing_edges), cost_(numeric_limits<double>::max()), previous_(0) {}
+
     BasicVertex::BasicVertex(const BasicVertex & other) {
         osm_id_ = other.osm_id_;
         outgoing_edges_ = other.outgoing_edges_;
@@ -16,7 +19,7 @@ namespace routing {
 
     BasicVertex::BasicVertex(BasicVertex && other) {
         osm_id_ = other.osm_id_;
-        outgoing_edges_ = std::move(outgoing_edges_);
+        outgoing_edges_ = std::move(other.outgoing_edges_);
         other.outgoing_edges_ = vector<BasicEdge>{};
         cost_ = other.cost_;
         previous_ = other.previous_;
@@ -50,5 +53,10 @@ namespace routing {
 
     void BasicVertex::AddEdge(BasicEdge&& edge) {
         outgoing_edges_.push_back(std::move(edge));
+    }
+
+
+    void BasicVertex::AddEdge(const BasicEdge & edge) {
+        outgoing_edges_.push_back(edge);
     }
 }

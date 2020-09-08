@@ -8,8 +8,13 @@ namespace routing {
     template <typename T>
     class CostComparer {
     public:
-        constexpr bool operator()( const T& lhs, const T& rhs ) const {
-            return lhs->cost_ < rhs->cost_;
+        constexpr bool operator()( const T& p1, const T& p2 ) const {
+            // Compare if these are same vertices.
+            if (p1.second == p2.second) {
+                return false;
+            }
+            // Compare costs.
+            return  p1.first < p2.second;
         }
     };
 
@@ -21,6 +26,8 @@ namespace routing {
         unsigned_id_type previous_;
 
         BasicVertex(unsigned_id_type osm_id, std::vector<BasicEdge> && outgoing_edges);
+
+        BasicVertex(unsigned_id_type osm_id, const std::vector<BasicEdge> & outgoing_edges);
 
         BasicVertex(const BasicVertex & other);
 
@@ -35,6 +42,8 @@ namespace routing {
         void Swap(BasicVertex & other);
 
         void AddEdge(BasicEdge&& edge);
+
+        void AddEdge(const BasicEdge & edge);
     };
 }
 #endif //BACKEND_VERTEX_H

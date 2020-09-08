@@ -73,15 +73,6 @@ namespace osm_parser {
                 return;
             }
 
-            /* Save original way.
-            {
-                const_nodelist_iterator it1 = nodes.cbegin();
-                const_nodelist_iterator it2 = nodes.cend();
-                Edge edge{way.positive_id(), it1->positive_ref(), it2->positive_ref()};
-                SaveEdge(it1, it2, edge, oneway);
-            }
-             */
-
             const_nodelist_iterator first = nodes.cbegin();
             const_nodelist_iterator second = nodes.cbegin();
             ++second;
@@ -99,10 +90,13 @@ namespace osm_parser {
 
                 bool is_intersection = value > 1 && value != osmium::index::empty_value<size_t>();
                 if (is_intersection) {
+                    Edge edge{way.positive_id(), first->positive_ref(), second->positive_ref()};
+
+                    // `second` iterator points directly to the last point
+                    // of the segment. Create iterator `to` which right is
+                    // after `second`.
                     const_nodelist_iterator to = second;
-                    // Incrementing `to` since we include the intersection point in the linestring.
                     ++to;
-                    Edge edge{way.positive_id(), first->positive_ref(), to->positive_ref()};
                     SaveEdge(first, to, edge, oneway);
                     first = second;
                 }
@@ -115,7 +109,14 @@ namespace osm_parser {
             // way segment.
             const_nodelist_iterator it = first;
             if (++it != nodes.cend()) {
-                Edge edge{way.positive_id(), first->positive_ref(), second->positive_ref()};
+
+                // `second` now points to end() of the collection.
+                // Retrieve osm_id of the last point of the segment
+                // by using temporary iterator `last_point`
+                // which points directly before `second`.
+                const_nodelist_iterator last_point = second;
+                --last_point;
+                Edge edge{way.positive_id(), first->positive_ref(), last_point->positive_ref()};
                 SaveEdge(first, second, edge, oneway);
             }
             first = second;
