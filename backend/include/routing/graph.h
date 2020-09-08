@@ -17,7 +17,7 @@ namespace routing {
 
         Graph();
 
-        void AddEdge(EdgeDbRow);
+        void AddEdge(EdgeDbRow &);
 
         void AddEdge(Edge&&);
 
@@ -33,16 +33,9 @@ namespace routing {
     Graph<Vertex, Edge>::Graph() : g_(std::unordered_map<unsigned_id_type, Vertex>{}) {}
 
     template <typename Vertex, typename Edge>
-    void Graph<Vertex, Edge>::AddEdge(EdgeDbRow r) {
-        Edge e{
-                r.get<unsigned_id_type>(0),
-                r.get<std::string>(1),
-                r.get<unsigned_id_type>(2),
-                r.get<unsigned_id_type>(3),
-                r.get<double>(4)
-        };
+    void Graph<Vertex, Edge>::AddEdge(EdgeDbRow & r) {
 
-        AddEdge(std::move(e));
+        AddEdge(std::move(Edge{r}));
 /*
         // Add edge to->from, this is a temporary measure...
         {

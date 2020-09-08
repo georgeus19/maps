@@ -47,12 +47,12 @@ EdgeDbRow DatabaseHelper::FindClosestEdge(double lon, double lat, const string &
     string point = MakeSTPoint(lon, lat);
     // "Closest" 100 streets to Broad Street station are?long 13.391480 lat 49.726250   49.7262000N, 13.3915000E
     string closest_edge_sql = "WITH closest_candidates AS ( " \
-                                  "SELECT e.osm_id, e.geog, e.from_node, e.to_node, e.length " \
+                                  "SELECT e.uid, e.geog, e.from_node, e.to_node, e.length " \
                                   "FROM " + table_name + " as e " \
                                   "ORDER BY e.geog <-> 'SRID=4326;" + point + "'::geography " \
                                   "LIMIT 100 " \
                               ") " \
-                              "SELECT osm_id, geog, from_node, to_node, length " \
+                              "SELECT uid, from_node, to_node, length " \
                               "FROM closest_candidates " \
                               "ORDER BY ST_Distance(geog, 'SRID=4326;" + point + "'::geography) " \
                               "LIMIT 1; ";

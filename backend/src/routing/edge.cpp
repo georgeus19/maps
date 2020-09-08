@@ -1,21 +1,25 @@
 #include "routing/edge.h"
 
 namespace routing {
-    BasicEdge::BasicEdge(unsigned_id_type osm_id, std::string &&geography, unsigned_id_type from, unsigned_id_type to, double length) :
-            osm_id_(osm_id), geography_(geography), from_(std::move(from)), to_(to), length_(length) {}
+
+    BasicEdge::BasicEdge(EdgeDbRow & r) :
+        uid_(r.get<unsigned_id_type>(0)),
+        from_(r.get<unsigned_id_type>(1)),
+        to_(r.get<unsigned_id_type>(2)),
+        length_(r.get<double>(3)) {}
+
+    BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
+            uid_(uid), from_(std::move(from)), to_(to), length_(length) {}
 
     BasicEdge::BasicEdge(const BasicEdge & other) {
-        osm_id_ = other.osm_id_;
-        geography_ = other.geography_;
+        uid_ = other.uid_;
         from_ = other.from_;
         to_ = other.to_;
         length_ = other.length_;
     }
 
     BasicEdge::BasicEdge(BasicEdge && other) {
-    osm_id_ = other.osm_id_;
-    geography_ = std::move(other.geography_);
-    other.geography_ = std::string{};
+    uid_ = other.uid_;
     from_ = other.from_;
     to_ = other.to_;
     length_ = other.length_;
@@ -29,9 +33,7 @@ namespace routing {
 
     BasicEdge& BasicEdge::operator= (BasicEdge && other) {
         if (this != &other){
-            osm_id_ = other.osm_id_;
-            geography_ = std::move(other.geography_);
-            other.geography_ = std::string{};
+            uid_ = other.uid_;
             from_ = other.from_;
             to_ = other.to_;
             length_ = other.length_;
@@ -42,8 +44,7 @@ namespace routing {
     BasicEdge::~BasicEdge() {}
 
     void BasicEdge::Swap(BasicEdge & other) {
-        std::swap(osm_id_, other.osm_id_);
-        std::swap(geography_, other.geography_);
+        std::swap(uid_, other.uid_);
         std::swap(from_, other.from_);
         std::swap(to_, other.to_);
         std::swap(length_, other.length_);
