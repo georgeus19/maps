@@ -34,12 +34,13 @@ namespace osm_parser {
         GeomFactory factory_;
         IWriter &writer_;
         std::string table_name_;
+        uint64_t id_counter_;
 
         using const_nodelist_iterator = osmium::WayNodeList::const_iterator;
 
     public:
         GraphGenerator(index_type &index_ptr, const GeomFactory &factory, IWriter &w, const std::string &table_name)
-                : nodes_ptr_(index_ptr), factory_{factory}, writer_{w}, table_name_{table_name} {}
+                : nodes_ptr_(index_ptr), factory_{factory}, writer_{w}, table_name_{table_name}, id_counter_(0) {}
 
         /*
          * Handles operation for current read way.
@@ -90,7 +91,7 @@ namespace osm_parser {
 
                 bool is_intersection = value > 1 && value != osmium::index::empty_value<size_t>();
                 if (is_intersection) {
-                    Edge edge{way.positive_id(), first->positive_ref(), second->positive_ref()};
+                    Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), second->positive_ref()};
 
                     // `second` iterator points directly to the last point
                     // of the segment. Create iterator `to` which right is
@@ -116,7 +117,7 @@ namespace osm_parser {
                 // which points directly before `second`.
                 const_nodelist_iterator last_point = second;
                 --last_point;
-                Edge edge{way.positive_id(), first->positive_ref(), last_point->positive_ref()};
+                Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), last_point->positive_ref()};
                 SaveEdge(first, second, edge, oneway);
             }
             first = second;
@@ -135,7 +136,7 @@ namespace osm_parser {
             auto &&linestring = CreateLineString(from, to);
             if (linestring != "") {
                 if (oneway == false) {
-                    Edge reciprocal_edge{edge.osm_id_, linestring, edge.to_, edge.from_};
+                    Edge reciprocal_edge{edge.osm_id_, ++id_counter_, linestring, edge.to_, edge.from_};
                     writer_.WriteEdge(table_name_, reciprocal_edge);
                 }
                 edge.set_geography(std::move(linestring));

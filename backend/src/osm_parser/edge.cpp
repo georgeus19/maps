@@ -4,17 +4,21 @@
 
 #include "osm_parser/edge.h"
 namespace osm_parser {
-    Edge::Edge(unsigned_id_type osm_id, std::string &&geography, unsigned_id_type from, unsigned_id_type to) :
-            osm_id_(osm_id), geography_(std::move(geography)), from_(from), to_(to) {}
+    Edge::Edge(unsigned_id_type osm_id, uint64_t uid, std::string &&geography, unsigned_id_type from, unsigned_id_type to) :
+            osm_id_(osm_id), uid_(uid), geography_(std::move(geography)), from_(from), to_(to) {}
 
-    Edge::Edge(unsigned_id_type osm_id, const std::string & geography, unsigned_id_type from, unsigned_id_type to) :
-        osm_id_(osm_id), geography_(geography), from_(from), to_(to) {}
+    Edge::Edge(unsigned_id_type osm_id, uint64_t uid, const std::string & geography, unsigned_id_type from, unsigned_id_type to) :
+        osm_id_(osm_id), uid_(uid), geography_(geography), from_(from), to_(to) {}
 
-    Edge::Edge(unsigned_id_type osm_id, unsigned_id_type from, unsigned_id_type to) :
-            osm_id_(osm_id), geography_(""), from_(from), to_(to) {}
+    Edge::Edge(unsigned_id_type osm_id, uint64_t uid, unsigned_id_type from, unsigned_id_type to) :
+            osm_id_(osm_id), uid_(uid), geography_(""), from_(from), to_(to) {}
 
     std::string Edge::get_osm_id() const {
         return std::to_string(osm_id_);
+    }
+
+    std::string Edge::get_uid() const {
+        return std::to_string(uid_);
     }
 
     const std::string &Edge::get_geography() const {

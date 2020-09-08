@@ -27,17 +27,20 @@ namespace osm_parser {
     class Edge {
     public:
         unsigned_id_type osm_id_;
+        uint64_t uid_;
         std::string geography_;
         unsigned_id_type from_;
         unsigned_id_type to_;
 
-        Edge(unsigned_id_type osm_id, std::string &&geography, unsigned_id_type from, unsigned_id_type to);
+        Edge(unsigned_id_type osm_id, uint64_t uid, std::string &&geography, unsigned_id_type from, unsigned_id_type to);
 
-        Edge(unsigned_id_type osm_id, const std::string & geography, unsigned_id_type from, unsigned_id_type to);
+        Edge(unsigned_id_type osm_id, uint64_t uid_, const std::string & geography, unsigned_id_type from, unsigned_id_type to);
 
-        Edge(unsigned_id_type osm_id, unsigned_id_type from, unsigned_id_type to);
+        Edge(unsigned_id_type osm_id, uint64_t uid_, unsigned_id_type from, unsigned_id_type to);
 
         std::string get_osm_id() const;
+
+        std::string get_uid() const;
 
         const std::string &get_geography() const;
 

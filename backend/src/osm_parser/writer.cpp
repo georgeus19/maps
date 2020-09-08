@@ -15,7 +15,7 @@ namespace osm_parser {
 
     void InsertWriter::WriteInitSql(const string &table_name) {
         string sql = "CREATE TABLE " + table_name + "("  \
-        "id serial PRIMARY KEY, " \
+        "uid serial PRIMARY KEY, " \
         "osm_id BIGINT NOT NULL, " \
         "geog geography(LINESTRING) NOT NULL, " \
         "from_node BIGINT NOT NULL, " \
@@ -56,6 +56,7 @@ namespace osm_parser {
     void CopyWriter::WriteInitSql(const string &table_name) {
         string create_table = "CREATE TABLE " + table_name + "("  \
         "osm_id BIGINT NOT NULL, " \
+        "uid BIGINT PRIMARY KEY, " \
         "geog geography(LINESTRING) NOT NULL, " \
         "from_node BIGINT NOT NULL, " \
         "to_node BIGINT NOT NULL);";
@@ -72,7 +73,7 @@ namespace osm_parser {
     }
 
     void CopyWriter::WriteEdge(const string &table_name, const Edge &edge) {
-        string data = edge.get_osm_id() + "; " + edge.get_geography() + "; " + edge.get_from() + "; " + edge.get_to();
+        string data = edge.get_osm_id() + "; " + edge.get_uid() + "; " + edge.get_geography() + "; " + edge.get_from() + "; " + edge.get_to();
         f_data_ << data << std::endl;
     }
 
