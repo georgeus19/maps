@@ -5,7 +5,7 @@
 #include <utility>
 #include <queue>
 #include "routing/edge.h"
-#include "database_helper.h"
+#include "database/database_helper.h"
 #include "routing/vertex.h"
 #include <set>
 
@@ -17,7 +17,7 @@ namespace routing {
 
         Graph();
 
-        void AddEdge(EdgeDbRow &);
+        void AddEdge(database::EdgeDbRow &);
 
         void AddEdge(Edge&&);
 
@@ -33,7 +33,7 @@ namespace routing {
     Graph<Vertex, Edge>::Graph() : g_(std::unordered_map<unsigned_id_type, Vertex>{}) {}
 
     template <typename Vertex, typename Edge>
-    void Graph<Vertex, Edge>::AddEdge(EdgeDbRow & r) {
+    void Graph<Vertex, Edge>::AddEdge(database::EdgeDbRow & r) {
 
         AddEdge(std::move(Edge{r}));
 /*

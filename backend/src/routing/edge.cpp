@@ -2,7 +2,7 @@
 
 namespace routing {
 
-    BasicEdge::BasicEdge(EdgeDbRow & r) :
+    BasicEdge::BasicEdge(database::EdgeDbRow & r) :
         uid_(r.get<unsigned_id_type>(0)),
         from_(r.get<unsigned_id_type>(1)),
         to_(r.get<unsigned_id_type>(2)),

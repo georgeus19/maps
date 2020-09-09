@@ -12,7 +12,7 @@ add_library(backend ${OthersGlob} ${DatabaseHelperGlob})
 add_executable(backend_test ${OthersGlob} ${DatabaseHelperGlob})
 add_library(render ${TileRenderingGlob})
 add_executable(graph_builder ${OsmParserGlob})
-add_executable(routing ${RoutingGLob} ${DatabaseHelperGlob})
+add_library(routing ${RoutingGLob} ${DatabaseHelperGlob})
 
 include_directories(src/osm_parser/)
 include_directories(src/tile_rendering/)

@@ -1,9 +1,4 @@
-from mapnik import PostGIS, Layer
-params = dict(dbname='gis',table='osm',user='postgres',password='wtz2trln')
-params['estimate_extent'] = False
-params['extent'] = '-20037508,-19929239,20037508,19929239'
-postgis = PostGIS(**params)
-lyr = Layer('PostGIS Layer')
-lyr.datasource = postgis
+import routing_module
 
-
+res = routing_module.CalculateShortestRoute("cz_edges", 13.3998825, 49.7230553, 13.3868150, 49.7282850)
+print (res)

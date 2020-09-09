@@ -1,7 +1,7 @@
 #ifndef BACKEND_EDGE_H
 #define BACKEND_EDGE_H
 #include <string>
-#include "database_helper.h"
+#include "database/database_helper.h"
 
 #include <iostream>
 
@@ -10,12 +10,13 @@ namespace routing {
 
     class BasicEdge {
     public:
+        using id_type = unsigned_id_type;
         unsigned_id_type uid_;
         unsigned_id_type from_;
         unsigned_id_type to_;
         double length_;
 
-        BasicEdge(EdgeDbRow &);
+        BasicEdge(database::EdgeDbRow &);
 
         BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
 

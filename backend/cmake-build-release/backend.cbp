@@ -38,10 +38,10 @@
 				</MakeCommands>
 			</Target>
 			<Target title="routing">
-				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-release/routing" prefix_auto="0" extension_auto="0"/>
+				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-release/librouting.a" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-release"/>
 				<Option object_output="./"/>
-				<Option type="1"/>
+				<Option type="2"/>
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add option="-D_LARGEFILE_SOURCE"/>
@@ -83,10 +83,10 @@
 				</MakeCommands>
 			</Target>
 			<Target title="routing/fast">
-				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-release/routing" prefix_auto="0" extension_auto="0"/>
+				<Option output="/home/hrubyk/projects/maps/backend/cmake-build-release/librouting.a" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/hrubyk/projects/maps/backend/cmake-build-release"/>
 				<Option object_output="./"/>
-				<Option type="1"/>
+				<Option type="2"/>
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add option="-D_LARGEFILE_SOURCE"/>
@@ -488,11 +488,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/hrubyk/projects/maps/backend/include/database_helper/database_helper.h">
-			<Option target="routing"/>
-			<Option target="backend"/>
-			<Option target="backend_test"/>
-		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/library.h">
 			<Option target="backend"/>
 			<Option target="backend_test"/>
@@ -527,11 +522,6 @@
 		<Unit filename="/home/hrubyk/projects/maps/backend/include/tile_rendering/rendermodule.h">
 			<Option target="render"/>
 		</Unit>
-		<Unit filename="/home/hrubyk/projects/maps/backend/src/database_helper/database_helper.cpp">
-			<Option target="routing"/>
-			<Option target="backend"/>
-			<Option target="backend_test"/>
-		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/library.cpp">
 			<Option target="backend"/>
 			<Option target="backend_test"/>
@@ -552,9 +542,6 @@
 			<Option target="routing"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/edge.cpp">
-			<Option target="routing"/>
-		</Unit>
-		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/graph.cpp">
 			<Option target="routing"/>
 		</Unit>
 		<Unit filename="/home/hrubyk/projects/maps/backend/src/routing/routing_module.cpp">

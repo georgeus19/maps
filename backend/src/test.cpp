@@ -1,4 +1,4 @@
-#include "database_helper.h"
+#include "database/database_helper.h"
 #include <iostream>
 #include <string>
 #include <mapnik/map.hpp>
@@ -24,7 +24,7 @@ using namespace std;
 using namespace mapnik;
 const string kDbName = "gis";
 const string kUser = "postgres";
-const string kPassword = "";
+const string kPassword = "wtz2trln";
 const string kHostAddress = "127.0.0.1";
 const string kPort = "5432";
 
