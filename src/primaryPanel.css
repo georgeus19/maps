@@ -1,8 +1,10 @@
+
+
 .PrimaryPanel {
     box-sizing: border-box;
     text-align: center;
     width: 20%;
-    background-color: blueviolet;
+    /* background-color: var(--bground); */
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -14,8 +16,9 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    background-color: rgb(226, 91, 12);
+    /* background-color: var(--bground); */
     height: 100%;
+    overflow:scroll;
     
   }
 
@@ -23,28 +26,32 @@
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    background-color: rgb(122, 78, 52);
+    /* background-color: var(--bground); */
     flex-direction: column;
+    width: 100%;
 }
 
 .Header {
     box-sizing: border-box;
+    width: 100%;
     display: flex;
     flex-direction: row;
-    background-color: crimson;
+    /* background-color: var(--bground); */
 }
 
 .PathPoint {
     padding: 1%;
     display: flex;
     flex-direction: row;
+    width: 100%;
+    /* background:var(--bground); */
 }
 
 .ConstraintContainer {
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    background-color: rgb(226, 164, 128);
+    /* background-color: var(--bground); */
     flex-direction: column;
 }
 
@@ -55,15 +62,15 @@
 .HeaderOption{
     height: 48px;
     display: inline-block;
-white-space: nowrap;
-border: none;
-color: #6b7580;
-padding: 0;
-background-color: #f1f1f1;
-text-decoration: none;
-width: 33.33%;
-position: relative;
-margin: 0;
+    white-space: nowrap;
+    border: none;
+    color: #6b7580;
+    padding: 0;
+    /* background-color: #edeb5a; */
+    text-decoration: none;
+    width: 33.33%;
+    position: relative;
+    margin: 0;
 }
 
 .HeaderOption.active {
@@ -79,7 +86,7 @@ margin: 0;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    background-color: rgb(226, 164, 128);
+    /* background-color: var(--bground); */
     flex-direction: column;
 }
 
@@ -91,7 +98,7 @@ margin: 0;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    background-color: rgb(226, 164, 128);
+    /* background-color: var(--bground); */
     flex-direction: column;
 }
 
@@ -103,11 +110,12 @@ margin: 0;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    background-color: rgb(226, 164, 128);
+    /* background-color: var(--bground); */
     flex-direction: column;
 }
 
-.Search {
-    padding: 1%;
-}
+
+
+
+
   

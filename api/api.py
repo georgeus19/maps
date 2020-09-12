@@ -1,17 +1,29 @@
-from flask import Flask   
+from flask import Flask, request, jsonify
 from flask_restplus import Api, Resource
 import renderModule
+import routing_module
 from werkzeug.routing import BaseConverter
 from flask import send_file
 import os.path
+import json
 
 app = Flask(__name__)
 api = Api(app)
 
 @api.route('/test')
 class Test(Resource):
-    def get(self):
-        return {'hello': "wrolds"}
+    def post(self):
+        content = request.json
+        route = []
+        if len(content) > 1:
+            for i in range(0, len(content) - 1):
+                start = content[i]
+                end = content[i + 1]
+                s = routing_module.CalculateShortestRoute("cz_edges", float(start["lon"]), float(start["lat"]), float(end["lon"]), float(end["lat"]))
+                route.extend(json.loads(s))
+        return route
+
+
 
 @api.route('/maps/<int:z>/<int:x>/<int:y>.png')
 class MapFeeder(Resource):
