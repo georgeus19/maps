@@ -188,6 +188,7 @@ function MapContainer(props) {
                         adr = lat + 'N, ' + lon + 'E';
                     }
                     props.dispatchPoints({type:'update', value:{name:adr, latLon:[lat, lon]}, index:props.currentPoint})
+                    props.setCurrentPoint(-1);
                 })
                 .catch((error) => {
                     console.warn('Error occured with respect to searching for address based on latlng.', error);

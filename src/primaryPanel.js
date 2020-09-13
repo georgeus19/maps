@@ -163,41 +163,53 @@ function PointContainer(props) {
 }
 
 /**
- * 
+ * Component `PathPoint` lets user to type a name of a location
+ * and add that location as a route point.
+ * Requests are sent to the server and it tries to find suitable
+ * location whose addresses match the text provided by users.
  * @param {*} props 
  */
 function PathPoint(props) {
-    const [selectedPlace, setSelectedPlace] = useState(null);
+    /**
+     * Represents text value of select/ input.
+     */
     const [text, setText] = useState('');
+
+    /**
+     * Printing to map is handled in `MapSection` so nothing is done here.
+     * @param {*} place 
+     */
     function showOnMap(place) {}
 
-    function handleInputChange(place) {
+    /**
+     * Callback to `SearchInput`. Is called when user selects option from dropdown menu
+     * to update `pathPoints`(array of points that make a route.).
+     * @param {*} place {label:..., value:...}
+     */
+    function handleSelect(place) {
         console.log('PLACE: ', place);
         //setText(place.label);   
         props.setCurrentPoint(props.index);
         props.dispatchPoints({type:'update', value:{name:place.label, latLon:[place.value.lat, place.value.lon]}, index:props.index})
     }
 
+    /**
+     * Update `text` when name of point changes.
+     */
     useEffect(() => {
         setText(props.pointName);
     }, [props.pointName])
 
-// <FormControl 
-//              type="text" placeholder="Select a path point..." value={props.pointName}
-//              onChange={handleInputChange} onFocus={() => {console.log("input focused!! " + props.index); return props.setCurrentPoint(props.index)}
-//              }
-//              ></FormControl>
-// <Button onFocus={() => props.setCurrentPoint(-1)} onClick={(e) => props.dispatchPoints({type:'clear', index:props.index})}>x</Button>
     return(
         <div className="PathPoint">
             <SearchInput 
                 searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
-                selectedPlace={props.pointName} setSelectedPlace={(place) => handleInputChange(place)}
+                selectedPlace={props.pointName} setSelectedPlace={(place) => handleSelect(place)}
                 showOnMap={(place) => showOnMap(place)}
                 text={text} setText={setText}
                 handleClick={() => props.setCurrentPoint(props.index)}
             >
-                  {props.pointCount > 2 && <Button onFocus={() => {} /*props.setCurrentPoint(-1) */} onClick={(e) => props.dispatchPoints({type:'delete', index:props.index})}>
+                  {props.pointCount > 2 && <Button onClick={(e) => props.dispatchPoints({type:'delete', index:props.index})}>
                   <Trash2/>
                   </Button>}
             
@@ -206,9 +218,11 @@ function PathPoint(props) {
     );
 }
 
-
+/**
+ * Component `AddPoint` lets user add more points to better define route locations.
+ * @param {*} props 
+ */
 function AddPoint(props) {
-
     return(
         <div className="AddPoint" onClick={() => {} /* props.setCurrentPoint(-1) */}>
             <Button  onClick={() => props.dispatchPoints({type:'insert', value:{name:'', latLon:[null, null]}, index:props.nextPointIndex})}><PlusSquare/></Button>
@@ -217,6 +231,10 @@ function AddPoint(props) {
     );
 }
 
+/**
+ * Component `ConstraintContainer` hadles all logic with respect to constrains. Not implemented yet.
+ * @param {*} props 
+ */
 function ConstraintContainer(props) {
     return (
         <div className="ConstraintContainer" onFocus={() => {} /* props.setCurrentPoint(-1) */}>
@@ -226,6 +244,10 @@ function ConstraintContainer(props) {
     );
 }
 
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function Constraint(props) {
     return (
         <div className="Constraint">
@@ -234,10 +256,18 @@ function Constraint(props) {
     );
 }
 
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function Footer(props) {
     return null;
 }
 
+/**
+ * Component `SearchTab` just forwards all `props` to `SearchContainer` which it contains.
+ * @param {*} props 
+ */
 function SearchTab(props) {
     return (
         <div className="Tab">
@@ -248,17 +278,28 @@ function SearchTab(props) {
     );
 }
 
+/**
+ * Component `SearchContainer` provides a way for user to search 
+ * in the map by having an select/input with dropdown menu.
+ * Requests are sent to the server and it tries to find suitable
+ * location whose addresses match the text provided by users. 
+ * @param {*} props 
+ */
 function SearchContainer(props) {
-    const [selectedPlace, setSelectedPlace] = useState(null);
     const [text, setText] = useState(props.searchPoint.address);
     
+    /**
+     * Update `text` when address of search point is changed.
+     */
     useEffect(() => {
-        console.log("saerchpoint address: ", props.searchPoint.address);
         setText(props.searchPoint.address);
     }, [props.searchPoint.address])
 
+    /**
+     * Trigger `MapSection` to render a marker for this place.
+     * @param {*} place {label:..., value:...}
+     */
     function showOnMap(place) {
-        //console.log("Selected place ", place);
         props.dispatchSearchPoint({type:'render', place:place.value});
     }
     return (
@@ -266,17 +307,19 @@ function SearchContainer(props) {
             <p>Search map:</p>
             <SearchInput
                 searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
-                selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
+                selectedPlace={props.searchPoint.address} setSelectedPlace={(t) => {}}
                 showOnMap={(place) => showOnMap(place)}
                 text={text} setText={setText}
                 handleClick={() => {}}
             ></SearchInput>
-  
         </div>
     );
 }
 
-
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function ExportTab(props) {
 
     return (
@@ -287,6 +330,10 @@ function ExportTab(props) {
     );
 }
 
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function ImportContainer(props) {
     return (
         <div className="ExportContainer">
@@ -297,6 +344,10 @@ function ImportContainer(props) {
     );
 }
 
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function Import(props) {
     return (
         <div>
@@ -305,6 +356,10 @@ function Import(props) {
     );
 }
 
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function ExportContainer(props) {
     return (
         <div className="ExportContainer"> 
@@ -314,6 +369,10 @@ function ExportContainer(props) {
     );
 }
 
+/**
+ * Not yet implemented.
+ * @param {*} props 
+ */
 function Export(props) {
     return (
         <div>
@@ -321,23 +380,6 @@ function Export(props) {
         </div>
     );
 }
-//    function GetData() {
-//        
-//        const options = {
-//            method: 'GET'
-//        };
-//        fetch('/maps/12/2197/1392.png', options).then((response) => { console.log("data received"); return response.json()}).then((data) => setTemp(data.hello));
-//    }
-//<FormControl value={props.searchPoint.address} onChange={(e) => props.dispatchSearchPoint({type:'set', value:e.target.value})}></FormControl>
-function useRefresh() {
-    const [state, refresh] = useState(0);
-    return [
-      state,
-      useCallback(() => {
-        refresh(state + 1);
-      }, [state]),
-    ];
-  } 
 
 export default PrimaryPanel;
 
