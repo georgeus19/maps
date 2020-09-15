@@ -24,9 +24,9 @@ namespace routing {
             v = it->second;
             q.erase(it);
 
-//            if (v->osm_id_ == end_node) {
-//                return Dijkstra::CreateRoute(end_node, start_node);
-//            }
+            if (v->osm_id_ == end_node) {
+                return Dijkstra::CreateRoute(end_node, start_node);
+            }
             for (auto&& edge: v->outgoing_edges_) {
                 Vertex * neighbour = g_.GetVertex(edge.get_to());
                 if (neighbour->cost_ > v->cost_ + edge.length_) {
@@ -44,7 +44,7 @@ namespace routing {
                 }
             }
         }
-        return Dijkstra::CreateRoute(end_node, start_node);
+        throw RouteNotFoundException("Route from " + to_string(start_node) + " to " + to_string(end_node) + " could not be found");
     }
 
     std::vector<Dijkstra::Edge> Dijkstra::CreateRoute(unsigned_id_type start_node, unsigned_id_type end_node) {

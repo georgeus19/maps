@@ -2,6 +2,8 @@
 
 namespace routing {
 
+    BasicEdge::BasicEdge(): uid_(0), from_(0), to_(0), length_(0) {}
+
     BasicEdge::BasicEdge(database::EdgeDbRow & r) :
         uid_(r.get<unsigned_id_type>(0)),
         from_(r.get<unsigned_id_type>(1)),
@@ -48,5 +50,20 @@ namespace routing {
         std::swap(from_, other.from_);
         std::swap(to_, other.to_);
         std::swap(length_, other.length_);
+    }
+
+    bool BasicEdge::operator==(const BasicEdge & other) const {
+        if (uid_ == other.uid_) { return true; }
+         // If there can be two edges with same from, to -> should not be possible.
+         if (from_ == other.from_ && to_ == other.to_ && length_ == other.length_) { return true; }
+         // If a way is not oneway then there are at least 2 edges with same geography and closest edge
+         // can be any of the two - there is no way to check that we selecting it.
+         if (from_ == other.to_ && to_ == other.from_ && length_ == other.length_) { return true; }
+
+         return false;
+    }
+
+    bool BasicEdge::operator!=(const BasicEdge & other) const {
+        return !((*this) == other);
     }
 }

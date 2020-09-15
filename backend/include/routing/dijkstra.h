@@ -4,6 +4,7 @@
 #include "routing/edge.h"
 #include "routing/vertex.h"
 #include "routing/graph.h"
+#include "routing/exception.h"
 #include <queue>
 #include <algorithm>
 

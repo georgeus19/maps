@@ -16,6 +16,8 @@ namespace routing {
         unsigned_id_type to_;
         double length_;
 
+        BasicEdge();
+
         BasicEdge(database::EdgeDbRow &);
 
         BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
@@ -31,6 +33,10 @@ namespace routing {
         ~BasicEdge();
 
         void Swap(BasicEdge & other);
+
+        bool operator==(const BasicEdge & other) const;
+
+        bool operator!=(const BasicEdge & other) const;
 
         unsigned_id_type get_uid() const;
 

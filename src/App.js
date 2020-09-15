@@ -35,9 +35,10 @@ function App() {
 	const [searchPoint, dispatchSearchPoint] = useReducer(searchPointReducer, {address:'', latLon:[49.7315809334801,13.384550088168409], zoom:13, render:false});
 
 	/**
-	 * Array of geoJson features that represent route that goes from selected start point to end point.
+	 * Array of geoJson features that represent route that goes from selected start point to end point and 
+	 * a key to trigger rerender when route changes.
 	 */
-	const [route, setRoute] = useState([]);
+	const [route, setRoute] = useState({data:[], key:-1});
 
 	/**
 	 * Indicates which tab is currently open in Primary panel.

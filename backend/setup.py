@@ -5,7 +5,7 @@ includeDirs = ['/usr/local/include', './include']
 
 libs = ['pqxx', 'pq']
 
-src = [ './src/routing/dijkstra.cpp', './src/routing/edge.cpp', './src/routing/routing_module.cpp', './src/routing/vertex.cpp', './src/database/database_helper.cpp']
+src = [ './src/routing/dijkstra.cpp', './src/routing/edge.cpp', './src/routing/routing_module.cpp', './src/routing/basic_edge_endpoint_handler.cpp', './src/routing/exception.cpp', './src/routing/vertex.cpp', './src/database/database_helper.cpp', './src/utility/point.cpp']
 
 module = Extension('routing_module',
                     define_macros = [('MAJOR_VERSION', '1'),

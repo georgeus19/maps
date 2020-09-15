@@ -40,7 +40,7 @@ namespace osm_parser {
 
     public:
         GraphGenerator(index_type &index_ptr, const GeomFactory &factory, IWriter &w, const std::string &table_name)
-                : nodes_ptr_(index_ptr), factory_{factory}, writer_{w}, table_name_{table_name}, id_counter_(0) {}
+                : nodes_ptr_(index_ptr), factory_{factory}, writer_{w}, table_name_{table_name}, id_counter_(5) {}
 
         /*
          * Handles operation for current read way.

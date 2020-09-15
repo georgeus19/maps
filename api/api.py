@@ -19,7 +19,9 @@ class Test(Resource):
             for i in range(0, len(content) - 1):
                 start = content[i]
                 end = content[i + 1]
-                s = routing_module.CalculateShortestRoute("cz_edges", float(start["lon"]), float(start["lat"]), float(end["lon"]), float(end["lat"]))
+                s = routing_module.CalculateShortestRoute("czedges", float(start["lon"]), float(start["lat"]), float(end["lon"]), float(end["lat"]))
+                if s[0] == 'E' and s[1] == 'R':
+                    return []
                 route.extend(json.loads(s))
         return route
 

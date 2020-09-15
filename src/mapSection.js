@@ -60,7 +60,7 @@ function MapContainer(props) {
      * it is set and map editor shows the area of the rectangle.
      */
     const [bounds, setBounds] = useState(null);
-        
+
     /**
      * When `props.searchPoint` changes
      * create and set a correspoding marker and 
@@ -99,7 +99,7 @@ function MapContainer(props) {
         }
 
         setRouteMarkers(validPoints.map((point) => {
-            return printMarker(point.latLon, point.name);
+            return printMarker(point.latLon, point.latLon);
         }))        
     }, [props.pathPoints])
 
@@ -219,7 +219,7 @@ function MapContainer(props) {
             /> 
             {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1)}
             {props.currentTab === TabEnum.routeTab && routeMarkers}
-            {props.currentTab === TabEnum.routeTab && <GeoJSON data={props.route} key={(props.route)}></GeoJSON>}
+            {props.currentTab === TabEnum.routeTab && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
         </Map>
     );  
   }

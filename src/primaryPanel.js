@@ -6,6 +6,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Camera, Search, PlusSquare, PlusCircle, Trash2 } from 'react-feather';
+import { point } from 'leaflet';
 
 const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
 
@@ -104,8 +105,12 @@ function PointContainer(props) {
             return Promise.reject(response);
         })
         .then((route) => {
-            props.setRoute(route);
-            console.log("fetched route: ", route);
+            if (route.length == 0) {
+                console.log("invalid path.");
+            } else {
+                props.setRoute({data:route, key:props.route.key < 0 ? 1 : -1});
+                console.log("fetched route: ", route);
+            }
         })
         .catch((error) => {
             console.warn('Error occured with respect to routing.', error);
@@ -136,7 +141,7 @@ function PointContainer(props) {
             findRoute(coordinates);
         } else {
             // Clear route.
-            props.setRoute([]);
+            props.setRoute({data:[], key:props.route.key < 0 ? 1 : -1});
         }
 
     }, [props.pathPoints])
@@ -152,6 +157,10 @@ function PointContainer(props) {
             dispatchPoints={props.dispatchPoints} nextPointIndex={index + 1}></AddPoint>);
         }
     })
+    points.push(<AddPoint key={"plus" + (props.pathPoints.length - 1)} currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint} 
+    dispatchPoints={props.dispatchPoints} nextPointIndex={(props.pathPoints.length - 1) + 1}></AddPoint>);
+    console.log("points: ", points);
+    console.log(props.pathPoints.length);
     return (
         <div className="PointContainer" >
             <p>Select path points:</p>
@@ -188,7 +197,6 @@ function PathPoint(props) {
      */
     function handleSelect(place) {
         console.log('PLACE: ', place);
-        //setText(place.label);   
         props.setCurrentPoint(props.index);
         props.dispatchPoints({type:'update', value:{name:place.label, latLon:[place.value.lat, place.value.lon]}, index:props.index})
     }
@@ -225,7 +233,10 @@ function PathPoint(props) {
 function AddPoint(props) {
     return(
         <div className="AddPoint" onClick={() => {} /* props.setCurrentPoint(-1) */}>
-            <Button  onClick={() => props.dispatchPoints({type:'insert', value:{name:'', latLon:[null, null]}, index:props.nextPointIndex})}><PlusSquare/></Button>
+            <Button  onClick={() => {
+                props.dispatchPoints({type:'insert', value:{name:'', latLon:[null, null]}, index:props.nextPointIndex});
+                props.setCurrentPoint(props.nextPointIndex);
+             }}><PlusSquare/></Button>
         </div>  
 
     );
@@ -286,6 +297,9 @@ function SearchTab(props) {
  * @param {*} props 
  */
 function SearchContainer(props) {
+    /**
+     * Represents text value of select/ input.
+     */
     const [text, setText] = useState(props.searchPoint.address);
     
     /**
