@@ -12,6 +12,10 @@ namespace routing {
     std::vector<BasicEdge> BasicEdgeEndpointHandler::CalculateEndpointEdges(utility::Point p, const std::string &table_name, database::DatabaseHelper &d) {
         vector<DbRow> rows = d.GetClosestSegments(p, table_name);
 
+        if (rows.size() == 0) {
+            throw RouteNotFoundException{"Route cannot be found - endpoint edge has no neighbours."};
+        }
+
         if (edge_id_from_ == edge_id_to_) {
             edge_id_from_ = rows[0].get<unsigned_id_type>(kMaxUid) + 1;
         }
@@ -22,8 +26,17 @@ namespace routing {
         unsigned_id_type node_id = node_id_from_;
 
         vector<BasicEdge> result_edges{};
+        if (rows.size() == 1) {
 
-        unsigned_id_type selected_segment_index = CalculateSelectedSegmentIndex(rows);
+        }
+
+        unsigned_id_type selected_segment_index;
+        if (rows.size() > 1) {
+            selected_segment_index = CalculateSelectedSegmentIndex(rows);
+        } else {
+            selected_segment_index = 0;
+        }
+
 
         DbRow selected_seg_row = rows[selected_segment_index];
         unsigned_id_type segment_original_intersection = 0;
@@ -40,6 +53,10 @@ namespace routing {
         if (adj_edge_to == closest_edge_to) { segment_original_intersection = adj_edge_to; }
 
         AddReciprocalEdges(selected_seg_row, result_edges, edge_id, node_id, segment_original_intersection);
+
+        if (rows.size() == 1) {
+            return result_edges;
+        }
 
         size_t other_index = (selected_segment_index == 0) ? 1 : 0;
 

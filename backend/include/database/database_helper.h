@@ -122,74 +122,6 @@ namespace database {
         return correct_segment.second;
     }
 
-
-    template <typename Edge>
-    std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge> & edges, const std::string & table_name, const Edge & start_closest_edge, EdgeDbRow r_start,
-                                                    const Edge & end_closest_edge, EdgeDbRow r_end) {
-        bool max_two_edges = false;
-        Edge first_edge;
-        Edge second_edge;
-        Edge last_edge;
-        Edge second_last_edge;
-
-            // 2 adjacent streets(len 2), 1 same street(len 1), 1 street in middle(len 3)
-        if (edges.size() == 1) {
-            // 1 street in middle(len 3). PEIEIEP
-            if (edges[0] != start_closest_edge && edges[0] != end_closest_edge) {
-//                edges.push_back(edges[0]);
-                first_edge = edges[0];
-                second_edge = edges[0];
-                last_edge = edges[0];
-                second_last_edge = edges[0];
-            } else { // PEIEP
-                first_edge = start_closest_edge; // WHY?
-                second_edge = start_closest_edge;
-                last_edge = end_closest_edge;
-                second_last_edge = end_closest_edge;
-                max_two_edges = true;
-            }
-        } else {
-            first_edge = edges[0];
-            second_edge = edges[1];
-            last_edge = edges[edges.size() - 1];
-            second_last_edge = edges[edges.size() - 2];
-        }
-        bool skip_last_edge = false; // edges are reversed - first edge is the one around end of route!!
-        std::string first_segment = std::move(SelectEndPointSegment<Edge>(last_edge, second_last_edge, table_name, start_closest_edge, r_start, skip_last_edge));
-
-        bool skip_first_edge = false;
-        std::string last_segment = std::move(SelectEndPointSegment<Edge>(first_edge, second_edge, table_name, end_closest_edge, r_end, skip_first_edge));
-
-        std::string sql_start = " SELECT ST_AsGeoJSON(geog) " \
-                                " FROM " + table_name + " WHERE ";
-        auto fold = [](std::string a, Edge e) {
-            return std::move(a) + " or uid = " + std::to_string(e.get_uid());
-        };
-        
-        auto&& from_it = skip_first_edge ? std::next(edges.begin()) : edges.begin();
-        auto&& to_it = skip_last_edge ? std::prev(edges.end()) : edges.end();
-
-        if (from_it == to_it || max_two_edges) {
-            return '[' + first_segment + ',' + last_segment + ']';
-        }
-
-        std::string first_cond = " uid = " + std::to_string(from_it->get_uid());
-        std::string cond = std::accumulate(from_it, to_it, first_cond, fold);
-        std::string sql_end = " ;";
-        std::string complete_sql = sql_start + cond + sql_end;
-
-        pqxx::nontransaction n(connection_);
-        pqxx::result result{n.exec(complete_sql)};
-
-        auto comma_fold = [](std::string a, pqxx::result::const_iterator it) {
-            return std::move(a) + ',' + it[0].as<std::string>();
-        };
-        std::string geojson_list_start = '[' + first_segment;
-        std::string geojson_list_end = ',' + last_segment + ']';
-        std::string geojson_list_result = std::accumulate(result.begin(), result.end(), geojson_list_start, comma_fold) + geojson_list_end;
-        return geojson_list_result;
-    }
-
     template <typename Edge>
     std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge> & edges, const std::string & table_name) {
 
@@ -309,6 +241,14 @@ WITH next_edge AS (
         return result_rows;
     }
 
+    /*
+     * Example of query
+select *
+from czedges as e where ST_DWithin('SRID=4326;POINT(13.393348750000001 49.723055299999999)'::geography,
+									e.geog,
+									0.7 * ST_Distance('SRID=4326;POINT(13.3998825 49.7230553)'::geography,
+										'SRID=4326;POINT(13.3868150 49.7282850)'::geography));
+     */
     template <typename Graph>
     void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const std::string & table_name, Graph & graph) {
         std::string load_graph_sql = "select uid, from_node, to_node, length " \
@@ -322,90 +262,5 @@ WITH next_edge AS (
             graph.AddEdge(row);
         }
     }
-
-/*
--- "Closest" 100 streets to Broad Street station are?long 13.391480 lat 49.726250   49.7262000N, 13.3915000E
-WITH closest_candidates AS (
-  SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length
-  FROM cz_edges as e
-  ORDER BY
-    e.geog <-> 'SRID=4326;POINT(13.3915000 49.7262000)'::geography
-  LIMIT 100
-),
-closest_edge AS (SELECT *
-FROM closest_candidates
-ORDER BY
-  ST_Distance(geog, 'SRID=4326;POINT(13.3915000 49.7262000)'::geography)
-LIMIT 1
-)
-SELECT *, 'SRID=4326;POINT(13.3915000 49.7262000)'::geography, st_asText(geog),
-st_astext(st_transform(
-	st_closestpoint(
-		st_transform(geog::geometry, 3785),
-		st_transform('SRID=4326;POINT(13.3915000 49.7262000)'::geometry, 3785)
-	),
-	4326))
-FROM closest_edge
- */
-
-/*
-select uid, from_node, to_node, length from cz_edges as e where ST_DWithin('SRID=4326;POINT(13.3915000 49.7262000)'::geography, e.geog, 2000);
-
- select *
-from cz_edges as e where ST_DWithin('SRID=4326;POINT(13.393348750000001 49.723055299999999)'::geography,
-									e.geog,
-									0.7 * ST_Distance('SRID=4326;POINT(13.3998825 49.7230553)'::geography,
-										'SRID=4326;POINT(13.3868150 49.7282850)'::geography));
-*/
-/*
- * TODO: Add edges representing segments to local graph when looking for the closest edges.
-WITH closest_candidates AS (
-  SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length
-  FROM czedges as e
-  ORDER BY
-    e.geog <-> 'SRID=4326;POINT(13.3915000 49.7262000)'::geography
-  LIMIT 100
-),
-closest_edge AS (SELECT *
-FROM closest_candidates
-ORDER BY
-  ST_Distance(geog, 'SRID=4326;POINT(13.3915000 49.7262000)'::geography)
-LIMIT 1
-),
-blade_point AS (
-	SELECT --*, 'SRID=4326;POINT(13.3915000 49.7262000)'::geography, st_asText(geog),
-		(st_transform(
-			st_closestpoint(
-				st_transform(geog::geometry, 3785),
-				st_transform('SRID=4326;POINT(13.3915000 49.7262000)'::geometry, 3785)
-			),
-			4326)) AS geog
-	FROM closest_edge
-),
- segments as (
-  SELECT st_transform(
-	  (
-	      st_dump(ST_Split(
-              ST_Snap(l.geog::geometry, blade.geog::geometry, 0.0000001),
-              blade.geog::geometry
-          ))
-  	  ).geom
-	  , 4326)::geography AS geog
-  FROM closest_edge AS l,
-       blade_point AS blade
-       ),
-max_uid AS (SELECT MAX(uid) AS uid FROM czedges),
-adjacent AS (
-SELECT czedges.from_node, czedges.to_node, ST_Length(segments.geog) as seg_len
-FROM czedges INNER JOIN segments ON (ST_Intersects(segments.geog, czedges.geog)),
-	closest_edge AS ce
-WHERE not ((ce.from_node = czedges.from_node and ce.to_node = czedges.to_node) or
-	  (ce.from_node = czedges.to_node and ce.to_node = czedges.from_node))
-LIMIT 1
-)
-SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(segments.geog), ST_AsGeoJSON(segments.geog), adjacent.seg_len, max_uid.uid
-  FROM segments, closest_edge as e, max_uid,  adjacent
- */
-
 }
 #endif //BACKEND_DATABASEHELPER_H

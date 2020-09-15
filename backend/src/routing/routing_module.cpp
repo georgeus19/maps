@@ -129,11 +129,12 @@ PyMODINIT_FUNC PyInit_routing_module(void) {
 //1: Object { lon: 13.393126720755621, lat: 49.72520397491957 }
 //Object { lon: 13.391427565774665, lat: 49.72625472231029 }
 //1: Object { lon: 13.393126622053574, lat: 49.725377367144915 }
+//15.568861848533453, 50.66747073900733, 15.581821585773252,  50.67989977147217)
 int main() {
     string result;
     try { //13.39134574848472, 49.72619577008857 , 13.390991827529778, 49.72644544959591
 //        result = CCalculateShortestRoute("czedges", utility::Point{13.3998825, 49.7230553}, utility::Point{13.3868150, 49.7282850});
-        result = CCalculateShortestRoute("czedges", utility::Point{13.391427565774665, 49.72625472231029}, utility::Point{ 13.393126622053574, 49.725377367144915});
+        result = CCalculateShortestRoute("czedges", utility::Point{15.568861848533453, 50.66747073900733}, utility::Point{ 15.581821585773252,  50.67989977147217});
     } catch (exception & e) {
         result = e.what();
     }

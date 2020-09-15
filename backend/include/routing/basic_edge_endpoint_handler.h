@@ -4,6 +4,7 @@
 #include <string>
 #include "routing/edge.h"
 #include "database/database_helper.h"
+#include "routing/exception.h"
 #include "routing/endpoint_handler.h"
 namespace routing {
 
