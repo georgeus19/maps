@@ -5,24 +5,31 @@
 #include <limits>
 namespace routing {
 
-    template <typename T>
-    class CostComparer {
-    public:
-        constexpr bool operator()( const T& p1, const T& p2 ) const {
-            // Compare if these are same vertices.
-            if (p1.second == p2.second) {
-                return false;
-            }
-            // Compare costs.
-            return  p1.first < p2.second;
-        }
-    };
-
+    /**
+     * BasicVertex is a routing graph vertex with only the most general properties.
+     */
     class BasicVertex {
     public:
+        /**
+         * Unique id.
+         */
         unsigned_id_type osm_id_;
+
+        /**
+         * Edges which have origin in this to all neighbours.
+         */
         std::vector<BasicEdge> outgoing_edges_;
+
+        /**
+         * How much it costs to go ti this vertex from the start point
+         * of a routing algorithm.
+         */
         double cost_;
+
+        /**
+         * Id of vertex that is one edge closer to the start
+         * point of the best route.
+         */
         unsigned_id_type previous_;
 
         BasicVertex(unsigned_id_type osm_id, std::vector<BasicEdge> && outgoing_edges);

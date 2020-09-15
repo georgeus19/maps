@@ -1,6 +1,3 @@
-//
-// Created by hrubyk on 02.09.20.
-//
 #include "osm_parser/writer.h"
 using namespace std;
 namespace osm_parser {
@@ -13,6 +10,9 @@ namespace osm_parser {
         f_.close();
     }
 
+    /*
+     * Create table script. Add unique id Primary key which is generated directly in db.
+     */
     void InsertWriter::WriteInitSql(const string &table_name) {
         string sql = "CREATE TABLE " + table_name + "("  \
         "uid serial PRIMARY KEY, " \
@@ -31,8 +31,11 @@ namespace osm_parser {
     }
 
     void InsertWriter::WriteFinishSql(const std::string &table_name) {
+        // Add length column.
         string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length double precision;";
+        // Calculate lengths.
         string fill_length_column = "UPDATE " + table_name + " set length = st_length(geog);";
+        // Create geo index.
         string create_index = "CREATE INDEX " + table_name + "_gix ON " + table_name + " USING GIST (geog);";
 
         f_ << add_length_column << std::endl;
@@ -54,15 +57,20 @@ namespace osm_parser {
     }
 
     void CopyWriter::WriteInitSql(const string &table_name) {
+        // Create table.
         string create_table = "CREATE TABLE " + table_name + "("  \
         "osm_id BIGINT NOT NULL, " \
         "uid BIGINT PRIMARY KEY, " \
         "geog geography(LINESTRING) NOT NULL, " \
         "from_node BIGINT NOT NULL, " \
         "to_node BIGINT NOT NULL);";
+        // Write COPY command that loads edges from data to table `table_name`.
         string copy = "COPY " + table_name + " FROM '" + data_path_ + "' DELIMITER ';' CSV;";
+        // Add length column.
         string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length double precision;";
+        // Calculate lengths.
         string fill_length_column = "UPDATE " + table_name + " set length = st_length(geog);";
+        // Create geo index.
         string create_index = "CREATE INDEX " + table_name + "_gix ON " + table_name + " USING GIST (geog);";
         f_init_table_ << create_table << std::endl;
         f_init_table_ << copy << std::endl;
@@ -73,11 +81,12 @@ namespace osm_parser {
     }
 
     void CopyWriter::WriteEdge(const string &table_name, const Edge &edge) {
+        // Write edge to data file. Data format is CSV with ';' delimiters.
         string data = edge.get_osm_id() + "; " + edge.get_uid() + "; " + edge.get_geography() + "; " + edge.get_from() + "; " + edge.get_to();
         f_data_ << data << std::endl;
     }
 
     void CopyWriter::WriteFinishSql(const std::string &table_name) {
-
+        // All done in WriteInitSql...
     }
 }

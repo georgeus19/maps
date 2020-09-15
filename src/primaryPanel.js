@@ -91,7 +91,7 @@ function PointContainer(props) {
      * @param {Array of pairs} points [[lon, lat], ...] 
      */
     function findRoute(points) {
-        fetch('/test', {
+        fetch('/route', {
             method: 'POST',
             body: JSON.stringify(points),
             headers: {

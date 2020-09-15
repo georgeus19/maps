@@ -3,9 +3,6 @@
 using namespace std;
 namespace database {
 
-    const string kHouseNameTag = "\"addr:housename\"";
-    const string kHouseNumberTag = "\"addr:housenumber\"";
-
     DatabaseHelper::DatabaseHelper(const string & db_name, const string & user, const string & password,
                                    const string & host_address, const string & port) : db_name_(db_name),
                                                                                        user_(user), password_(password), host_address_(host_address),
@@ -19,26 +16,6 @@ namespace database {
 
     bool DatabaseHelper::IsDbOpen() {
         return connection_.is_open();
-    }
-
-    void DatabaseHelper::CreateGraphTable(const string & sql) {
-        pqxx::work w(connection_);
-        w.exec(sql);
-        w.commit();
-    }
-
-    void DatabaseHelper::SearchFor(const string & s) {
-        string sql = "SELECT " + kHouseNameTag + " " \
-        "FROM planet_osm_polygon " \
-        "WHERE " + kHouseNameTag + " like '" + s + "%' " \
-        "LIMIT 5";
-        pqxx::nontransaction n(connection_);
-
-        pqxx::result query_result(n.exec(sql));
-
-        for (pqxx::result::const_iterator it = query_result.cbegin(); it != query_result.end(); ++it) {
-            std::cout << it[0].as<string>() << std::endl;
-        }
     }
 
     /*
@@ -68,7 +45,11 @@ FROM closest_edge
      */
     EdgeDbRow DatabaseHelper::FindClosestEdge(utility::Point p, const string & table_name){
         string point = MakeGeographyPoint(p);
-        // "Closest" 100 streets to Broad Street station are?long 13.391480 lat 49.726250   49.7262000N, 13.3915000E
+        /*
+         * Find closest 100 candidates to be the closest edge by comparing bounding rectangles.
+         * Then select the closest edge out of them by comparing true line to point distances.
+         * Return the closest edge info and calculate closest point on the edge from point.
+         */
         string closest_edge_sql = "WITH closest_candidates AS ( " \
                                       "SELECT e.uid, e.geog, e.from_node, e.to_node, e.length " \
                                       "FROM " + table_name + " as e " \
@@ -98,7 +79,7 @@ FROM closest_edge
 
 
     std::string DatabaseHelper::MakeSTPoint(utility::Point p) {
-        return "POINT(" + to_string(p.lon_) + " " + to_string(p.lat_) + ")"; // e.g. POINT(13.3915000 49.7262000)
+        return "POINT(" + to_string(p.lon_) + " " + to_string(p.lat_) + ")";
     }
 
 
@@ -111,19 +92,7 @@ FROM closest_edge
                 "" + MakeGeographyPoint(end) + ") ";
     }
 
-    std::pair<double, std::string> DatabaseHelper::GetSegmentDistanceToStart(DbRow r) {
-        double min = std::numeric_limits<double>::max();
-        size_t segment_index = 4;
-        for (size_t i = 0; i < 4; ++i) {
-            double dist = r.get<double>(i);
-            if (dist < min) {
-                min = dist;
-            }
-        }
-        return std::make_pair(min, r.get<std::string>(segment_index));
-    }
-
-    /*
+    /**
      * Example of such sql:
 WITH closest_candidates AS (
   SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length
@@ -174,6 +143,23 @@ SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s
      */
     vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string &table_name) {
         string point = MakeGeographyPoint(p);
+        /*
+         * First compute closest edge to `point` by fast finding (compare bounding rectangles)
+         * the 100 candidates and selecting the best from them.
+         *
+         * Then calculate the closest point on the found edge to the `point`.
+         *
+         * Split the edge using the point to two segments (Snap closest point
+         * to line - then it can be split by it 100%).
+         *
+         * Get max edge uid used in graph.
+         *
+         * Select ad edge that is adjacent to one of the segments (they touch at one intersection)
+         * and calculate distance of the segment to later identify which one it was.
+         *
+         * Put it all together and return endpoints of adjacent edge, closest edge,
+         * segment length, segment geoJSON geometry, previous query segment length and max uid.
+         */
         string sql = "WITH closest_candidates AS ( " \
                      "  SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length " \
                      "  FROM " + table_name + " as e " \
@@ -229,7 +215,5 @@ SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s
             result_rows.push_back(DbRow{c});
         }
         return result_rows;
-
     }
-
 }

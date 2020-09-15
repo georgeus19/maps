@@ -1,3 +1,7 @@
+/*
+ * This is just a test file to see if mapnik is correctly installed and if not to see compilation errors and install mapnik correctly.
+ * This program also tests that xml stylesheet is correctly configured and a picture is correctly generated.
+ */
 #include <iostream>
 #include <string>
 #include <mapnik/map.hpp>
@@ -24,11 +28,6 @@ using namespace mapnik;
 int main() {
     mapnik::datasource_cache::instance().register_datasources("/usr/local/lib/mapnik/input");
     mapnik::Map m(600,300);
-    // m.set_background(parse_color("steelblue"));
-    // feature_type_style s;
-    //rule r;
-    // polygon_symbolizer polygon_symbolizer;
-    // put(polygon_symbolizer, keys::fill(10));
 
     mapnik::load_map(m, "/home/hrubyk/projects/maps/backend/world_style.xml");
     m.zoom_all();

@@ -1,6 +1,15 @@
+/*
+ * This file implements rendering tiles and contains python bindings for the rendering function.
+ * Tiles are saved to the directory specified in arguments.
+ * It is not used on the server since it is too slow in comparison with Apache + mod_tile (renderd)
+ * but it is a good way to test python bindings and that mapnik is correctly installed.
+ *
+ * Since it is not used, it contains some hardcoded paths (xml, fonts, inputs).
+ * Change them if you want to use this module and generate a new .so file using setupRendering.py
+ * script in the backend directory.
+ */
 #define PY_SSIZE_T_CLEAN
 #include <python3.8/Python.h>
-#include "rendermodule.h"
 
 #include <iostream>
 #include <string>
@@ -54,10 +63,13 @@ box2d<double> Tile2BoudingBox(int tile_x, int tile_y, int zoom) {
 }
 
 int CRender(int tile_x, int tile_y, int zoom, const string& tile_path) {
-    mapnik::datasource_cache::instance().register_datasources("/usr/local/lib/mapnik/input");
+    string inputs_path = "/usr/local/lib/mapnik/input";
+    string fonts_path = "/usr/local/lib/mapnik/fonts/";
+    string xml_stylesheet_path = "/home/hrubyk/projects/maps/backend/stylesheet_osm_bright/map_stylesheet.xml";
+    mapnik::datasource_cache::instance().register_datasources(inputs_path);
     mapnik::Map m(256, 256);
-    m.register_fonts("/usr/local/lib/mapnik/fonts/");
-    mapnik::load_map(m, "/home/hrubyk/projects/maps/backend/stylesheet_osm_bright/map_stylesheet.xml");
+    m.register_fonts(fonts_path);
+    mapnik::load_map(m, xml_stylesheet_path);
 
     //m.set_aspect_fix_mode(mapnik::Map::ADJUST_BBOX_HEIGHT);
     m.zoom_to_box(Tile2BoudingBox(tile_x, tile_y, zoom));
@@ -66,16 +78,15 @@ int CRender(int tile_x, int tile_y, int zoom, const string& tile_path) {
     mapnik::image_rgba8 im(256,256);
     mapnik::agg_renderer<mapnik::image_rgba8> ren(m, im);
     ren.apply();
-    /*
-    std::ostringstream oss;
-    oss << "/home/hrubyk/projects/maps/api/";
-    oss << "im_" << zoom << "_" << (int)x << "_" << (int)y << ".png";
-    std::string image_path = oss.str();
-    */
+
     mapnik::save_to_file(im, tile_path);
     return 1;
 }
 
+/*
+ * From down below is the setup for python bindings.
+ * Parsing arguments from python and calling our tile_render function.
+ */
 static PyObject* Render(PyObject* self, PyObject* args) {
     int tile_x;
     int tile_y;
@@ -87,6 +98,9 @@ static PyObject* Render(PyObject* self, PyObject* args) {
     return Py_BuildValue("i", CRender(tile_x, tile_y, tile_z, string(tile_path)));
 }
 
+/*
+ * Registering method Render so that it can be called from python.
+ */
 static PyMethodDef renderMethods[] = {
         {"Render", Render, METH_VARARGS, "Render tile."},
         {NULL, NULL, 0, NULL}

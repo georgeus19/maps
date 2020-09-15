@@ -9,7 +9,6 @@ file(GLOB OthersGlob src/*.cpp include/*.h)
 file(GLOB RoutingGLob src/routing/*.cpp include/routing/*.h)
 file(GLOB UtilityGlob src/utility/*.cpp include/utility/*.h)
 
-add_library(backend ${OthersGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_executable(backend_test ${OthersGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_library(render ${TileRenderingGlob})
 add_executable(graph_builder ${OsmParserGlob})
@@ -50,9 +49,6 @@ link_directories(backend_test /usr/local/lib)
 
 target_link_libraries(routing pqxx)
 target_link_libraries(routing pq)
-
-target_link_libraries(backend pqxx)
-target_link_libraries(backend pq)
 
 target_link_libraries(backend_test mapnik boost_filesystem boost_regex cairo png proj tiff webp icui18n boost_system harfbuzz jpeg icuuc freetype z dl)
 target_link_libraries(backend_test libmapnik-json.a libmapnik-wkt.a )

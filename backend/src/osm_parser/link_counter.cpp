@@ -1,11 +1,8 @@
-//
-// Created by hrubyk on 02.09.20.
-//
 #include "osm_parser/link_counter.h"
 
 using namespace std;
 namespace osm_parser {
-    LinkCounter::LinkCounter(index_type &index_ptr) : nodes_ptr_(index_ptr) {}
+    LinkCounter::LinkCounter(index_type &node_links) : node_links_(node_links) {}
 
     void LinkCounter::way(const osmium::Way &way) {
         // Skip invalid ways.
@@ -24,12 +21,14 @@ namespace osm_parser {
 
             osmium::unsigned_object_id_type node_id = nr.positive_ref();
 
-            size_t value = nodes_ptr_.get_noexcept(node_id);
+            size_t value = node_links_.get_noexcept(node_id);
+            // If a node is not found in the index osmium library
+            // returns osmium::index::empty_value<T>() in get_noexcept().
             bool not_in_index = value == osmium::index::empty_value<size_t>();
             if (not_in_index) {
-                nodes_ptr_.set(node_id, 1);
+                node_links_.set(node_id, 1);
             } else {
-                nodes_ptr_.set(node_id, value + 1);
+                node_links_.set(node_id, value + 1);
             }
         }
     }

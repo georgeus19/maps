@@ -10,7 +10,7 @@ import json
 app = Flask(__name__)
 api = Api(app)
 
-@api.route('/test')
+@api.route('/route')
 class Test(Resource):
     def post(self):
         content = request.json

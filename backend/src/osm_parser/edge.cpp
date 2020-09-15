@@ -1,7 +1,3 @@
-//
-// Created by hrubyk on 02.09.20.
-//
-
 #include "osm_parser/edge.h"
 namespace osm_parser {
     Edge::Edge(unsigned_id_type osm_id, uint64_t uid, std::string &&geography, unsigned_id_type from, unsigned_id_type to) :
@@ -10,6 +6,9 @@ namespace osm_parser {
     Edge::Edge(unsigned_id_type osm_id, uint64_t uid, const std::string & geography, unsigned_id_type from, unsigned_id_type to) :
         osm_id_(osm_id), uid_(uid), geography_(geography), from_(from), to_(to) {}
 
+    /**
+     * Geography is usually read later when this option of conctructor is used.
+     */
     Edge::Edge(unsigned_id_type osm_id, uint64_t uid, unsigned_id_type from, unsigned_id_type to) :
             osm_id_(osm_id), uid_(uid), geography_(""), from_(from), to_(to) {}
 

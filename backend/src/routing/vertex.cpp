@@ -5,10 +5,10 @@ using namespace std;
 namespace routing {
     
     BasicVertex::BasicVertex(unsigned_id_type osm_id, std::vector<BasicEdge> && outgoing_edges)
-        : osm_id_(osm_id), outgoing_edges_(std::move(outgoing_edges)), cost_(numeric_limits<double>::max()), previous_(0) {}
+        : osm_id_(osm_id), outgoing_edges_(std::move(outgoing_edges)), cost_(numeric_limits<double>::max()), previous_(numeric_limits<unsigned_id_type>::max()) {}
 
     BasicVertex::BasicVertex(unsigned_id_type osm_id, const std::vector<BasicEdge> & outgoing_edges)
-            : osm_id_(osm_id), outgoing_edges_(outgoing_edges), cost_(numeric_limits<double>::max()), previous_(0) {}
+            : osm_id_(osm_id), outgoing_edges_(outgoing_edges), cost_(numeric_limits<double>::max()), previous_(numeric_limits<unsigned_id_type>::max()) {}
 
     BasicVertex::BasicVertex(const BasicVertex & other) {
         osm_id_ = other.osm_id_;
@@ -34,7 +34,7 @@ namespace routing {
     BasicVertex& BasicVertex::operator=(BasicVertex && other) {
         if (this != &other) {
             osm_id_ = other.osm_id_;
-            outgoing_edges_ = std::move(outgoing_edges_);
+            outgoing_edges_ = std::move(other.outgoing_edges_);
             other.outgoing_edges_ = vector<BasicEdge>{};
             cost_ = other.cost_;
             previous_ = other.previous_;

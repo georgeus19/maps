@@ -1,3 +1,6 @@
+/*
+ * This is just a test file to see if mapnik is correctly installed and if not to see compilation errors and install mapnik correctly.
+ */
 #include <iostream>
 #include <string>
 #include <mapnik/map.hpp>

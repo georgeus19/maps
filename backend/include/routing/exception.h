@@ -6,6 +6,9 @@
 
 namespace routing {
 
+    /**
+     * RouteNotFoundException is thrown when it is impossible to find the best route.
+     */
     class RouteNotFoundException : public std::exception {
         std::string message_;
     public:
@@ -23,7 +26,7 @@ namespace routing {
 
         RouteNotFoundException & operator=(RouteNotFoundException && other);
 
-        ~RouteNotFoundException();
+        ~RouteNotFoundException() override;
 
         void Swap(RouteNotFoundException & other);
 

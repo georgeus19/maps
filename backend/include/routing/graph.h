@@ -10,23 +10,42 @@
 #include <set>
 
 namespace routing {
+
+    /**
+     * Routing graph which can be used for any edge and vertex types.
+     * However, Vertex and Edge must be valid with respect to each other.
+     * @tparam Vertex Type of vertex in the graph.
+     * @tparam Edge Type of edge in the graph.
+     */
     template <typename Vertex, typename Edge>
     class Graph {
+        /**
+         * Internal graph representaions. Unfortunately, even though the ids
+         * are number they are too high to index using std::vector.
+         */
         std::unordered_map<unsigned_id_type, Vertex> g_;
     public:
 
         Graph();
 
-        void AddEdge(database::EdgeDbRow &);
+        /**
+         * Add edge represented by row to graph.
+         * @param row Row representing graph edge.
+         */
+        void AddEdge(database::EdgeDbRow & row);
 
-        void AddEdge(Edge&&);
+        /**
+         * Add `edge` to graph.
+         * @param edge Edge which is added to graph.
+         */
+        void AddEdge(Edge&& edge);
 
+        /**
+         * Return point to vertex with `id`.
+         * @param id Id of vertex to which Vertex* points.
+         * @return Pointer to vetex or nullptr if it is not found.
+         */
         Vertex* GetVertex(unsigned_id_type id);
-
-//        std::priority_queue<Vertex*, std::vector<Vertex*>, CostComparer<Vertex*>> GetVertices();
-
-        std::set<std::pair<double, Vertex*>, CostComparer<std::pair<double, Vertex*>>> GetVertices();
-
     };
 
     template <typename Vertex, typename Edge>
@@ -34,29 +53,7 @@ namespace routing {
 
     template <typename Vertex, typename Edge>
     void Graph<Vertex, Edge>::AddEdge(database::EdgeDbRow & r) {
-
         AddEdge(std::move(Edge{r}));
-/*
-        // Add edge to->from, this is a temporary measure...
-        {
-            Edge e{
-                    r.get<unsigned_id_type>(0),
-                    r.get<std::string>(1),
-                    r.get<unsigned_id_type>(3),
-                    r.get<unsigned_id_type>(2),
-                    r.get<double>(4)
-            };
-            auto&& it = g_.find(e.get_from());
-            if (it == g_.end()) {
-                unsigned_id_type from_node = e.get_from();
-                Vertex v{from_node, std::vector<Edge>{}};
-                v.AddEdge(std::move(e));
-                g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(from_node), std::move(v)));
-            } else {
-                it->second.AddEdge(std::move(e));
-            }
-        }
-        */
     }
 
     template <typename Vertex, typename Edge>
@@ -93,26 +90,6 @@ namespace routing {
         } else {
             return &((it->second));
         }
-    }
-
-//    template <typename Vertex, typename Edge>
-//    std::priority_queue<Vertex*, std::vector<Vertex*>, CostComparer<Vertex*>> Graph<Vertex, Edge>::GetVertices() {
-//        std::priority_queue<Vertex*, std::vector<Vertex*>, CostComparer<Vertex*>> res;
-//        for(auto&& it = g_.begin(); it != g_.end(); ++it) {
-//            std::cout << it->second.osm_id_ << " ";
-//            std::cout << &(it->second) << std::endl;
-//            res.push(&(it->second));
-//        }
-//        return res;
-//    }
-
-    template <typename Vertex, typename Edge>
-    std::set<std::pair<double, Vertex*>, CostComparer<std::pair<double, Vertex*>>> Graph<Vertex, Edge>::GetVertices() {
-       std::set<std::pair<double, Vertex*>, CostComparer<std::pair<double, Vertex*>>> res;
-        for(auto&& it = g_.begin(); it != g_.end(); ++it) {
-            res.insert(std::make_pair<double, Vertex*>((it->second).cost_, &(it->second)));
-        }
-        return res;
     }
 }
 

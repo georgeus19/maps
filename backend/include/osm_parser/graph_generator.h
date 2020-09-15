@@ -24,25 +24,56 @@
 
 
 namespace osm_parser {
-    /*
-     * Class used for spliting ways into segments that contain no intersection within.
-     * Final segments are written to an output file using `writer_`.
+    /**
+     * Class derived from osmium hadler class means that three methods can be overridden
+     * - node(), way(), ref() - and these methods are called when osm node, way, ref
+     * element is parsed. So that it is possible to e.g. read geometries and 
+     * decide what to do with them.
+     * 
+     * Class used for spliting ways into segments (=graph edges) that contain no intersection within.
+     * Final segments are written to an output file using `writer_`. The file is a sql script
+     * that can load the segments into db.
      */
     template<typename GeomFactory>
     class GraphGenerator : public osmium::handler::Handler {
-        index_type &nodes_ptr_;
+        /**
+         * A index type provided by osmium library.
+         * This field contains for each node a number of how many ways it is part of.
+         * So if the number is greater than one it is an intersection.
+         */
+        index_type &node_links_;
+
+        /**
+         * Osmium factory used to create wkt or wkb format geometries from lon lat coordinates.
+         * These geometries can be further used with postgis.
+         */
         GeomFactory factory_;
+
+        /**
+         * Writer writes each way (resp. its parts=edges) to a file with its geometry, etc...
+         * It generates sql script that can be used to load edges to db.
+         */
         IWriter &writer_;
+
+        /**
+         * Name of db table which should be created to hold the data.
+         * Only in sql script. No db table is created now.
+         */
         std::string table_name_;
+
+        /**
+         * Field that is incremented for each new edge.
+         * It is a source of unique ids for edges.
+         */
         uint64_t id_counter_;
 
         using const_nodelist_iterator = osmium::WayNodeList::const_iterator;
 
     public:
-        GraphGenerator(index_type &index_ptr, const GeomFactory &factory, IWriter &w, const std::string &table_name)
-                : nodes_ptr_(index_ptr), factory_{factory}, writer_{w}, table_name_{table_name}, id_counter_(5) {}
+        GraphGenerator(index_type &node_links, const GeomFactory &factory, IWriter &w, const std::string &table_name)
+                : node_links_(node_links), factory_{factory}, writer_{w}, table_name_{table_name}, id_counter_(5) {}
 
-        /*
+        /**
          * Handles operation for current read way.
          * If way is highway it is split into segments (=edges)
          * segments' geometries (linestring) are created.
@@ -79,7 +110,7 @@ namespace osm_parser {
             ++second;
             for (; second != nodes.cend(); ++second) {
 
-                size_t value = nodes_ptr_.get_noexcept(second->positive_ref());
+                size_t value = node_links_.get_noexcept(second->positive_ref());
                 bool not_in_index = value == osmium::index::empty_value<size_t>();
                 // All of these nodes should definitely be in the index.
 
@@ -124,7 +155,7 @@ namespace osm_parser {
         }
 
     private:
-        /*
+        /**
          * Saves a way segment to a file.
          *
          * @param from Iterator pointing to the first node of the segment.
@@ -145,7 +176,7 @@ namespace osm_parser {
             }
         }
 
-        /*
+        /**
          * Creates a wkt linestring of a segment represented by given iterators.
          *
          * @param from Iterator pointing to the first node of the segment.

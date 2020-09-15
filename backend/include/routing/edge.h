@@ -8,12 +8,32 @@
 namespace routing {
     using unsigned_id_type = std::uint64_t;
 
+    /**
+     * BasicEdge is a graph edge with only most general properties which can be
+     * used only in simple algorithms.
+     */
     class BasicEdge {
     public:
         using id_type = unsigned_id_type;
+
+        /**
+         * Unique id of the edge.
+         */
         unsigned_id_type uid_;
+
+        /**
+         * Origin of the edge.
+         */
         unsigned_id_type from_;
+
+        /**
+         * Destination of the edge.
+         */
         unsigned_id_type to_;
+
+        /**
+         * Length of the edge.
+         */
         double length_;
 
         BasicEdge();
@@ -34,6 +54,9 @@ namespace routing {
 
         void Swap(BasicEdge & other);
 
+        /**
+         * "Graphical" comparison of edges.
+         */
         bool operator==(const BasicEdge & other) const;
 
         bool operator!=(const BasicEdge & other) const;

@@ -1,3 +1,7 @@
+/*
+ * File used for testing how libraries, other components work.
+ * It is not used in the main project - it is safe to ignore this file.
+ */
 #include "database/database_helper.h"
 #include <iostream>
 #include <string>
@@ -68,19 +72,12 @@ int CRender(int tile_x, int tile_y, int zoom, const string& tile_path) {
     m.register_fonts("/usr/local/lib/mapnik/fonts/");
     mapnik::load_map(m, "/home/hrubyk/projects/maps/backend/stylesheet_osm_bright/map_stylesheet.xml");
 
-    //m.set_aspect_fix_mode(mapnik::Map::ADJUST_BBOX_HEIGHT);
     m.zoom_to_box(Tile2BoudingBox(tile_x, tile_y, zoom));
-    //m.zoom_all();
 
     mapnik::image_rgba8 im(256,256);
     mapnik::agg_renderer<mapnik::image_rgba8> ren(m, im);
     ren.apply();
-    /*
-    std::ostringstream oss;
-    oss << "/home/hrubyk/projects/maps/api/";
-    oss << "im_" << zoom << "_" << (int)x << "_" << (int)y << ".png";
-    std::string image_path = oss.str();
-    */
+
     mapnik::save_to_file(im, tile_path);
     return 1;
 }
