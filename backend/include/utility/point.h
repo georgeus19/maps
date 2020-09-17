@@ -5,6 +5,9 @@
 
 namespace utility {
 
+    /**
+     * Point represent geographical location on Earth.
+     */
     struct Point {
         double lon_;
         double lat_;
