@@ -61,6 +61,8 @@ function MapContainer(props) {
      */
     const [bounds, setBounds] = useState(null);
 
+    const [draggedRouteMarker, setDraggedRouteMarker] = useState(0);
+
     /**
      * When `props.searchPoint` changes
      * create and set a correspoding marker and 
@@ -99,8 +101,12 @@ function MapContainer(props) {
         }
 
         setRouteMarkers(validPoints.map((point) => {
-            return printMarker(point.latLon, point.latLon);
-        }))        
+            return printMarker(point.latLon, point.latLon, true);
+        }));
+        console.log("ROUTE MARKERS", validPoints.map((point) => {
+            return printMarker(point.latLon, point.latLon, true);
+        }));
+        console.log("POINT PATH ", validPoints);        
     }, [props.pathPoints])
 
     /**
@@ -138,12 +144,61 @@ function MapContainer(props) {
 
     }
 
+    function handleRouteMarkerDragend(e) {
+        const from = L.latLng(e.target.options.position[0], e.target.options.position[1]);
+        const to = {lat:e.target._latlng.lat, lng:e.target._latlng.lng};
+        let minDistance = Number.MAX_VALUE;
+        let minIndex = -1;
+        const distances = props.pathPoints.map((point) => {           
+            if (isValidPoint(point) === false) {
+                return  Number.MAX_VALUE;
+            }
+            return from.distanceTo(L.latLng(point.latLon[0], point.latLon[1])); 
+        });
+        
+        for (let i = 0; i < distances.length; i++) {
+            if (minDistance > distances[i]) {
+                minDistance = distances[i];
+                minIndex = i;
+            }
+        }
+        console.log("distances ", distances);
+        
+
+
+        console.log("index of moved marker: ", minIndex);
+        // props.setCurrentPoint(minIndex);
+        if (minDistance === Number.MAX_VALUE) {
+            console.log("SOMETHING DID NOT PAN OUT WITH DRAGGED MARKER: ", e);
+        }
+        setPoint(to.lng, to.lat, minIndex);
+        
+    }
+
+    // function handleRouteMarkerDragstart(e) {
+    //     let index = 0;
+    //     let found = false;
+
+    //     props.pathPoints.filter((point) => {           
+    //         if (e.target._latlng.lat === point.latLon[0] && e.target._latlng.lng === point.latLon[1]) {
+    //             found = true;
+    //             return true;
+    //         } 
+    //         if (found === false) {
+    //             ++index;
+    //         }
+    //     });
+        
+    //     setDraggedRouteMarker(index);
+    // }
+
+
     /**
      * Create a marker element with predefined `markerIcon`. 
      * @param {pair} latLon [lat, lon]
      * @param {*} key 
      */
-    function printMarker(latLon, key) {
+    function printMarker(latLon, key, isRouteMarker) {
         const icon = L.icon({
             iconUrl: markerIcon,
         
@@ -154,7 +209,8 @@ function MapContainer(props) {
             popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
         });
         return (
-            <Marker position={latLon} icon={markerIcon} key={key}>
+            <Marker position={latLon} icon={markerIcon} key={key} draggable={isRouteMarker}
+             ondragend={handleRouteMarkerDragend}>
 
             </Marker>
         );
@@ -165,9 +221,10 @@ function MapContainer(props) {
      * find address of location specified by parameters.
      * @param {double} lon 
      * @param {double} lat 
+     * @param {int} index - if not -1 then it indicates for which point (on that index) is address looked for.
      */
-    function setPoint(lon, lat) {
-        if (props.currentPoint === -1) {
+    function setPoint(lon, lat, index = -1) {
+        if (props.currentPoint === -1 && index === -1) {
             return;
         }
 
@@ -175,10 +232,11 @@ function MapContainer(props) {
         const options = {
             method: 'GET'
         };
-        fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json', options)
+        // https://nominatim.openstreetmap.org/reverse?lat - nominatim free test api server
+        fetch('http://127.0.0.1/nominatim/reverse?lat=' + lat + '&lon=' + lon + '&format=json', options)
                 .then((response) => { console.log("DATA FETCHED"); return response.json();})
                 .then((data) => {
-                    console.log(data); 
+                    console.log("fetched reverse geocoding data ", data); 
                     let adr;
                     if (data.display_name) {
                         adr = data.display_name;
@@ -187,7 +245,12 @@ function MapContainer(props) {
                     } else {
                         adr = lat + 'N, ' + lon + 'E';
                     }
-                    props.dispatchPoints({type:'update', value:{name:adr, latLon:[lat, lon]}, index:props.currentPoint})
+                    if (index === -1) {
+                        props.dispatchPoints({type:'update', value:{name:adr, latLon:[lat, lon]}, index:props.currentPoint})
+                    } else {
+                        props.dispatchPoints({type:'update', value:{name:adr, latLon:[lat, lon]}, index:index})
+                    }
+                    
                     props.setCurrentPoint(-1);
                 })
                 .catch((error) => {
@@ -217,7 +280,7 @@ function MapContainer(props) {
                 url="http://127.0.0.1/hot/{z}/{x}/{y}.png" // Address of tiles on our local server.
                 attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
             /> 
-            {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1)}
+            {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1, false)}
             {props.currentTab === TabEnum.routeTab && routeMarkers}
             {props.currentTab === TabEnum.routeTab && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
         </Map>

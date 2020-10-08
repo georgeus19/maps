@@ -36,8 +36,8 @@ function SearchInput(props) {
         const fetchPlaces = async () => {
             const options = {
                 method: 'GET'
-            };
-            await fetch('https://nominatim.openstreetmap.org/search?q=' + props.text + '&format=json&addressdetails=1', options)
+            };//https://nominatim.openstreetmap.org - nominatim free test api server
+            await fetch('http://127.0.0.1/nominatim/search?q=' + props.text + '&format=json&addressdetails=1', options)
                 .then((response) => { console.log("DATA FETCHED"); return response.json();})
                 .then((data) => {
                     console.log(data); 
@@ -72,16 +72,16 @@ function SearchInput(props) {
                     console.warn('Error occured with respect to searching.', error);
                 });
         }
-        if (search === false) {
-            console.log("NO fetch.");
-            return;
-        }
-        setSearch(false);
+        //if (search === false) {
+        //    console.log("NO fetch.");
+        //    return;
+        //}
+        //setSearch(false);
         if (props.text === '') {
             return;
         }
         fetchPlaces();
-    
+        setMenuOpen(true);
     }, [search]);
 
     /**
@@ -90,7 +90,7 @@ function SearchInput(props) {
     useEffect(() => {
         if (props.text === '' || props.text === null) {
             setPlaceOptions([]);
-        }
+        } 
     }, [props.text])
 
     /**
@@ -103,6 +103,7 @@ function SearchInput(props) {
         switch (action) {
             case 'input-change':
                 props.setText(value);
+                setSearch(!search);
                 break;
             case 'input-blur':
                 break;
@@ -134,7 +135,7 @@ function SearchInput(props) {
                 defaultValue=""
                 className="Select"
                 menuIsOpen={menuOpen}
-                onFocus={() => {props.handleClick(); setMenuOpen(true); }}
+                onFocus={() => {props.handleClick();  }}
                 onChange={handleOnChange}
                 options={placeOptions}
                 inputValue={props.text}
@@ -143,7 +144,7 @@ function SearchInput(props) {
                 onInputChange={handleInputChange}
              />
             {props.children}
-            <Button onClick={() => { setSearch(true); /*fetchPlaces(props.text) */}}><Search/></Button>
+            <Button onClick={() => { setSearch(!search); /*fetchPlaces(props.text) */}}><Search/></Button>
             
         </div>
     );
