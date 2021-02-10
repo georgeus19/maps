@@ -67,6 +67,8 @@ namespace routing {
 
         unsigned_id_type get_to() const;
 
+        double get_length() const;
+
     };
 
     inline unsigned_id_type BasicEdge::get_uid() const {
@@ -79,6 +81,10 @@ namespace routing {
 
     inline unsigned_id_type BasicEdge::get_to() const {
         return to_;
+    }
+
+    inline double BasicEdge::get_length() const {
+        return length_;
     }
 
 }

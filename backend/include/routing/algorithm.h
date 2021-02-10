@@ -22,7 +22,7 @@ namespace routing {
          *
          * @param graph Graph where routing happens.
          */
-        Algorithm(typename Implementation::G  & graph) : impl_(graph) {}
+        Algorithm(Graph<typename Implementation::Vertex, typename Implementation::Edge>  & graph) : impl_(graph) {}
 
         /**
          * Find the best route from `start_node` to `end_node`.
@@ -31,8 +31,17 @@ namespace routing {
          * @param end_node Node the routing ends in.
          * @return Vector of edges that represent the best route.
          */
-        std::vector<typename Implementation::Edge> Run(unsigned_id_type start_node, unsigned_id_type end_node) {
-            return impl_.Run(start_node, end_node);
+        void Run(unsigned_id_type start_node, unsigned_id_type end_node) {
+            impl_.Run(start_node, end_node);
+        }
+
+         /**
+         * Get shortest route from the node the algorithm was run to.
+         * @param end_node Endpoint of the route.
+         * @return Vector of edges which represent the found route. Empty if no path found.
+         */
+        std::vector<typename Implementation::Edge> GetRoute(unsigned_id_type end_node) {
+            return impl_.GetRoute(end_node);
         }
 
     };

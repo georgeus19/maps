@@ -3,7 +3,9 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
+#include <functional>
 #include <queue>
+
 #include "routing/edge.h"
 #include "database/database_helper.h"
 #include "routing/vertex.h"
@@ -25,6 +27,10 @@ namespace routing {
          */
         std::unordered_map<unsigned_id_type, Vertex> g_;
     public:
+        using vertex_iterator = std::unordered_map<unsigned_id_type, Vertex>::iterator;
+
+        using V = Vertex;
+        using E = Edge;
 
         Graph();
 
@@ -46,6 +52,9 @@ namespace routing {
          * @return Pointer to vetex or nullptr if it is not found.
          */
         Vertex* GetVertex(unsigned_id_type id);
+
+        void forEachVertex(std::function<void(Vertex&)> f);
+
     };
 
     template <typename Vertex, typename Edge>
@@ -91,6 +100,15 @@ namespace routing {
             return &((it->second));
         }
     }
+
+    template <typename Vertex, typename Edge>
+    void Graph<Vertex, Edge>::forEachVertex(std::function<void(Vertex&)> f) {
+        for (auto&& pair : g_) {
+            f(pair.second);
+        }
+    }
+
+    
 }
 
 #endif //BACKEND_GRAPH_H
