@@ -34,7 +34,7 @@ TEST_F(DijkstraTest, ExistingPath) {
     alg.Run(1, 6);
     vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
     for(auto&& e : path) {
-        std::cout << e.from_ << "->" << e.to_ << std::endl;
+        std::cout << e.get_from() << "->" << e.get_to() << std::endl;
     }
 
     vector<Dijkstra<G>::Edge> expected_path{
@@ -50,7 +50,7 @@ TEST_F(DijkstraTest, RunTwiceExistingPath) {
     alg.Run(1, 6);
     vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
     for(auto&& e : path) {
-        std::cout << e.from_ << "->" << e.to_ << std::endl;
+        std::cout << e.get_from() << "->" << e.get_to() << std::endl;
     }
 
     vector<Dijkstra<G>::Edge> expected_path{

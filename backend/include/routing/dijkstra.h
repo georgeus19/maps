@@ -144,14 +144,14 @@ private:
     void Dijkstra<G>::UpdateNeighbours(Vertex * v, std::set<QueuePair> & q) {
         v->ForEachEdge([&](Edge & edge) {
             Vertex * neighbour = g_.GetVertex(edge.get_to());
-            if (neighbour->get_cost() > v->get_cost() + edge.length_) {
+            if (neighbour->get_cost() > v->get_cost() + edge.get_length()) {
 
                 // Only vertices with updated values are in priority queue.
                 if (neighbour->get_cost() != std::numeric_limits<double>::max()) {
                     q.erase(std::make_pair(neighbour->get_cost(), neighbour));
                 }
 
-                neighbour->set_cost(v->get_cost() + edge.length_);
+                neighbour->set_cost(v->get_cost() + edge.get_length());
                 neighbour->set_previous(v->get_osm_id());
 
                 q.insert(std::make_pair(neighbour->get_cost(), neighbour));

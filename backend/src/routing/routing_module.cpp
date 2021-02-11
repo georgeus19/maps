@@ -73,8 +73,8 @@ string CCalculateShortestRoute(const std::string & table_name, utility::Point st
     // Construct list of geometries.
     std::string geojson_array = d.GetRouteCoordinates(res, table_name);
 
-    string first_edge_geometry = start_handler.GetEndpointEdgeGeometry(res[res.size() - 1].uid_);
-    string last_edge_geometry = end_handler.GetEndpointEdgeGeometry(res[0].uid_);
+    string first_edge_geometry = start_handler.GetEndpointEdgeGeometry(res[res.size() - 1].get_uid());
+    string last_edge_geometry = end_handler.GetEndpointEdgeGeometry(res[0].get_uid());
 
     string final_array = "[" + first_edge_geometry + geojson_array + "," + last_edge_geometry + "]";
     return final_array;
