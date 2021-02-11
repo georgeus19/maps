@@ -2,7 +2,8 @@
 #define BACKEND_DIJKSTRA_H
 #include <vector>
 #include "routing/edge.h"
-#include "routing/vertex.h"
+#include "routing/vertices/basic_vertex.h"
+#include "routing/vertices/contraction_vertex.h"
 #include "routing/graph.h"
 #include "routing/exception.h"
 #include <queue>
@@ -61,7 +62,7 @@ private:
 
     template< typename G>
     void Dijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type end_node) {
-        if (!Run(start_node, [=](Dijkstra<G>::Vertex* v) { return v->osm_id_ == end_node; })) {
+        if (!Run(start_node, [=](Dijkstra<G>::Vertex* v) { return v->get_osm_id() == end_node; })) {
             throw RouteNotFoundException("Route from " + std::to_string(start_node) + " to " + std::to_string(end_node) + " could not be found");
         }
     }
@@ -70,36 +71,31 @@ private:
     std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute(unsigned_id_type end_node) {
         unsigned_id_type prev = end_node;
         Vertex * end_vertex = g_.GetVertex(end_node);
-        unsigned_id_type cur = end_vertex->previous_;
+        unsigned_id_type cur = end_vertex->get_previous();
         Vertex * curv = g_.GetVertex(cur);
 
         std::vector<Dijkstra::Edge> route;
 
-        if (end_vertex->GetPreviousDefaultValue() == end_vertex->previous_) {
+        if (end_vertex->GetPreviousDefaultValue() == end_vertex->get_previous()) {
             return route;
         }
 
         while (cur != start_node_) {
-            // Find the correct edge.
-            for(auto&& e : curv->outgoing_edges_) {
-                if (e.get_to() == prev) {
-                    route.push_back(e);
-                    break;
-                }
-            }
+            Edge& e = curv->FindEdge([=](const Edge& e) {
+                return e.get_to() == prev;
+            });
+            route.push_back(e);
 
             prev = cur;
-            cur = curv->previous_;
+            cur = curv->get_previous();
             curv = g_.GetVertex(cur);
         }
 
         // Find the correct edge of the route's first vertex == start_node_.
-        for(auto&& e : curv->outgoing_edges_) {
-            if (e.get_to() == prev) {
-                route.push_back(e);
-                break;
-            }
-        }
+        Edge& e = curv->FindEdge([=](const Edge& e) {
+            return e.get_to() == prev;
+        });
+        route.push_back(e);
 
         std::reverse(route.begin(), route.end());;
         return route; 
@@ -122,8 +118,8 @@ private:
         InitGraph();
 
         Vertex * v = g_.GetVertex(start_node);
-        v->cost_ = 0;
-        q.insert(std::make_pair(v->cost_, v));
+        v->set_cost(0);
+        q.insert(std::make_pair(v->get_cost(), v));
 
         while (q.empty() == false) {
             auto&& it = q.begin();
@@ -146,22 +142,22 @@ private:
 
     template <typename G>
     void Dijkstra<G>::UpdateNeighbours(Vertex * v, std::set<QueuePair> & q) {
-        for (auto&& edge: v->outgoing_edges_) {
+        v->ForEachEdge([&](Edge & edge) {
             Vertex * neighbour = g_.GetVertex(edge.get_to());
-            if (neighbour->cost_ > v->cost_ + edge.length_) {
+            if (neighbour->get_cost() > v->get_cost() + edge.length_) {
 
                 // Only vertices with updated values are in priority queue.
-                if (neighbour->cost_ != std::numeric_limits<double>::max()) {
-                    q.erase(std::make_pair(neighbour->cost_, neighbour));
+                if (neighbour->get_cost() != std::numeric_limits<double>::max()) {
+                    q.erase(std::make_pair(neighbour->get_cost(), neighbour));
                 }
 
-                neighbour->cost_ = v->cost_ + edge.length_;
-                neighbour->previous_ = v->osm_id_;
+                neighbour->set_cost(v->get_cost() + edge.length_);
+                neighbour->set_previous(v->get_osm_id());
 
-                q.insert(std::make_pair(neighbour->cost_, neighbour));
+                q.insert(std::make_pair(neighbour->get_cost(), neighbour));
 
             }
-        }
+        });
     }
 
     template <typename G>

@@ -33,29 +33,29 @@ void VertexContractor<Graph>::Contract() {
 
 template <typename Graph>
 void VertexContractor<Graph>::ContractVertex(Vertex & vertex) {
-    auto&& outgoing = vertex.outgoing_edges_;
-    auto&& ingoing = vertex.ingoing_edges_;
-    std::vector<Edge> new_edges;
+    // auto&& outgoing = vertex.outgoing_edges_;
+    // auto&& ingoing = vertex.ingoing_edges_;
+    // std::vector<Edge> new_edges;
     
-    double max_outgoing_length = std::max_element(outgoing.begin(), outgoing.end(), [](const Edge & a, const Edge & b) {
-        return a.get_length() < b.get_length();
-    })->get_length();
-    // Create all new edges.
-    for(auto&& ingoing_it = ingoing.cbegin(); ingoing_it != ingoing.cend(); ++ingoing_it) {
+    // double max_outgoing_length = std::max_element(outgoing.begin(), outgoing.end(), [](const Edge & a, const Edge & b) {
+    //     return a.get_length() < b.get_length();
+    // })->get_length();
+    // // Create all new edges.
+    // for(auto&& ingoing_it = ingoing.cbegin(); ingoing_it != ingoing.cend(); ++ingoing_it) {
+    //     Edge * ingoing_edge = *ingoing_it;
+    //     Dijkstra<Graph> dijkstra{g_};
+    //     double max_cost = max_outgoing_length + ingoing_edge->get_length();
+    //     auto&& end_condition = [=](Vertex * v) {
+    //         return v->cost_ > max_cost;
+    //     };
+    //     dijkstra.Run(ingoing_edge->from_, end_condition);
 
-        Dijkstra<Graph> dijkstra{g_};
-        double max_cost = max_outgoing_length + ingoing_it->get_length();
-        auto&& end_condition = [=](Vertex * v) {
-            return v->cost_ > max_cost;
-        };
-        dijkstra.Run(ingoing_it->from, end_condition);
-
-        for(auto&& outgoing_it = outgoing.cbegin(); outgoing_it != outgoing.cend(); ++outgoing_it) {
-            if (ingoing_it->get_length() + outgoing_it->get_length() <= g_.GetPathLength(outgoing_it->get_to)) {
-                g_.AddEdge(typename Graph::Edge{++free_edge_id_, ingoing_it->from_, outgoing_it->to_, ingoing_it->length_ + outgoing_it->length_});
-            }
-        }
-    }
+    //     for(auto&& outgoing_it = outgoing.cbegin(); outgoing_it != outgoing.cend(); ++outgoing_it) {
+    //         if (ingoing_edge->get_length() + outgoing_it->get_length() <= dijkstra.GetPathLength(outgoing_it->get_to())) {
+    //             g_.AddEdge(Edge{++free_edge_id_, ingoing_edge->get_from(), outgoing_it->get_to(), ingoing_edge->get_length() + outgoing_it->get_length()});
+    //         }
+    //     }
+    // }
 
 }
 

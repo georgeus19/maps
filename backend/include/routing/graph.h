@@ -8,7 +8,8 @@
 
 #include "routing/edge.h"
 #include "database/database_helper.h"
-#include "routing/vertex.h"
+#include "routing/vertices/basic_vertex.h"
+#include "routing/vertices/contraction_vertex.h"
 #include <set>
 
 namespace routing {
@@ -55,6 +56,16 @@ namespace routing {
 
         void forEachVertex(std::function<void(Vertex&)> f);
 
+        void AddReverseEdge(Edge&& edge) {
+            // Vertex* v = GetVertex(edge.get_from());
+            // AddEdge(std::move(edge), v.AddEdge 
+        }
+
+    private:
+
+        void AddEdge(Edge&& edge, std::function<void(Edge&&)> add_edge);
+
+
     };
 
     template <typename Vertex, typename Edge>
@@ -73,7 +84,7 @@ namespace routing {
         if (from_it == g_.end()) {
             unsigned_id_type from_node = e.get_from();
             // Vertex is not in the graph. Add Vertex with the edge.
-            Vertex v{from_node, std::vector<Edge>{}};
+            Vertex v{from_node};
             v.AddEdge(e);
             g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(from_node), std::move(v)));
         } else {
@@ -85,7 +96,7 @@ namespace routing {
         // So try add it with no outgoing edges.
         auto && to_it = g_.find(to_node);
         if (to_it == g_.end()) {
-            Vertex to_vertex{to_node, std::vector<Edge>{}};
+            Vertex to_vertex{to_node};
             g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(to_node), std::move(to_vertex)));
         }
     }

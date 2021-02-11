@@ -2,7 +2,9 @@
 #define BACKEND_ALGORITHM_H
 #include "routing/edge.h"
 #include <vector>
-#include "routing/vertex.h"
+#include "routing/vertices/basic_vertex.h"
+#include "routing/vertices/contraction_vertex.h"
+
 namespace routing {
 
     /**

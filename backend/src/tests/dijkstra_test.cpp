@@ -3,7 +3,8 @@
 #include "routing/graph.h"
 #include "routing/edge.h"
 #include "routing/algorithm.h"
-#include "routing/vertex.h"
+#include "routing/vertices/basic_vertex.h"
+#include "routing/vertices/contraction_vertex.h"
 #include "routing/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
@@ -63,14 +64,14 @@ TEST_F(DijkstraTest, LimitedSearch) {
     Dijkstra<G> dijkstra{g_};
     double max_cost = 4; // Shortest path found to vertices 1, 2, 3, 4.
     dijkstra.Run(1, [=](BasicVertex<BasicEdge> * v) { 
-            return v->cost_ > max_cost;
+            return v->get_cost() > max_cost;
         });
-    EXPECT_EQ(g_.GetVertex(1)->cost_, 0);
-    EXPECT_EQ(g_.GetVertex(2)->cost_, 2);
-    EXPECT_EQ(g_.GetVertex(3)->cost_, 2);
-    EXPECT_EQ(g_.GetVertex(4)->cost_, 5);
-    EXPECT_EQ(g_.GetVertex(5)->cost_, std::numeric_limits<double>::max());
-    EXPECT_EQ(g_.GetVertex(6)->cost_, 10);
+    EXPECT_EQ(g_.GetVertex(1)->get_cost(), 0);
+    EXPECT_EQ(g_.GetVertex(2)->get_cost(), 2);
+    EXPECT_EQ(g_.GetVertex(3)->get_cost(), 2);
+    EXPECT_EQ(g_.GetVertex(4)->get_cost(), 5);
+    EXPECT_EQ(g_.GetVertex(5)->get_cost(), std::numeric_limits<double>::max());
+    EXPECT_EQ(g_.GetVertex(6)->get_cost(), 10);
 }
 
 
