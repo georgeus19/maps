@@ -14,110 +14,115 @@
 
 namespace routing {
 
+/**
+ * Routing graph which can be used for any edge and vertex types.
+ * However, Vertex and Edge must be valid with respect to each other.
+ * @tparam Vertex Type of vertex in the graph.
+ * @tparam Edge Type of edge in the graph.
+ */
+template <typename Vertex, typename Edge>
+class Graph {
+public:
+    using vertex_iterator = std::unordered_map<unsigned_id_type, Vertex>::iterator;
+
+    using V = Vertex;
+    using E = Edge;
+
+    Graph();
+
     /**
-     * Routing graph which can be used for any edge and vertex types.
-     * However, Vertex and Edge must be valid with respect to each other.
-     * @tparam Vertex Type of vertex in the graph.
-     * @tparam Edge Type of edge in the graph.
+     * Add edge represented by row to graph.
+     * @param row Row representing graph edge.
      */
-    template <typename Vertex, typename Edge>
-    class Graph {
-        /**
-         * Internal graph representaions. Unfortunately, even though the ids
-         * are number they are too high to index using std::vector.
-         */
-        std::unordered_map<unsigned_id_type, Vertex> g_;
-    public:
-        using vertex_iterator = std::unordered_map<unsigned_id_type, Vertex>::iterator;
+    void AddEdge(database::EdgeDbRow & row);
 
-        using V = Vertex;
-        using E = Edge;
+    /**
+     * Add `edge` to graph.
+     * @param edge Edge which is added to graph.
+     */
+    void AddEdge(Edge&& edge);
 
-        Graph();
+    void AddReverseEdge(Edge&& edge);
 
-        /**
-         * Add edge represented by row to graph.
-         * @param row Row representing graph edge.
-         */
-        void AddEdge(database::EdgeDbRow & row);
+    /**
+     * Return point to vertex with `id`.
+     * @param id Id of vertex to which Vertex* points.
+     * @return Pointer to vetex or nullptr if it is not found.
+     */
+    Vertex* GetVertex(unsigned_id_type id);
 
-        /**
-         * Add `edge` to graph.
-         * @param edge Edge which is added to graph.
-         */
-        void AddEdge(Edge&& edge);
+    void forEachVertex(std::function<void(Vertex&)> f);
 
-        /**
-         * Return point to vertex with `id`.
-         * @param id Id of vertex to which Vertex* points.
-         * @return Pointer to vetex or nullptr if it is not found.
-         */
-        Vertex* GetVertex(unsigned_id_type id);
+private:
+    /**
+     * Internal graph representaions. Unfortunately, even though the ids
+     * are number they are too high to index using std::vector.
+     */
+    std::unordered_map<unsigned_id_type, Vertex> g_;
 
-        void forEachVertex(std::function<void(Vertex&)> f);
+    void AddEdge(Edge&& edge, std::function<void(Vertex &, Edge&& e)> add_edge);
+};
 
-        void AddReverseEdge(Edge&& edge) {
-            // Vertex* v = GetVertex(edge.get_from());
-            // AddEdge(std::move(edge), v.AddEdge 
-        }
+template <typename Vertex, typename Edge>
+Graph<Vertex, Edge>::Graph() : g_(std::unordered_map<unsigned_id_type, Vertex>{}) {}
 
-    private:
+template <typename Vertex, typename Edge>
+inline void Graph<Vertex, Edge>::AddEdge(Edge && e) {
+    AddEdge(std::move(e), [](Vertex& v, Edge&& e) {
+        v.AddEdge(std::move(e));            
+    });
+}
 
-        void AddEdge(Edge&& edge, std::function<void(Edge&&)> add_edge);
+template <typename Vertex, typename Edge>
+inline void Graph<Vertex, Edge>::AddReverseEdge(Edge && e) {
+    e.Reverse();
+    AddEdge(std::move(e), [](Vertex& v, Edge&& e){
+        v.AddReverseEdge(std::move(e));
+    });
+}
 
-
-    };
-
-    template <typename Vertex, typename Edge>
-    Graph<Vertex, Edge>::Graph() : g_(std::unordered_map<unsigned_id_type, Vertex>{}) {}
-
-    template <typename Vertex, typename Edge>
-    void Graph<Vertex, Edge>::AddEdge(database::EdgeDbRow & r) {
-        AddEdge(std::move(Edge{r}));
-    }
-
-    template <typename Vertex, typename Edge>
-    void Graph<Vertex, Edge>::AddEdge(Edge && e) {
+template <typename Vertex, typename Edge>
+void Graph<Vertex, Edge>::AddEdge(Edge && e, std::function<void(Vertex &, Edge && e)> add_edge) {
+    unsigned_id_type from_node = e.get_from();
+    unsigned_id_type to_node = e.get_to();
+    auto&& from_it = g_.find(from_node);
+    if (from_it == g_.end()) {
         unsigned_id_type from_node = e.get_from();
-        unsigned_id_type to_node = e.get_to();
-        auto&& from_it = g_.find(from_node);
-        if (from_it == g_.end()) {
-            unsigned_id_type from_node = e.get_from();
-            // Vertex is not in the graph. Add Vertex with the edge.
-            Vertex v{from_node};
-            v.AddEdge(e);
-            g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(from_node), std::move(v)));
-        } else {
-            // Vertex exists. Add edge.
-            (from_it->second).AddEdge(std::move(e));
-        }
-
-        // e.to_ might not be added to the graph.
-        // So try add it with no outgoing edges.
-        auto && to_it = g_.find(to_node);
-        if (to_it == g_.end()) {
-            Vertex to_vertex{to_node};
-            g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(to_node), std::move(to_vertex)));
-        }
+        // Vertex is not in the graph. Add Vertex with the edge.
+        Vertex v{from_node};
+        add_edge(v, std::move(e));
+        g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(from_node), std::move(v)));
+    } else {
+        // Vertex exists. Add edge.
+        add_edge(from_it->second, std::move(e));
     }
 
-
-    template <typename Vertex, typename Edge>
-    inline Vertex* Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
-        auto&& it = g_.find(id);
-        if (it == g_.end()) {
-            return nullptr;
-        } else {
-            return &((it->second));
-        }
+    // e.to_ might not be added to the graph.
+    // So try add it with no outgoing edges.
+    auto && to_it = g_.find(to_node);
+    if (to_it == g_.end()) {
+        Vertex to_vertex{to_node};
+        g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(to_node), std::move(to_vertex)));
     }
+}
 
-    template <typename Vertex, typename Edge>
-    void Graph<Vertex, Edge>::forEachVertex(std::function<void(Vertex&)> f) {
-        for (auto&& pair : g_) {
-            f(pair.second);
-        }
+
+template <typename Vertex, typename Edge>
+inline Vertex* Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
+    auto&& it = g_.find(id);
+    if (it == g_.end()) {
+        return nullptr;
+    } else {
+        return &((it->second));
     }
+}
+
+template <typename Vertex, typename Edge>
+void Graph<Vertex, Edge>::forEachVertex(std::function<void(Vertex&)> f) {
+    for (auto&& pair : g_) {
+        f(pair.second);
+    }
+}
 
     
 }

@@ -63,6 +63,10 @@ public:
     ~BasicEdge();
 
     void Swap(BasicEdge & other);
+    void Reverse(); 
+
+    void Print();
+
     /**
      * "Graphical" comparison of edges.
      */

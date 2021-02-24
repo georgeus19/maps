@@ -4,7 +4,7 @@
 #include <vector>
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
-
+                                   
 namespace routing {
 
     /**

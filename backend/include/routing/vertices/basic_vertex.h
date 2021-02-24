@@ -74,9 +74,9 @@ public:
 
     void Swap(BasicVertex & other);
 
-    virtual void AddEdge(Edge&& edge);
+    void AddEdge(Edge&& edge);
 
-    virtual void AddEdge(const Edge & edge);
+    void AddEdge(const Edge & edge);
 
     unsigned_id_type GetPreviousDefaultValue() const;
 

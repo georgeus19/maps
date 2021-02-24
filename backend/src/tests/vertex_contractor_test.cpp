@@ -15,6 +15,8 @@
 #include "routing/preprocessing/vertex_contractor.h"
 #include <string>
 #include <vector>
+#include <tuple>
+
 using namespace std;
 using namespace routing;
 using namespace database;
@@ -22,30 +24,45 @@ using namespace preprocessing;
 
 using G = Graph<ContractionVertex<BasicEdge>, BasicEdge>;
 
-class VertexContractorTest : public testing::Test {
+class VertexContractorTest : public testing::TestWithParam<std::tuple<size_t, std::vector<BasicEdge>>> {
     protected:
     
     G g_;
     void SetUp() override {
-        TestBasicGraph(g_);
+        TestBasicReverseGraph(g_);
     }
 };
 
+INSTANTIATE_TEST_CASE_P(
+    SimpleContractionParameters, 
+    VertexContractorTest,
+    ::testing::Values(
+        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}}),
+        std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 3}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 6}, BasicEdge{1, 5, 3, 5}}),
+        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}}),
+        std::make_tuple(2, std::vector<BasicEdge> { BasicEdge{1, 2, 6, 8}}),
+        std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}})
+    )
+);
 
-TEST_F(VertexContractorTest, SimpleContraction) {
+
+TEST_P(VertexContractorTest, SimpleContraction) {
+    size_t tested_vertex_id = std::get<0>(GetParam());
+    std::vector<BasicEdge> expected = std::get<1>(GetParam());
+
+    ContractionVertex<BasicEdge>* tested_vertex = g_.GetVertex(tested_vertex_id);
+    tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
     VertexContractor<G> contractor{g_, 11};
 
     ContractionVertex<BasicEdge>* contracted_vertex = g_.GetVertex(4);
     ContractionVertex<BasicEdge>& v = *contracted_vertex;
+   
+    std::cout << "After contraction." << std::endl;
     contractor.ContractVertex(v);
-    std::vector<BasicEdge> three_edges {
-        BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}
-    };
-    ContractionVertex<BasicEdge>* vertex_three = g_.GetVertex(3);
-    vertex_three->ForEachEdge([](BasicEdge& e){
-        std::cout << e.get_from() << "->" << e.get_to() << std::endl;
-    });
+    
+    tested_vertex = g_.GetVertex(tested_vertex_id);
+    tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
 
-    EXPECT_THAT(vertex_three->get_edges(), testing::ElementsAreArray(three_edges));
+    EXPECT_THAT(tested_vertex->get_edges(), testing::ElementsAreArray(expected));
 
 }

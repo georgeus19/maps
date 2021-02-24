@@ -52,6 +52,14 @@ void BasicEdge::Swap(BasicEdge & other) {
     std::swap(length_, other.length_);
 }
 
+void BasicEdge::Reverse() {
+    std::swap(from_, to_);
+}
+
+void BasicEdge::Print() {
+    std::cout << get_from() << "->" << get_to() << " length: " << get_length() << std::endl;
+}
+
 bool BasicEdge::operator==(const BasicEdge & other) const {
     if (uid_ == other.uid_) { return true; }
         // If there can be two edges with same from, to.

@@ -5,37 +5,42 @@
 #include <vector>
 #include <limits>
 namespace routing {
-    template <typename Edge>
-    class ContractionVertex : public BasicVertex<Edge> {
-    private:
 
-        unsigned_id_type order_id_;
+template <typename Edge>
+class ContractionVertex : public BasicVertex<Edge> {
+private:
 
-        bool contracted_;
+    unsigned_id_type order_id_;
 
-        std::vector<Edge> reverse_edges_;
-    public:
+    bool contracted_;
 
-        ContractionVertex(unsigned_id_type osm_id);
+    std::vector<Edge> reverse_edges_;
+public:
+    inline std::vector<Edge>& get_reverse_edges() {
+        return reverse_edges_;
+    }        
 
-        void AddReverseEdge(Edge&& edge);
+    ContractionVertex(unsigned_id_type osm_id);
 
-        void AddReverseEdge(const Edge & edge);
-    };
+    void AddReverseEdge(Edge&& edge);
 
-    template <typename Edge>
-    ContractionVertex<Edge>::ContractionVertex(unsigned_id_type osm_id)
-            : BasicVertex<Edge>(osm_id), contracted_(false), reverse_edges_(std::vector<Edge>{}) {}
+    void AddReverseEdge(const Edge & edge);
+};
 
-    template <typename Edge>
-    void ContractionVertex<Edge>::AddReverseEdge(Edge&& edge) {
-        reverse_edges_.push_back(std::move(edge));
-    }
+template <typename Edge>
+ContractionVertex<Edge>::ContractionVertex(unsigned_id_type osm_id)
+        : BasicVertex<Edge>(osm_id), contracted_(false), reverse_edges_(std::vector<Edge>{}) {}
 
-    template <typename Edge>
-    void ContractionVertex<Edge>::AddReverseEdge(const Edge & edge) {
-        reverse_edges_.push_back(edge);
-    }
+template <typename Edge>
+inline void ContractionVertex<Edge>::AddReverseEdge(Edge&& edge) {
+    reverse_edges_.push_back(std::move(edge));
+}
+
+template <typename Edge>
+inline void ContractionVertex<Edge>::AddReverseEdge(const Edge & edge) {
+    reverse_edges_.push_back(edge);
+}
+
 
 }
 
