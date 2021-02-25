@@ -25,6 +25,8 @@ public:
     void AddReverseEdge(Edge&& edge);
 
     void AddReverseEdge(const Edge & edge);
+
+    void ForEachReverseEdge(std::function<void(Edge&)> f);
 };
 
 template <typename Edge>
@@ -39,6 +41,11 @@ inline void ContractionVertex<Edge>::AddReverseEdge(Edge&& edge) {
 template <typename Edge>
 inline void ContractionVertex<Edge>::AddReverseEdge(const Edge & edge) {
     reverse_edges_.push_back(edge);
+}
+
+template <typename Edge>
+void ContractionVertex<Edge>::ForEachReverseEdge(std::function<void(Edge&)> f) {
+    std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
 }
 
 
