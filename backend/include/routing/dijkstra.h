@@ -43,7 +43,7 @@ public:
 
     bool Run(unsigned_id_type start_node, std::function<bool(Vertex *)> end_condition, std::function<bool(Vertex*)> ignore);
 
-    double GetPathLength(unsigned_id_type to);
+    double GetPathLength(unsigned_id_type to) const;
 private:
     /**
      * Graph where dijkstra's algorithm is used.
@@ -137,7 +137,7 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, std::function<bool(Vertex *)>
 }
 
 template <typename G>
-double Dijkstra<G>::GetPathLength(unsigned_id_type to) {
+double Dijkstra<G>::GetPathLength(unsigned_id_type to) const {
     return g_.GetVertex(to)->get_cost();
 }
 

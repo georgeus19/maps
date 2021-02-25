@@ -20,6 +20,11 @@ public:
 
     void ContractVertex(Vertex & vertex);
 
+private:
+    void AddShortcuts(Vertex & contracted_vertex, const Edge & reversed_first_edge, double max_outgoing_length); 
+
+    void AddShortcut(const Dijkstra<Graph>& dijkstra, unsigned_id_type start_vertex_id, unsigned_id_type end_vertex_id, double shortcut_length);
+
 };
 
 template <typename Graph>
@@ -33,39 +38,49 @@ void VertexContractor<Graph>::Contract() {
 
 template <typename Graph>
 void VertexContractor<Graph>::ContractVertex(Vertex & vertex) {
-    auto&& outgoing = vertex.get_edges();
-    auto&& reverse_edges = vertex.get_reverse_edges();
-    std::vector<Edge> new_edges;
-    
-    double max_outgoing_length = std::max_element(outgoing.begin(), outgoing.end(), [](const Edge & a, const Edge & b) {
+    double max_outgoing_length = std::max_element(vertex.get_edges().begin(), vertex.get_edges().end(), [](const Edge & a, const Edge & b) {
         return a.get_length() < b.get_length();
     })->get_length();
-    // Create all new edges.
-    for(auto&& reverse_edges_it = reverse_edges.cbegin(); reverse_edges_it != reverse_edges.cend(); ++reverse_edges_it) {
-        if (g_.GetVertex(reverse_edges_it->get_to())->IsContracted()) {
-            continue;
-        }
-        Dijkstra<Graph> dijkstra{g_};
-        double max_cost = max_outgoing_length + reverse_edges_it->get_length();
-        auto&& end_condition = [=](Vertex * v) {
-            return v->get_cost() > max_cost;
-        };
-        dijkstra.Run(reverse_edges_it->get_to(), end_condition, [](Vertex* v) { return v->IsContracted(); });
 
-        for(auto&& outgoing_it = outgoing.cbegin(); outgoing_it != outgoing.cend(); ++outgoing_it) {
-            if (g_.GetVertex(outgoing_it->get_to())->IsContracted()) {
-                continue;
-            }
-            bool edge_is_shortest_path = reverse_edges_it->get_length() + outgoing_it->get_length() <= dijkstra.GetPathLength(outgoing_it->get_to());
-            if (edge_is_shortest_path) {
-                g_.AddEdge(Edge{++free_edge_id_, reverse_edges_it->get_to(), outgoing_it->get_to(), reverse_edges_it->get_length() + outgoing_it->get_length()});
-                g_.AddReverseEdge(Edge{++free_edge_id_, reverse_edges_it->get_to(), outgoing_it->get_to(), reverse_edges_it->get_length() + outgoing_it->get_length()});
-            }
-        }
+    for(auto&& reverse_edge : vertex.get_reverse_edges()) {
+        AddShortcuts(vertex, reverse_edge, max_outgoing_length);
     }
     vertex.SetContracted();
-
 }
+
+template <typename Graph>
+void VertexContractor<Graph>::AddShortcuts(Vertex & contracted_vertex, const Edge & reversed_first_edge, double max_outgoing_length) {
+    unsigned_id_type start_vertex_id = reversed_first_edge.get_to();
+    Vertex* start_vertex = g_.GetVertex(start_vertex_id);
+
+    if (start_vertex->IsContracted()) {
+        return;
+    }
+    Dijkstra<Graph> dijkstra{g_};
+    double max_cost = max_outgoing_length + reversed_first_edge.get_length();
+    auto&& end_condition = [=](Vertex * v) {
+        return v->get_cost() > max_cost;
+    };
+    dijkstra.Run(start_vertex_id, end_condition, [](Vertex* v) { return v->IsContracted(); });
+
+    for(auto&& second_edge : contracted_vertex.get_edges()) {
+        AddShortcut(dijkstra, start_vertex_id, second_edge.get_to(), reversed_first_edge.get_length() + second_edge.get_length());
+    }
+}
+
+template <typename Graph>
+void VertexContractor<Graph>::AddShortcut(const Dijkstra<Graph>& dijkstra, unsigned_id_type start_vertex_id, unsigned_id_type end_vertex_id, double shortcut_length) {
+    if (g_.GetVertex(end_vertex_id)->IsContracted()) {
+        return;
+    }
+    bool edge_is_shortest_path = shortcut_length <= dijkstra.GetPathLength(end_vertex_id);
+    if (edge_is_shortest_path) {
+        g_.AddEdge(Edge{++free_edge_id_, start_vertex_id, end_vertex_id, shortcut_length});
+        g_.AddReverseEdge(Edge{++free_edge_id_, start_vertex_id, end_vertex_id, shortcut_length});
+    }
+}
+
+
 
 template <typename Vertex, typename Edge>
 class SearchSpaceLimit {
