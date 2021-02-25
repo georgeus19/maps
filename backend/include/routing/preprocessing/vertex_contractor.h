@@ -42,14 +42,20 @@ void VertexContractor<Graph>::ContractVertex(Vertex & vertex) {
     })->get_length();
     // Create all new edges.
     for(auto&& reverse_edges_it = reverse_edges.cbegin(); reverse_edges_it != reverse_edges.cend(); ++reverse_edges_it) {
+        if (g_.GetVertex(reverse_edges_it->get_to())->IsContracted()) {
+            continue;
+        }
         Dijkstra<Graph> dijkstra{g_};
         double max_cost = max_outgoing_length + reverse_edges_it->get_length();
         auto&& end_condition = [=](Vertex * v) {
             return v->get_cost() > max_cost;
         };
-        dijkstra.Run(reverse_edges_it->get_to(), end_condition, [](Vertex* v) { return false; });
+        dijkstra.Run(reverse_edges_it->get_to(), end_condition, [](Vertex* v) { return v->IsContracted(); });
 
         for(auto&& outgoing_it = outgoing.cbegin(); outgoing_it != outgoing.cend(); ++outgoing_it) {
+            if (g_.GetVertex(outgoing_it->get_to())->IsContracted()) {
+                continue;
+            }
             bool edge_is_shortest_path = reverse_edges_it->get_length() + outgoing_it->get_length() <= dijkstra.GetPathLength(outgoing_it->get_to());
             if (edge_is_shortest_path) {
                 g_.AddEdge(Edge{++free_edge_id_, reverse_edges_it->get_to(), outgoing_it->get_to(), reverse_edges_it->get_length() + outgoing_it->get_length()});
@@ -57,6 +63,7 @@ void VertexContractor<Graph>::ContractVertex(Vertex & vertex) {
             }
         }
     }
+    vertex.SetContracted();
 
 }
 

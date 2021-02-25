@@ -4,6 +4,7 @@
 #include "routing/vertices/basic_vertex.h"
 #include <vector>
 #include <limits>
+#include <cassert>
 namespace routing {
 
 template <typename Edge>
@@ -21,6 +22,15 @@ public:
     }        
 
     ContractionVertex(unsigned_id_type osm_id);
+
+    inline void SetContracted() {
+        assert(contracted_ == false);
+        contracted_ = true;
+    }
+
+    inline bool IsContracted() {
+        return contracted_;
+    }
 
     void AddReverseEdge(Edge&& edge);
 

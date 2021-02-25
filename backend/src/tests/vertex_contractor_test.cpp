@@ -132,18 +132,18 @@ TEST_P(VertexContractorDoubleContractionEdgesTests, SimpleContractionReverseEdge
     std::vector<BasicEdge> expected = std::get<1>(GetParam());
 
     ContractionVertex<BasicEdge>* tested_vertex = g_.GetVertex(tested_vertex_id);
-    tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
+    tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
     VertexContractor<G> contractor{g_, 11};
 
     ContractVertex(g_, contractor, 4);
     std::cout << "After first contraction." << std::endl;
     tested_vertex = g_.GetVertex(tested_vertex_id);
-    tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
+    tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
     ContractVertex(g_, contractor, 5);
     std::cout << "After second  contraction." << std::endl;
     
     tested_vertex = g_.GetVertex(tested_vertex_id);
-    tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
+    tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
 
     EXPECT_THAT(tested_vertex->get_edges(), testing::ElementsAreArray(expected));
 }
