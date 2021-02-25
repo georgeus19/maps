@@ -23,6 +23,7 @@ using namespace database;
 using namespace preprocessing;
 
 using G = Graph<ContractionVertex<BasicEdge>, BasicEdge>;
+void ContractVertex(G& g, VertexContractor<G> & contractor, size_t id);
 
 class VertexContractorSimpleEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<BasicEdge>>> {
     protected:
@@ -39,7 +40,30 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}}),
         std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 4}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 7}, BasicEdge{1, 5, 3, 6}}),
+        std::make_tuple(4, std::vector<BasicEdge> { BasicEdge{1, 4, 3, 2}, BasicEdge{1, 4, 5, 2}, BasicEdge{1, 4, 6, 6}}),
         std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}}),
+        std::make_tuple(2, std::vector<BasicEdge> { BasicEdge{1, 2, 6, 8}}),
+        std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}})
+    )
+);
+
+class VertexContractorDoubleContractionEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<BasicEdge>>> {
+    protected:
+    
+    G g_;
+    void SetUp() override {
+        TestBasicReverseGraph(g_);
+    }
+};
+
+INSTANTIATE_TEST_CASE_P(
+    DoubleContractionEdgesTestParameters, 
+    VertexContractorDoubleContractionEdgesTests,
+    ::testing::Values(
+        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}, BasicEdge{1, 3, 6, 7}}),
+        std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 4}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 7}, BasicEdge{1, 5, 3, 6}}),
+        std::make_tuple(4, std::vector<BasicEdge> { BasicEdge{1, 4, 3, 2}, BasicEdge{1, 4, 5, 2}, BasicEdge{1, 4, 6, 6}}),
+        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}, BasicEdge{1, 6, 3, 9}}),
         std::make_tuple(2, std::vector<BasicEdge> { BasicEdge{1, 2, 6, 8}}),
         std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}})
     )
@@ -74,12 +98,9 @@ TEST_P(VertexContractorSimpleEdgesTests, SimpleContractionEdgesTest) {
     ContractionVertex<BasicEdge>* tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
     VertexContractor<G> contractor{g_, 11};
-
-    ContractionVertex<BasicEdge>* contracted_vertex = g_.GetVertex(4);
-    ContractionVertex<BasicEdge>& v = *contracted_vertex;
    
+    ContractVertex(g_, contractor, 4);
     std::cout << "After contraction." << std::endl;
-    contractor.ContractVertex(v);
     
     tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex->ForEachEdge([](BasicEdge& e){ e.Print(); });
@@ -95,14 +116,40 @@ TEST_P(VertexContractorSimpleReverseEdgesTests, SimpleContractionReverseEdgesTes
     tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
     VertexContractor<G> contractor{g_, 11};
 
-    ContractionVertex<BasicEdge>* contracted_vertex = g_.GetVertex(4);
-    ContractionVertex<BasicEdge>& v = *contracted_vertex;
+    ContractVertex(g_, contractor, 4);
    
     std::cout << "After contraction." << std::endl;
-    contractor.ContractVertex(v);
     
     tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
 
     EXPECT_THAT(tested_vertex->get_reverse_edges(), testing::ElementsAreArray(expected));
+}
+
+TEST_P(VertexContractorDoubleContractionEdgesTests, SimpleContractionReverseEdgesTest) {
+    size_t tested_vertex_id = std::get<0>(GetParam());
+    std::cout << "Double contraction - tested vertex is " << tested_vertex_id << std::endl;
+    std::vector<BasicEdge> expected = std::get<1>(GetParam());
+
+    ContractionVertex<BasicEdge>* tested_vertex = g_.GetVertex(tested_vertex_id);
+    tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
+    VertexContractor<G> contractor{g_, 11};
+
+    ContractVertex(g_, contractor, 4);
+    std::cout << "After first contraction." << std::endl;
+    tested_vertex = g_.GetVertex(tested_vertex_id);
+    tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
+    ContractVertex(g_, contractor, 5);
+    std::cout << "After second  contraction." << std::endl;
+    
+    tested_vertex = g_.GetVertex(tested_vertex_id);
+    tested_vertex->ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
+
+    EXPECT_THAT(tested_vertex->get_edges(), testing::ElementsAreArray(expected));
+}
+
+void ContractVertex(G& g, VertexContractor<G> & contractor, size_t id) {
+    ContractionVertex<BasicEdge>* contracted_vertex = g.GetVertex(id);
+    ContractionVertex<BasicEdge>& v = *contracted_vertex;
+    contractor.ContractVertex(v);
 }
