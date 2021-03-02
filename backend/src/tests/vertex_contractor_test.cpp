@@ -150,6 +150,6 @@ TEST_P(VertexContractorDoubleContractionEdgesTests, SimpleContractionReverseEdge
 
 void ContractVertex(G& g, VertexContractor<G> & contractor, size_t id) {
     ContractionVertex<BasicEdge>* contracted_vertex = g.GetVertex(id);
-    ContractionVertex<BasicEdge>& v = *contracted_vertex;
-    contractor.ContractVertex(v);
+    // ContractionVertex<BasicEdge>& v = *contracted_vertex;
+    contractor.ContractVertex(*contracted_vertex);
 }
