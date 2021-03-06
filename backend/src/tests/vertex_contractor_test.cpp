@@ -38,12 +38,12 @@ INSTANTIATE_TEST_CASE_P(
     SimpleContractionEdgesTestParameters, 
     VertexContractorSimpleEdgesTests,
     ::testing::Values(
-        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}}),
-        std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 4}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 7}, BasicEdge{1, 5, 3, 6}}),
-        std::make_tuple(4, std::vector<BasicEdge> { BasicEdge{1, 4, 3, 2}, BasicEdge{1, 4, 5, 2}, BasicEdge{1, 4, 6, 6}}),
-        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}}),
+        std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}}),
         std::make_tuple(2, std::vector<BasicEdge> { BasicEdge{1, 2, 6, 8}}),
-        std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}})
+        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}, BasicEdge{1, 3, 6, 9}}),
+        std::make_tuple(4, std::vector<BasicEdge> { BasicEdge{1, 4, 3, 2}, BasicEdge{1, 4, 5, 2}, BasicEdge{1, 4, 6, 6}}),
+        std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 4}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 7}, BasicEdge{1, 5, 3, 6}}),
+        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}})
     )
 );
 
@@ -60,12 +60,12 @@ INSTANTIATE_TEST_CASE_P(
     DoubleContractionEdgesTestParameters, 
     VertexContractorDoubleContractionEdgesTests,
     ::testing::Values(
-        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}, BasicEdge{1, 3, 6, 7}}),
-        std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 4}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 7}, BasicEdge{1, 5, 3, 6}}),
-        std::make_tuple(4, std::vector<BasicEdge> { BasicEdge{1, 4, 3, 2}, BasicEdge{1, 4, 5, 2}, BasicEdge{1, 4, 6, 6}}),
-        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}, BasicEdge{1, 6, 3, 9}}),
+        std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}}),
         std::make_tuple(2, std::vector<BasicEdge> { BasicEdge{1, 2, 6, 8}}),
-        std::make_tuple(1, std::vector<BasicEdge> { BasicEdge{1, 1, 2, 2}, BasicEdge{1, 1, 3, 2}})
+        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}, BasicEdge{1, 3, 6, 9}, BasicEdge{1, 3, 6, 7}}),
+        std::make_tuple(4, std::vector<BasicEdge> { BasicEdge{1, 4, 3, 2}, BasicEdge{1, 4, 5, 2}, BasicEdge{1, 4, 6, 6}}),
+        std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 4}, BasicEdge{1, 5, 6, 2}, BasicEdge{1, 5, 3, 7}, BasicEdge{1, 5, 3, 6}}),
+        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 5, 3}, BasicEdge{1, 6, 3, 10}, BasicEdge{1, 6, 3, 9}})
     )
 );
 
@@ -84,7 +84,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 1, 2}, BasicEdge{1, 3, 4, 2}, BasicEdge{1, 3, 5, 7}, BasicEdge{1, 3, 5, 6}}),
         std::make_tuple(5, std::vector<BasicEdge> { BasicEdge{1, 5, 4, 2}, BasicEdge{1, 5, 6, 3}, BasicEdge{1, 5, 3, 5}}),
-        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 2, 8}, BasicEdge{1, 6, 4, 6}, BasicEdge{1, 6, 5, 2}}),
+        std::make_tuple(6, std::vector<BasicEdge> { BasicEdge{1, 6, 2, 8}, BasicEdge{1, 6, 4, 6}, BasicEdge{1, 6, 5, 2}, BasicEdge{1, 6, 3, 9}}),
         std::make_tuple(2, std::vector<BasicEdge> { BasicEdge{1, 2, 1, 2}}),
         std::make_tuple(1, std::vector<BasicEdge> {})
     )
@@ -126,7 +126,7 @@ TEST_P(VertexContractorSimpleReverseEdgesTests, SimpleContractionReverseEdgesTes
     EXPECT_THAT(tested_vertex->get_reverse_edges(), testing::ElementsAreArray(expected));
 }
 
-TEST_P(VertexContractorDoubleContractionEdgesTests, SimpleContractionReverseEdgesTest) {
+TEST_P(VertexContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
     size_t tested_vertex_id = std::get<0>(GetParam());
     std::cout << "Double contraction - tested vertex is " << tested_vertex_id << std::endl;
     std::vector<BasicEdge> expected = std::get<1>(GetParam());
@@ -152,4 +152,31 @@ void ContractVertex(G& g, VertexContractor<G> & contractor, size_t id) {
     ContractionVertex<BasicEdge>* contracted_vertex = g.GetVertex(id);
     // ContractionVertex<BasicEdge>& v = *contracted_vertex;
     contractor.ContractVertex(*contracted_vertex);
+}
+
+
+
+class VertexContractorContractionOrderTests : public testing::TestWithParam<std::tuple<size_t, std::vector<BasicEdge>>> {
+    protected:
+    
+    G g_;
+    void SetUp() override {
+        TestBasicReverseGraph(g_);
+    }
+};
+
+INSTANTIATE_TEST_CASE_P(
+    VertexContractorContractionOrderTestParameters, 
+    VertexContractorContractionOrderTests,
+    ::testing::Values(
+        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}})
+    )
+);
+
+TEST_P(VertexContractorContractionOrderTests, VertexContractorContractionOrderTest) {
+    VertexContractor<G> contractor{g_, 11};
+    auto&& q = contractor.CalculateContractionPriority();
+    auto&& first = q.top();
+    contractor.ContractMinVertex(q);
+
 }

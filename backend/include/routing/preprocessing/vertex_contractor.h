@@ -16,7 +16,7 @@ class VertexContractor {
     VertexOrdering<Graph> ordering_;
     using Edge = Graph::E;
     using Vertex = Graph::V;
-    using PriorityQueue = std::priority_queue<std::pair<double, Vertex*>, std::vector<std::pair<double, Vertex*>>,  std::greater<double>>;
+    using PriorityQueue = std::priority_queue<std::pair<double, Vertex*>, std::vector<std::pair<double, Vertex*>>,  std::greater<std::pair<double, Vertex*>>>;
 public:
     VertexContractor<Graph>(Graph & g, unsigned_id_type free_edge_id);
 
@@ -26,9 +26,10 @@ public:
 
     std::vector<Edge> FindShortcuts(Vertex & vertex);
 
-private:
-
     void ContractMinVertex(PriorityQueue& q);
+
+    PriorityQueue CalculateContractionPriority();
+private:
 
     void FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge, double max_outgoing_length); 
 
@@ -36,11 +37,11 @@ private:
 
     void AddShortcuts(std::vector<Edge> shortcuts);
 
-    size_t CalculateEdgeDifference(Vertex& vertex); 
+    int32_t CalculateEdgeDifference(Vertex& vertex); 
 
-    size_t CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts);
+    int32_t CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts);
 
-    size_t CalculateDeletedNeighbours(Vertex& vertex);
+    int32_t CalculateDeletedNeighbours(Vertex& vertex);
 
     double CalculateContractionAttractivity(Vertex& vertex);
 
@@ -53,12 +54,7 @@ VertexContractor<Graph>::VertexContractor(Graph &g, unsigned_id_type free_edge_i
 
 template <typename Graph>
 void VertexContractor<Graph>::ContractGraph() {
-    PriorityQueue q;
-    g_.ForEachVertex([&](Vertex& vertex) {
-        double attractivity = CalculateContractionAttractivity(vertex);
-        q.push(std::make_pair(attractivity, &vertex));
-    });
-
+    PriorityQueue q = CalculateContractionPriority();
 
     while(!q.empty()) {
         ContractMinVertex(q);
@@ -96,9 +92,8 @@ void VertexContractor<Graph>::ContractMinVertex(VertexContractor<Graph>::Priorit
         double priority_threshold;
         double new_priority;
         while(true) {
-            auto&& pair = q.top();
+            v = q.top().second;
             q.pop();
-            v = pair->second;
             double priority_threshold = q.top().first;
             shortcuts = FindShortcuts(*v);
             double new_priority = CalculateContractionAttractivity(*v, shortcuts);
@@ -108,14 +103,23 @@ void VertexContractor<Graph>::ContractMinVertex(VertexContractor<Graph>::Priorit
             q.push(std::make_pair(new_priority, v));
         }
     } else {
-        auto&& pair = q.top();
-        q.pop();
-        v = pair->second;
+        v = q.top().second;
         shortcuts = FindShortcuts(*v);
+        q.pop();
     }
 
     AddShortcuts(shortcuts);
-    v.SetContracted();
+    v->SetContracted();
+}
+
+template <typename Graph>
+VertexContractor<Graph>::PriorityQueue VertexContractor<Graph>::CalculateContractionPriority() {
+    PriorityQueue q;
+    g_.forEachVertex([&](Vertex& vertex) {
+        double attractivity = CalculateContractionAttractivity(vertex);
+        q.push(std::make_pair(attractivity, &vertex));
+    });
+    return q;
 }
 
 template <typename Graph>
@@ -131,7 +135,9 @@ void VertexContractor<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex
     auto&& end_condition = [=](Vertex * v) {
         return v->get_cost() > max_cost;
     };
-    dijkstra.Run(start_vertex_id, end_condition, [](Vertex* v) { return v->IsContracted(); });
+    dijkstra.Run(start_vertex_id, end_condition, [&](Vertex* v) {
+        return v->get_osm_id() == contracted_vertex.get_osm_id() || v->IsContracted();
+    });
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
         double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
@@ -155,21 +161,23 @@ void VertexContractor<Graph>::AddShortcuts(std::vector<Edge> shortcuts) {
 }
 
 template <typename Graph>
-size_t VertexContractor<Graph>::CalculateEdgeDifference(Vertex& vertex) {
-    return CalculateEdgeDifference(vertex, FindShortcuts(vertex));
+int32_t VertexContractor<Graph>::CalculateEdgeDifference(Vertex& vertex) {
+    auto&& shortcuts = FindShortcuts(vertex);
+    return CalculateEdgeDifference(vertex, shortcuts);
 }
 
 template <typename Graph>
-size_t VertexContractor<Graph>::CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts) {
-    return shortcuts.size() - vertex.edges().size();
+int32_t VertexContractor<Graph>::CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts) {
+    size_t adjacent_edges_count = vertex.get_edges().size() + vertex.get_reverse_edges().size();
+    return shortcuts.size() - adjacent_edges_count;
 }
 
 template <typename Graph>
-size_t VertexContractor<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
-    size_t deleted_neighbours = 0;
-    for(auto&& edge : vertex.edges()) {
+int32_t VertexContractor<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
+    int32_t deleted_neighbours = 0;
+    for(auto&& edge : vertex.get_edges()) {
         Vertex* neighbour = g_.GetVertex(edge.get_to());
-        if (!neighbour->IsContracted()) {
+        if (neighbour->IsContracted()) {
             ++deleted_neighbours;
         }   
     }
@@ -178,12 +186,12 @@ size_t VertexContractor<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
 
 template <typename Graph>
 double VertexContractor<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
-    return (double)CalculateEdgeDifference(vertex) + CalculateDeletedNeighbours(vertex);
+    return static_cast<double>(CalculateEdgeDifference(vertex) + CalculateDeletedNeighbours(vertex));
 }
 
 template <typename Graph>
 double VertexContractor<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
-    return (double)CalculateEdgeDifference(vertex, shortcuts) + CalculateDeletedNeighbours(vertex);
+    return static_cast<double>(CalculateEdgeDifference(vertex, shortcuts) + CalculateDeletedNeighbours(vertex));
 }
 
 
