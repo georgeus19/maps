@@ -156,27 +156,31 @@ void ContractVertex(G& g, VertexContractor<G> & contractor, size_t id) {
 
 
 
-class VertexContractorContractionOrderTests : public testing::TestWithParam<std::tuple<size_t, std::vector<BasicEdge>>> {
-    protected:
+// class VertexContractorContractionOrderTests : public testing::TestWithParam<std::tuple<size_t, std::vector<BasicEdge>>> {
+//     protected:
     
-    G g_;
-    void SetUp() override {
-        TestBasicReverseGraph(g_);
-    }
-};
+//     G g_;
+//     void SetUp() override {
+//         TestBasicReverseGraph(g_);
+//     }
+// };
 
-INSTANTIATE_TEST_CASE_P(
-    VertexContractorContractionOrderTestParameters, 
-    VertexContractorContractionOrderTests,
-    ::testing::Values(
-        std::make_tuple(3, std::vector<BasicEdge> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}})
-    )
-);
+// INSTANTIATE_TEST_CASE_P(
+//     VertexContractorContractionOrderTestParameters, 
+//     VertexContractorContractionOrderTests,
+//     ::testing::Values(
+//         std::make_tuple(3, std::vector<std::> { BasicEdge{1, 3, 4, 3}, BasicEdge{1, 3, 5, 5}})
+//     )
+// );
 
-TEST_P(VertexContractorContractionOrderTests, VertexContractorContractionOrderTest) {
-    VertexContractor<G> contractor{g_, 11};
-    auto&& q = contractor.CalculateContractionPriority();
-    auto&& first = q.top();
-    contractor.ContractMinVertex(q);
+// TEST_P(VertexContractorContractionOrderTests, VertexContractorContractionOrderTest) {
+//     VertexContractor<G> contractor{g_, 11};
+//     // contractor.ContractGraph();
+//     auto&& q = contractor.CalculateContractionPriority();
+//     auto&& first = q.top();
+//     contractor.ContractMinVertex(q);
 
-}
+//     // contractor.ContractMinVertex(q);
+
+// }
+

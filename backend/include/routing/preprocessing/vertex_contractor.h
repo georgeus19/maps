@@ -16,8 +16,8 @@ class VertexContractor {
     VertexOrdering<Graph> ordering_;
     using Edge = Graph::E;
     using Vertex = Graph::V;
-    using PriorityQueue = std::priority_queue<std::pair<double, Vertex*>, std::vector<std::pair<double, Vertex*>>,  std::greater<std::pair<double, Vertex*>>>;
 public:
+    using PriorityQueue = std::priority_queue<std::pair<double, Vertex*>, std::vector<std::pair<double, Vertex*>>,  std::greater<std::pair<double, Vertex*>>>;
     VertexContractor<Graph>(Graph & g, unsigned_id_type free_edge_id);
 
     void ContractGraph();
