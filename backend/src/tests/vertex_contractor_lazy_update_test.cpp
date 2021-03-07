@@ -12,7 +12,9 @@
 #include "routing/endpoint_handler.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
-#include "routing/preprocessing/vertex_contractor.h"
+#include "routing/preprocessing/vertex_measures.h"
+#include "routing/preprocessing/graph_contractor.h"
+#include "routing/preprocessing/contraction_parameters.h"
 #include <string>
 #include <vector>
 #include <tuple>
@@ -25,7 +27,7 @@ using namespace preprocessing;
 
 using G = Graph<ContractionVertex<BasicEdge>, BasicEdge>;
 struct ExpectedVertexProperties;
-std::vector<ExpectedVertexProperties> QueueToVector(VertexContractor<G>::PriorityQueue& q);
+std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q);
 void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name); 
 
 struct ExpectedVertexProperties {
@@ -52,7 +54,7 @@ struct ExpectedVertexProperties {
         : vertex_id_(vertex_id), contraction_priority_(contraction_priority) {}
 };
 
-class VertexContractorLazyUpdateTests : public testing::Test {
+class GraphContractorLazyUpdateTests : public testing::Test {
     protected:
     
     G g_;
@@ -61,10 +63,10 @@ class VertexContractorLazyUpdateTests : public testing::Test {
     }
 };
 
-TEST_F(VertexContractorLazyUpdateTests, VertexContractorLazyUpdateTest) {
-    VertexContractor<G> contractor{g_, 11};
+TEST_F(GraphContractorLazyUpdateTests, GraphContractorLazyUpdateTest) {
+    GraphContractor<G> contractor{g_, ContractionParameters{11}};
     std::vector<ExpectedVertexProperties> expected{ ExpectedVertexProperties{2, -2} };
-    VertexContractor<G>::PriorityQueue q{};
+    GraphContractor<G>::PriorityQueue q{};
     q.emplace(-4, g_.GetVertex(2));
     q.emplace(-3, g_.GetVertex(3));
     contractor.ContractMinVertex(q);
@@ -77,7 +79,7 @@ TEST_F(VertexContractorLazyUpdateTests, VertexContractorLazyUpdateTest) {
 
 }
 
-std::vector<ExpectedVertexProperties> QueueToVector(VertexContractor<G>::PriorityQueue& q) {
+std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q) {
     std::vector<ExpectedVertexProperties> v{};
     while(!q.empty()) {
         auto&& pair = q.top();
