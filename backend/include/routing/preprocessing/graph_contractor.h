@@ -1,7 +1,7 @@
-#ifndef BACKEND_CONTRACTOR_H
-#define BACKEND_CONTRACTOR_H
+#ifndef BACKEND_GRAPH_CONTRACTOR_H
+#define BACKEND_GRAPH_CONTRACTOR_H
 #include "routing/preprocessing/vertex_measures.h"
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include <vector>
 #include <set>
@@ -122,4 +122,4 @@ public:
 }
 
 
-#endif //BACKEND_CONTRACTOR_H
+#endif //BACKEND_GRAPH_CONTRACTOR_H

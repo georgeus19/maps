@@ -1,4 +1,4 @@
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 
 namespace routing {
 

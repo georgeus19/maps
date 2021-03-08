@@ -2,7 +2,7 @@
 #define BACKEND_ENDPOINT_HANDLER_H
 #include <unordered_map>
 #include <string>
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 
 

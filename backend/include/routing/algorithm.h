@@ -1,6 +1,6 @@
 #ifndef BACKEND_ALGORITHM_H
 #define BACKEND_ALGORITHM_H
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include <vector>
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"

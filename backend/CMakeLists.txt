@@ -6,9 +6,9 @@ file(GLOB OsmParserGlob src/osm_parser/*.cpp include/osm_parser/*.h)
 file(GLOB DatabaseHelperGlob src/database/*.cpp include/database/*.h)
 file(GLOB TileRenderingGlob src/tile_rendering/*.cpp include/tile_rendering/*.h)
 file(GLOB OthersGlob src/*.cpp include/*.h)
-file(GLOB RoutingGLob src/routing/*.cpp include/routing/*.h include/src/routing/vertices/*.h)
+file(GLOB RoutingGLob src/routing/*.cpp include/routing/*.h include/src/routing/vertices/*.h src/routing/edges/*.cpp include/routing/edges/*.h)
 file(GLOB UtilityGlob src/utility/*.cpp include/utility/*.h)
-file(GLOB RoutingPreprocessingGlob src/routing/preprocessing/*.cpp include/routing/preprocessing/*.h)
+file(GLOB RoutingPreprocessingGlob src/routing/preprocessing/*.cpp include/routing/preprocessing/*.h src/routing/edges/*.cpp include/routing/edges/*.h)
 file(GLOB RoutingTestsGlob src/tests/*.cpp include/tests/*.h)
 
 

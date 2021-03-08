@@ -6,7 +6,7 @@
 #include <functional>
 #include <queue>
 
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"

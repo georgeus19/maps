@@ -6,7 +6,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <python3.8/Python.h>
 #include "routing/graph.h"
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/dijkstra.h"
 #include "routing/exception.h"

@@ -1,7 +1,7 @@
 #ifndef VERTEX_MEASURES_H
 #define VERTEX_MEASURES_H
 
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include <vector>
 #include <set>
 #include <queue>

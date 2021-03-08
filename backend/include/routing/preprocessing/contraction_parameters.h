@@ -1,7 +1,7 @@
-#ifndef BACKEND_CONTRACTION_PARAMETERS
-#define BACKEND_CONTRACTION_PARAMETERS
+#ifndef BACKEND_CONTRACTION_PARAMETERS_H
+#define BACKEND_CONTRACTION_PARAMETERS_H
 
-#include "routing/edge.h"
+#include "routing/edges/basic_edge.h"
 #include <vector>
 #include <set>
 #include <queue>
@@ -27,4 +27,4 @@ inline unsigned_id_type ContractionParameters::NextFreeEdgeId() {
 }
 }
 
-#endif //BACKEND_CONTRACTION_PARAMETERS
+#endif //BACKEND_CONTRACTION_PARAMETERS_H
