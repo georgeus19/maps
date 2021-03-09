@@ -36,6 +36,12 @@ public:
 
     double CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts);
 
+private:
+
+    void CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices);
+
+    size_t CalculateCurrentEdgeCount(const std::vector<Edge>& edges);
+
 };
 
 template <typename Graph>
@@ -88,31 +94,53 @@ int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex) {
 
 template <typename Graph>
 int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts) {
-    size_t adjacent_edges_count = vertex.get_edges().size() + vertex.get_reverse_edges().size();
+    size_t adjacent_edges_count = CalculateCurrentEdgeCount(vertex.get_edges()) + CalculateCurrentEdgeCount(vertex.get_reverse_edges());
     return shortcuts.size() - adjacent_edges_count;
 }
 
 template <typename Graph>
 int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
-    int32_t deleted_neighbours = 0;
-    for(auto&& edge : vertex.get_edges()) {
-        Vertex* neighbour = g_.GetVertex(edge.get_to());
-        if (neighbour->IsContracted()) {
-            ++deleted_neighbours;
-        }   
-    }
-    return deleted_neighbours;
+    std::vector<unsigned_id_type> deleted_neighbours{};
+    CalculateDeletedNeighbours(vertex.get_edges(), deleted_neighbours);
+    CalculateDeletedNeighbours(vertex.get_reverse_edges(), deleted_neighbours);
+    return deleted_neighbours.size();
 }
 
 template <typename Graph>
 double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
-    return static_cast<double>(CalculateEdgeDifference(vertex) + CalculateDeletedNeighbours(vertex));
+    auto&& shortcuts = FindShortcuts(vertex);
+    return CalculateContractionAttractivity(vertex, shortcuts);
 }
 
 template <typename Graph>
 double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
     return static_cast<double>(CalculateEdgeDifference(vertex, shortcuts) + CalculateDeletedNeighbours(vertex));
 }
+
+template <typename Graph>
+void VertexMeasures<Graph>::CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices) {
+    for(auto&& edge : edges) {
+        unsigned_id_type neighbour_id = edge.get_to();
+        Vertex* neighbour = g_.GetVertex(neighbour_id);
+        if (neighbour->IsContracted() && counted_vertices.end() == std::find(counted_vertices.begin(), counted_vertices.end(), neighbour_id)) {
+            counted_vertices.push_back(neighbour_id);
+        }   
+    }
+}
+
+template <typename Graph>
+size_t VertexMeasures<Graph>::CalculateCurrentEdgeCount(const std::vector<Edge>& edges) {
+    size_t count = 0;
+    for(auto&& edge : edges) {
+        Vertex* vertex = g_.GetVertex(edge.get_to());
+        if (!vertex->IsContracted()) {
+            ++count;
+        }   
+    }
+    return count;
+}
+
+
 
 }
 }
