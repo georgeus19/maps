@@ -38,8 +38,6 @@ public:
 
     void ForEachReverseEdge(std::function<void(Edge&)> f);
 
-private:
-    size_t GetNotContractedEdges(const std::vector<Edge>& edges);
 };
 
 template <typename Edge>
@@ -61,13 +59,6 @@ void ContractionVertex<Edge>::ForEachReverseEdge(std::function<void(Edge&)> f) {
     std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
 }
 
-// template <typename Edge>
-// size_t ContractionVertex<Edge>::GetNotContractedEdges(const std::vector<Edge>& edges) {
-//     size_t count = 0;
-//     for(auto&& edge : edges) {
-//         if (edge.)
-//     }
-// }
 
 
 }
