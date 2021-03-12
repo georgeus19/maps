@@ -15,6 +15,7 @@
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/preprocessing/contraction_parameters.h"
+#include "routing/preprocessing/bidirectional_dijkstra.h"
 
 #include <string>
 #include <vector>
@@ -90,8 +91,6 @@ INSTANTIATE_TEST_CASE_P(
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 1, -1}, 5, std::vector<unsigned_id_type>{ 4 }}, // DN of one edge + reverse edge.
         VertexMeasuresTestParameters{VertexMeasuresTest{-4, 2, -2}, 3, std::vector<unsigned_id_type>{ 4, 5 }}, // DN for two reverse edges.
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 0}, 5, std::vector<unsigned_id_type>{ 4, 3 }} // DN for two edges.
-        
-        
     )
 );
 

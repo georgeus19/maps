@@ -107,17 +107,6 @@ void GraphContractor<Graph>::AddShortcuts(std::vector<Edge> shortcuts) {
     }
 }
 
-template <typename Vertex, typename Edge>
-class SearchSpaceLimit {
-    const Vertex* start_;
-    const Vertex* end_;
-public:
-    SearchSpaceLimit(const Vertex* start, const Vertex* end) : start_(start), end_(end) {}
-    void operator()(Vertex & v) {
-
-    }
-};
-
 }
 }
 
