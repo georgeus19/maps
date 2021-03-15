@@ -22,7 +22,7 @@ public:
 
     BidirectionalDijkstra(G & g);
 
-     /**
+    /**
      * Find the best route from `start_node` to `end_node`.
      *
      * @param start_node Node the routing start from.
@@ -30,6 +30,13 @@ public:
      * @return Vector of edges that represent the best route.
      */
     void Run(unsigned_id_type start_node, unsigned_id_type end_node);
+
+    /**
+     * Get shortest route from the node the algorithm was run to.
+     * @param end_node Endpoint of the route.
+     * @return Vector of edges which represent the found route. Empty if no path found.
+     */
+    std::vector<Edge> GetRoute(unsigned_id_type end_node);
 
 private:
     /**
@@ -151,6 +158,11 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         });
 
     }
+}
+
+template <typename G>
+std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::GetRoute(unsigned_id_type end_node) {
+    return std::vector<Edge>{};
 }
 
 template <typename G>

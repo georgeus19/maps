@@ -5,6 +5,8 @@
 #include <vector>
 #include <limits>
 #include <cassert>
+#include <functional>
+
 namespace routing {
 
 template <typename Edge>

@@ -13,7 +13,6 @@ file(GLOB RoutingTestsGlob src/tests/*.cpp include/tests/*.h)
 
 
 
-
 add_executable(backend_test ${OthersGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_library(render ${TileRenderingGlob})
 add_executable(graph_builder ${OsmParserGlob})
