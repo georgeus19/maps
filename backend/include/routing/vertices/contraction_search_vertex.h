@@ -103,8 +103,11 @@ void ContractionSearchVertex<Edge>::ForEachReverseEdge(std::function<void(Edge&)
 template <typename Edge>
 double ContractionSearchVertex<Edge>::GetSummedCosts() {
     double max = std::max(get_forward_cost(), get_backward_cost());
-    // if (max)
-    
+    if (max != this->GetCostMaxValue()) { 
+        return get_forward_cost() + get_backward_cost();
+    } else {
+        return max;
+    }
 }
 
 

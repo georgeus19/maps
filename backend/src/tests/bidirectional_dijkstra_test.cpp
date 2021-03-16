@@ -79,7 +79,7 @@ TEST_F(BidirectionalDijkstraTest, LimitedSearch) {
 
 
 TEST_F(BidirectionalDijkstraTest, NotExistingPath) {
-    Algorithm<Dijkstra<G>> alg{g_};
+    Algorithm<BidirectionalDijkstra<G>> alg{g_};
     EXPECT_THROW(alg.Run(5, 1), RouteNotFoundException);
 }
 
