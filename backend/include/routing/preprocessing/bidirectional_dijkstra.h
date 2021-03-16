@@ -8,6 +8,7 @@
 #include <queue>
 #include <cassert>
 #include <limits>
+#include <memory>
 
 namespace routing {
 namespace preprocessing {
@@ -43,13 +44,14 @@ private:
      * Graph where dijkstra's algorithm is used.
      */
     G & g_;
+    unsigned_id_type settled_vertex_;
     struct PriorityQueueMember;
     struct MinQueueComparator;
     class Direction;
     class ForwardDirection;
     class BackwardDirection;
 
-    using PriorityQueue = std::priority_queue<PriorityQueueMember>;
+    using PriorityQueue = std::priority_queue<PriorityQueueMember, std::vector<PriorityQueueMember>, MinQueueComparator>;
 
     PriorityQueueMember GetMin(PriorityQueue& a, PriorityQueue& b);
 
@@ -65,26 +67,36 @@ private:
     struct PriorityQueueMember {
         double priority;
         unsigned_id_type vertex_id;
-        Direction direction;
+        Direction* direction;
 
-        PriorityQueueMember() : priority(std::numeric_limits<double>::max()), vertex_id(0), direction() {}
+        PriorityQueueMember() : priority(std::numeric_limits<double>::max()), vertex_id(0), direction(nullptr) {}
 
-        PriorityQueueMember(double p, unsigned_id_type v, const Direction& dir) : priority(p), vertex_id(v), direction(dir) {}
+        PriorityQueueMember(double p, unsigned_id_type v, Direction* dir) : priority(p), vertex_id(v), direction(dir) {}
+
+        bool operator< (const PriorityQueueMember& other) {
+            return priority < other.priority;
+        }
+
+        bool operator> (const PriorityQueueMember& other) {
+            return priority > other.priority;
+        }
 
 
     };
 
     class Direction {
     protected:
-        PriorityQueue queue_;
+        PriorityQueue* queue_;
     public:
 
         Direction(PriorityQueue* q) : queue_(q) {} 
         virtual ~Direction() {}
-        virtual void SetCost(Vertex& vertex, double cost);
-        virtual double GetCost(Vertex& vertex);
-        virtual void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f);
-        virtual void Enqueue(double priority, unsigned_id_type vertex_id);
+        virtual void SetCost(Vertex& vertex, double cost) = 0;
+        virtual double GetCost(Vertex& vertex) = 0;
+        virtual void SetPrevious(Vertex& vertex, unsigned_id_type previous) = 0;
+        virtual unsigned_id_type GetPrevious(Vertex& vertex) = 0;
+        virtual void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) = 0;
+        virtual void Enqueue(double priority, unsigned_id_type vertex_id) = 0;
     };
 
     class ForwardDirection : public Direction {
@@ -100,12 +112,20 @@ private:
             return vertex.get_forward_cost();
         }
 
+        void SetPrevious(Vertex& vertex, unsigned_id_type previous) override {
+            vertex.set_forward_previous(previous);
+        }
+        
+        unsigned_id_type GetPrevious(Vertex& vertex) override {
+            return vertex.get_forward_previous();
+        }
+
         void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) override {
             vertex.ForEachEdge(f);
         }
 
         void Enqueue(double priority, unsigned_id_type vertex_id) override {
-            this->queue_.emplace(priority, vertex_id, *this);
+            this->queue_->emplace(priority, vertex_id, this);
         }
 
     };
@@ -123,12 +143,20 @@ private:
             return vertex.get_backward_cost();
         }
 
+        void SetPrevious(Vertex& vertex, unsigned_id_type previous) override {
+            vertex.set_backward_previous(previous);
+        }
+        
+        unsigned_id_type GetPrevious(Vertex& vertex) override {
+            return vertex.get_backward_previous();
+        }
+
         void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) override {
             vertex.ForEachReverseEdge(f);
         }
 
         void Enqueue(double priority, unsigned_id_type vertex_id) override {
-            this->queue_.emplace(priority, vertex_id, *this);
+            this->queue_->emplace(priority, vertex_id, this);
         }
 
     };
@@ -136,23 +164,32 @@ private:
 };
 
 template <typename G>
+BidirectionalDijkstra<G>::BidirectionalDijkstra(G & g) : g_(g), settled_vertex_(0) {}
+
+template <typename G>
 void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type end_node) {
     PriorityQueue forward_queue;
     PriorityQueue backward_queue;
-    forward_queue.emplace(0, start_node, ForwardDirection{&forward_queue});
-    backward_queue.emplace(0, end_node, BackwardDirection{&backward_queue});
+    ForwardDirection forward_direction{&forward_queue};
+    BackwardDirection backward_direction{&backward_queue};
+    forward_queue.emplace(0, start_node, &forward_direction);
+    backward_queue.emplace(0, end_node, &backward_direction);
+
+    double min_path_length = std::numeric_limits<double>::max();
     
     while (!forward_queue.empty() || !backward_queue.empty()) {
         PriorityQueueMember min_member = GetMin(forward_queue, backward_queue);
         Vertex* vertex = g_.GetVertex(min_member.vertex_id);
-        Direction direction = min_member.direction;
+        Direction* direction = min_member.direction;
+        double path_length = vertex->get_forward_cost() + vertex->get_forward_cost();
         // if vertex->backward_cost, vertex->forward_cost settled - update path length.
 
-        direction.ForEachEdge(*vertex, [&](Edge& edge) {
+        direction->ForEachEdge(*vertex, [&, vertex, direction](Edge& edge) {
             Vertex* neighbour = g_.GetVertex(edge.get_to());
-            double new_cost = direction.GetCost(*vertex) + edge.get_length();
-            if (new_cost < direction.GetCost(*neighbour)) {
-                direction.SetCost(*neighbour, new_cost);
+            double new_cost = direction->GetCost(*vertex) + edge.get_length();
+            if (new_cost < direction->GetCost(*neighbour)) {
+                direction->SetCost(*neighbour, new_cost);
+                direction->SetPrevious(*neighbour, vertex->get_osm_id());
 
             }
         });

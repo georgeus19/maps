@@ -19,20 +19,21 @@
 using namespace std;
 using namespace routing;
 using namespace database;
+using namespace preprocessing;
 // using namespace testing;
-using G = Graph<BasicVertex<BasicEdge>, BasicEdge>;
+using G = Graph<ContractionSearchVertex<BasicEdge>, BasicEdge>;
 
 class BidirectionalDijkstraTest : public testing::Test {
     protected:
     
     G g_;
     void SetUp() override {
-        TestBasicGraph(g_);
+        TestBasicReverseGraph(g_);
     }
 };
 
 TEST_F(BidirectionalDijkstraTest, ExistingPath) {
-    Algorithm<Dijkstra<G>> alg{g_};
+    Algorithm<BidirectionalDijkstra<G>> alg{g_};
     alg.Run(1, 6);
     vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
     for(auto&& e : path) {

@@ -12,7 +12,7 @@ namespace routing {
  */
 template <typename Edge>
 class BasicVertex {
-private:
+protected:
     /**
      * Unique id.
      */
@@ -85,6 +85,8 @@ public:
     void ForEachEdge(std::function<void(Edge&)>);
 
     Edge& FindEdge(std::function<bool(const Edge&)>);
+
+    double GetCostMaxValue();
 };
 
 template <typename Edge>
@@ -156,7 +158,7 @@ unsigned_id_type BasicVertex<Edge>::GetPreviousDefaultValue() const {
 template <typename Edge>
 void BasicVertex<Edge>::ResetRoutingProperties() {
     previous_ = GetPreviousDefaultValue();
-    cost_ = std::numeric_limits<double>::max();
+    cost_ = GetCostMaxValue();
 }
 
 template <typename Edge>
@@ -172,6 +174,12 @@ Edge& BasicVertex<Edge>::FindEdge(std::function<bool(const Edge&)> f) {
     }
     throw "Edge not found";
 }
+
+template <typename Edge>
+inline double BasicVertex<Edge>::GetCostMaxValue() {
+    return std::numeric_limits<double>::max();
+}
+
 
 }
 

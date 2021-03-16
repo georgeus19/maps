@@ -18,13 +18,15 @@ private:
 
     std::vector<Edge> reverse_edges_;
 
-    double forward_cost_;
-
     double backward_cost_;
 
     unsigned_id_type backward_previous_;
 
 public:
+
+    inline void set_order_id(unsigned_id_type order_id) {
+        order_id_ = order_id;
+    }
 
     inline unsigned_id_type get_order_id() const {
         return order_id_;
@@ -35,11 +37,11 @@ public:
     }        
 
     inline void set_forward_cost(double cost) {
-        forward_cost_ = cost;
+        this->cost_ = cost;
     }
 
     inline double get_forward_cost() const {
-        return forward_cost_;
+        return this->cost_;
     } 
 
     inline void set_backward_cost(double cost) {
@@ -66,13 +68,22 @@ public:
         return backward_previous_;
     }
 
+    ContractionSearchVertex(unsigned_id_type osm_id);
+
     void AddReverseEdge(Edge&& edge);
 
     void AddReverseEdge(const Edge & edge);
 
     void ForEachReverseEdge(std::function<void(Edge&)> f);
 
+    double GetSummedCosts();
+
 };
+
+template <typename Edge>
+ContractionSearchVertex<Edge>::ContractionSearchVertex(unsigned_id_type osm_id)
+    : BasicVertex<Edge>(osm_id), order_id_(0), reverse_edges_(),
+    backward_cost_(this->GetCostMaxValue()), backward_previous_(0) {}
 
 template <typename Edge>
 inline void ContractionSearchVertex<Edge>::AddReverseEdge(Edge&& edge) {
@@ -87,6 +98,13 @@ inline void ContractionSearchVertex<Edge>::AddReverseEdge(const Edge & edge) {
 template <typename Edge>
 void ContractionSearchVertex<Edge>::ForEachReverseEdge(std::function<void(Edge&)> f) {
     std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
+}
+
+template <typename Edge>
+double ContractionSearchVertex<Edge>::GetSummedCosts() {
+    double max = std::max(get_forward_cost(), get_backward_cost());
+    // if (max)
+    
 }
 
 
