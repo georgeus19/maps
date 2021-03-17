@@ -7,7 +7,6 @@
 #include <vector>
 #include "routing/edges/basic_edge.h"
 
-
 namespace routing {
 
 template <typename G>
@@ -57,10 +56,7 @@ public:
 
 private:
     
-    
     G& g_;
-    
-
 };
   
 template <typename G>
@@ -70,12 +66,12 @@ template <typename G>
 std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
     unsigned_id_type prev = end_node;
     Vertex * end_vertex = g_.GetVertex(end_node);
-    unsigned_id_type cur = graph_info->GetPrevious(*end_vertex); // end_vertex->get_previous();
+    unsigned_id_type cur = graph_info->GetPrevious(*end_vertex);
     Vertex * curv = g_.GetVertex(cur);
 
     std::vector<Edge> route;
 
-    if (end_vertex->GetPreviousDefaultValue() == graph_info->GetPrevious(*end_vertex) /* end_vertex->get_previous() */ ) {
+    if (end_vertex->GetPreviousDefaultValue() == graph_info->GetPrevious(*end_vertex) ) {
         return route;
     }
 
@@ -86,7 +82,7 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphI
         route.push_back(e);
 
         prev = cur;
-        cur = graph_info->GetPrevious(*curv); // curv->get_previous();
+        cur = graph_info->GetPrevious(*curv);
         curv = g_.GetVertex(cur);
     }
 
