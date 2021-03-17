@@ -4,6 +4,7 @@
 #include <vector>
 #include <limits>
 #include <functional>
+#include "routing/exception.h"
 
 namespace routing {
 
@@ -172,7 +173,7 @@ Edge& BasicVertex<Edge>::FindEdge(std::function<bool(const Edge&)> f) {
     if (it != outgoing_edges_.end()) {
         return *it;
     }
-    throw "Edge not found";
+    throw EdgeNotFoundException("Edge not found");
 }
 
 template <typename Edge>

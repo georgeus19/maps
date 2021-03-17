@@ -67,14 +67,14 @@ TEST_F(GraphContractorLazyUpdateTests, GraphContractorLazyUpdateTest) {
     GraphContractor<G> contractor{g_, ContractionParameters{11}};
     std::vector<ExpectedVertexProperties> expected{ ExpectedVertexProperties{2, -2} };
     GraphContractor<G>::PriorityQueue q{};
-    q.emplace(-4, g_.GetVertex(2));
-    q.emplace(-3, g_.GetVertex(3));
+    q.emplace(-4, &(g_.GetVertex(2)));
+    q.emplace(-3, &(g_.GetVertex(3)));
     contractor.ContractMinVertex(q);
     auto&& actual = QueueToVector(q);
     Print(actual, "actual");
     Print(expected, "expected");
-    EXPECT_EQ(false, g_.GetVertex(2)->IsContracted());
-    EXPECT_EQ(true, g_.GetVertex(3)->IsContracted());
+    EXPECT_EQ(false, g_.GetVertex(2).IsContracted());
+    EXPECT_EQ(true, g_.GetVertex(3).IsContracted());
     EXPECT_THAT(actual, testing::UnorderedElementsAreArray(expected));
 
 }

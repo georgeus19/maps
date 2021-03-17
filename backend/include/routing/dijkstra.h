@@ -56,7 +56,7 @@ private:
     unsigned_id_type start_node_;
     unsigned_id_type end_node_;
 
-    void UpdateNeighbours(Vertex * v, std::set<QueuePair> & q, std::function<bool(Vertex*)> ignore);
+    void UpdateNeighbours(Vertex& v, std::set<QueuePair> & q, std::function<bool(Vertex*)> ignore);
 
     void InitGraph();
 };
@@ -101,16 +101,16 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, std::function<bool(Vertex *)>
     start_node_ = start_node;
     InitGraph();
 
-    Vertex * v = g_.GetVertex(start_node);
-    v->set_cost(0);
-    q.insert(std::make_pair(v->get_cost(), v));
+    Vertex& start_vertex = g_.GetVertex(start_node);
+    start_vertex.set_cost(0);
+    q.insert(std::make_pair(start_vertex.get_cost(), &start_vertex));
 
     while (q.empty() == false) {
         auto&& it = q.begin();
-        v = it->second;
+        Vertex& v = *(it->second);
         q.erase(it);
 
-        if (end_condition(v)) {
+        if (end_condition(&v)) {
             return true;
         }
 
@@ -121,24 +121,24 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, std::function<bool(Vertex *)>
 
 template <typename G>
 double Dijkstra<G>::GetPathLength(unsigned_id_type to) const {
-    return g_.GetVertex(to)->get_cost();
+    return g_.GetVertex(to).get_cost();
 }
 
 template <typename G>
-void Dijkstra<G>::UpdateNeighbours(Vertex * v, std::set<QueuePair> & q, std::function<bool(Vertex*)> ignore) {
-    v->ForEachEdge([&](Edge & edge) {
-        Vertex * neighbour = g_.GetVertex(edge.get_to());
-        if (!ignore(neighbour) && neighbour->get_cost() > v->get_cost() + edge.get_length()) {
+void Dijkstra<G>::UpdateNeighbours(Vertex& v, std::set<QueuePair>& q, std::function<bool(Vertex*)> ignore) {
+    v.ForEachEdge([&](Edge & edge) {
+        Vertex& neighbour = g_.GetVertex(edge.get_to());
+        if (!ignore(&neighbour) && neighbour.get_cost() > v.get_cost() + edge.get_length()) {
 
             // Only vertices with updated values are in priority queue.
-            if (neighbour->get_cost() != std::numeric_limits<double>::max()) {
-                q.erase(std::make_pair(neighbour->get_cost(), neighbour));
+            if (neighbour.get_cost() != std::numeric_limits<double>::max()) {
+                q.erase(std::make_pair(neighbour.get_cost(), &neighbour));
             }
 
-            neighbour->set_cost(v->get_cost() + edge.get_length());
-            neighbour->set_previous(v->get_osm_id());
+            neighbour.set_cost(v.get_cost() + edge.get_length());
+            neighbour.set_previous(v.get_osm_id());
 
-            q.insert(std::make_pair(neighbour->get_cost(), neighbour));
+            q.insert(std::make_pair(neighbour.get_cost(), &neighbour));
 
         }
     });
@@ -147,7 +147,7 @@ void Dijkstra<G>::UpdateNeighbours(Vertex * v, std::set<QueuePair> & q, std::fun
 template <typename G>
 void Dijkstra<G>::InitGraph() {
     
-    g_.forEachVertex([](Vertex &  v) {
+    g_.forEachVertex([](Vertex&  v) {
         v.ResetRoutingProperties();
     }); 
 }

@@ -60,14 +60,14 @@ std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindSho
 template <typename Graph>
 void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge, double max_outgoing_length) {
     unsigned_id_type start_vertex_id = reversed_first_edge.get_to();
-    Vertex* start_vertex = g_.GetVertex(start_vertex_id);
+    Vertex& start_vertex = g_.GetVertex(start_vertex_id);
 
-    if (start_vertex->IsContracted()) {
+    if (start_vertex.IsContracted()) {
         return;
     }
     Dijkstra<Graph> dijkstra{g_};
     double max_cost = max_outgoing_length + reversed_first_edge.get_length();
-    auto&& end_condition = [=](Vertex * v) {
+    auto&& end_condition = [=](Vertex* v) {
         return v->get_cost() > max_cost;
     };
     dijkstra.Run(start_vertex_id, end_condition, [&](Vertex* v) {
@@ -79,7 +79,7 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
         unsigned_id_type end_vertex_id = second_edge.get_to();
         double path_length = dijkstra.GetPathLength(end_vertex_id);
         
-        if (g_.GetVertex(end_vertex_id)->IsContracted() || shortcut_length > path_length) {
+        if (g_.GetVertex(end_vertex_id).IsContracted() || shortcut_length > path_length) {
             continue;
         }
         shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), start_vertex_id, end_vertex_id, shortcut_length});
@@ -121,8 +121,8 @@ template <typename Graph>
 void VertexMeasures<Graph>::CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices) {
     for(auto&& edge : edges) {
         unsigned_id_type neighbour_id = edge.get_to();
-        Vertex* neighbour = g_.GetVertex(neighbour_id);
-        if (neighbour->IsContracted() && counted_vertices.end() == std::find(counted_vertices.begin(), counted_vertices.end(), neighbour_id)) {
+        Vertex& neighbour = g_.GetVertex(neighbour_id);
+        if (neighbour.IsContracted() && counted_vertices.end() == std::find(counted_vertices.begin(), counted_vertices.end(), neighbour_id)) {
             counted_vertices.push_back(neighbour_id);
         }   
     }
@@ -132,8 +132,8 @@ template <typename Graph>
 size_t VertexMeasures<Graph>::CalculateCurrentEdgeCount(const std::vector<Edge>& edges) {
     size_t count = 0;
     for(auto&& edge : edges) {
-        Vertex* vertex = g_.GetVertex(edge.get_to());
-        if (!vertex->IsContracted()) {
+        Vertex& vertex = g_.GetVertex(edge.get_to());
+        if (!vertex.IsContracted()) {
             ++count;
         }   
     }

@@ -66,12 +66,12 @@ TEST_F(DijkstraTest, LimitedSearch) {
     dijkstra.Run(1, [=](BasicVertex<BasicEdge>* v) { 
             return v->get_cost() > max_cost;
         }, [](BasicVertex<BasicEdge>*) { return false; });
-    EXPECT_EQ(g_.GetVertex(1)->get_cost(), 0);
-    EXPECT_EQ(g_.GetVertex(2)->get_cost(), 2);
-    EXPECT_EQ(g_.GetVertex(3)->get_cost(), 2);
-    EXPECT_EQ(g_.GetVertex(4)->get_cost(), 5);
-    EXPECT_EQ(g_.GetVertex(5)->get_cost(), std::numeric_limits<double>::max());
-    EXPECT_EQ(g_.GetVertex(6)->get_cost(), 10);
+    EXPECT_EQ(g_.GetVertex(1).get_cost(), 0);
+    EXPECT_EQ(g_.GetVertex(2).get_cost(), 2);
+    EXPECT_EQ(g_.GetVertex(3).get_cost(), 2);
+    EXPECT_EQ(g_.GetVertex(4).get_cost(), 5);
+    EXPECT_EQ(g_.GetVertex(5).get_cost(), std::numeric_limits<double>::max());
+    EXPECT_EQ(g_.GetVertex(6).get_cost(), 10);
 }
 
 

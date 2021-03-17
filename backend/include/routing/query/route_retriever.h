@@ -65,29 +65,29 @@ RouteRetriever<G>::RouteRetriever(G& g) : g_(g) {}
 template <typename G>
 std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
     unsigned_id_type prev = end_node;
-    Vertex * end_vertex = g_.GetVertex(end_node);
-    unsigned_id_type cur = graph_info->GetPrevious(*end_vertex);
-    Vertex * curv = g_.GetVertex(cur);
+    Vertex& end_vertex = g_.GetVertex(end_node);
+    unsigned_id_type cur = graph_info->GetPrevious(end_vertex);
+    Vertex& curv = g_.GetVertex(cur);
 
     std::vector<Edge> route;
 
-    if (end_vertex->GetPreviousDefaultValue() == graph_info->GetPrevious(*end_vertex) ) {
+    if (end_vertex.GetPreviousDefaultValue() == graph_info->GetPrevious(end_vertex) ) {
         return route;
     }
 
     while (cur != start_node) {
-        Edge& e = curv->FindEdge([=](const Edge& e) {
+        Edge& e = curv.FindEdge([=](const Edge& e) {
             return e.get_to() == prev;
         });
         route.push_back(e);
 
         prev = cur;
-        cur = graph_info->GetPrevious(*curv);
+        cur = graph_info->GetPrevious(curv);
         curv = g_.GetVertex(cur);
     }
 
     // Find the correct edge of the route's first vertex == start_node.
-    Edge& e = curv->FindEdge([=](const Edge& e) {
+    Edge& e = curv.FindEdge([=](const Edge& e) {
         return e.get_to() == prev;
     });
     route.push_back(e);

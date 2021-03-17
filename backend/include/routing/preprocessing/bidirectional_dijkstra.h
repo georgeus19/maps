@@ -183,28 +183,28 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
     BackwardDirection backward_direction{&backward_queue};
     forward_queue.emplace(0, start_node, &forward_direction);
     backward_queue.emplace(0, end_node, &backward_direction);
-    g_.GetVertex(start_node)->set_forward_cost(0);
-    g_.GetVertex(end_node)->set_backward_cost(0);
+    g_.GetVertex(start_node).set_forward_cost(0);
+    g_.GetVertex(end_node).set_backward_cost(0);
 
     double min_path_length = std::numeric_limits<double>::max();
     
     while (!forward_queue.empty() || !backward_queue.empty()) {
         PriorityQueueMember min_member = GetMin(forward_queue, backward_queue);
-        Vertex* vertex = g_.GetVertex(min_member.vertex_id);
+        Vertex& vertex = g_.GetVertex(min_member.vertex_id);
         Direction* direction = min_member.direction;
-        double path_length = vertex->GetSummedCosts();
+        double path_length = vertex.GetSummedCosts();
         if (path_length < min_path_length) {
             min_path_length = path_length;
-            settled_vertex_ = vertex->get_osm_id();
+            settled_vertex_ = vertex.get_osm_id();
         }
         // if vertex->backward_cost, vertex->forward_cost settled - update path length.
 
-        direction->ForEachEdge(*vertex, [&, vertex, direction](Edge& edge) {
-            Vertex* neighbour = g_.GetVertex(edge.get_to());
-            double new_cost = direction->GetCost(*vertex) + edge.get_length();
-            if (vertex->get_order_id() < neighbour->get_order_id() && new_cost < direction->GetCost(*neighbour)) {
-                direction->SetCost(*neighbour, new_cost);
-                direction->SetPrevious(*neighbour, vertex->get_osm_id());
+        direction->ForEachEdge(vertex, [&](Edge& edge) {
+            Vertex& neighbour = g_.GetVertex(edge.get_to());
+            double new_cost = direction->GetCost(vertex) + edge.get_length();
+            if (vertex.get_order_id() < neighbour.get_order_id() && new_cost < direction->GetCost(neighbour)) {
+                direction->SetCost(neighbour, new_cost);
+                direction->SetPrevious(neighbour, vertex.get_osm_id());
 
             }
         });

@@ -5,11 +5,13 @@
 #include <utility>
 #include <functional>
 #include <queue>
+#include <string>
 
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
+#include "routing/exception.h"
 #include <set>
 
 namespace routing {
@@ -49,7 +51,7 @@ public:
      * @param id Id of vertex to which Vertex* points.
      * @return Pointer to vetex or nullptr if it is not found.
      */
-    Vertex* GetVertex(unsigned_id_type id);
+    Vertex& GetVertex(unsigned_id_type id);
 
     void forEachVertex(std::function<void(Vertex&)> f);
 
@@ -108,12 +110,12 @@ void Graph<Vertex, Edge>::AddEdge(Edge && e, std::function<void(Vertex &, Edge &
 
 
 template <typename Vertex, typename Edge>
-inline Vertex* Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
+inline Vertex& Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
     auto&& it = g_.find(id);
     if (it == g_.end()) {
-        return nullptr;
+        throw VertexNotFoundException("Vertex " + std::to_string(id) + " not found in graph.");
     } else {
-        return &((it->second));
+        return it->second;
     }
 }
 

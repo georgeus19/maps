@@ -100,12 +100,12 @@ TEST_P(VertexContractionMeasuresTests, VertexContractionMeasuresTest) {
     VertexMeasures measures{g_, ContractionParameters{11}};
     
     for(auto&& v : parameters.vertices_to_contract) {
-        contractor.ContractVertex(*(g_.GetVertex(v)));
+        contractor.ContractVertex(g_.GetVertex(v));
     }
     auto&& tested_vertex = g_.GetVertex(parameters.tested_vertex);
-    double edge_difference = measures.CalculateEdgeDifference(*tested_vertex);
-    int32_t deleted_neighbours = measures.CalculateDeletedNeighbours(*tested_vertex);
-    int32_t contraction_priority = measures.CalculateContractionAttractivity(*tested_vertex);
+    double edge_difference = measures.CalculateEdgeDifference(tested_vertex);
+    int32_t deleted_neighbours = measures.CalculateDeletedNeighbours(tested_vertex);
+    int32_t contraction_priority = measures.CalculateContractionAttractivity(tested_vertex);
     std::cout << "Test measures of vertex " << parameters.tested_vertex << std::endl;
     std::cout << "Edge difference: expected: " << parameters.measures.edge_difference << " actual: " << edge_difference << std::endl;
     std::cout << "Deleted neighbours: expected: " << parameters.measures.deleted_neighbours << " actual: " << deleted_neighbours << std::endl;
