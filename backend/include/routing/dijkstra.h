@@ -8,6 +8,7 @@
 #include "routing/exception.h"
 #include <queue>
 #include <algorithm>
+#include "routing/query/route_retriever.h"
 
 namespace routing {
 
@@ -41,6 +42,8 @@ public:
      */
     std::vector<Edge> GetRoute(unsigned_id_type end_node);
 
+    std::vector<Edge> GetRoute();
+
     bool Run(unsigned_id_type start_node, std::function<bool(Vertex *)> end_condition, std::function<bool(Vertex*)> ignore);
 
     double GetPathLength(unsigned_id_type to) const;
@@ -51,6 +54,7 @@ private:
     G & g_;
 
     unsigned_id_type start_node_;
+    unsigned_id_type end_node_;
 
     void UpdateNeighbours(Vertex * v, std::set<QueuePair> & q, std::function<bool(Vertex*)> ignore);
 
@@ -58,47 +62,26 @@ private:
 };
 
 template< typename G>
-Dijkstra<G>::Dijkstra(G & g) : g_(g), start_node_(0) {}
+Dijkstra<G>::Dijkstra(G & g) : g_(g), start_node_(0), end_node_(0) {}
 
 template< typename G>
 void Dijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type end_node) {
+    start_node_ = start_node;
+    end_node_ = end_node;
     if (!Run(start_node, [=](Dijkstra<G>::Vertex* v) { return v->get_osm_id() == end_node; }, [](Dijkstra<G>::Vertex*) { return false; })) {
         throw RouteNotFoundException("Route from " + std::to_string(start_node) + " to " + std::to_string(end_node) + " could not be found");
     }
 }
 
 template< typename G>
-std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute(unsigned_id_type end_node) {
-    unsigned_id_type prev = end_node;
-    Vertex * end_vertex = g_.GetVertex(end_node);
-    unsigned_id_type cur = end_vertex->get_previous();
-    Vertex * curv = g_.GetVertex(cur);
+inline std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute(unsigned_id_type end_node) {
+    typename RouteRetriever<G>::DijkstraGraphInfo graph_info{};
+    return RouteRetriever{g_}.GetRoute(&graph_info, start_node_, end_node);
+}
 
-    std::vector<Dijkstra::Edge> route;
-
-    if (end_vertex->GetPreviousDefaultValue() == end_vertex->get_previous()) {
-        return route;
-    }
-
-    while (cur != start_node_) {
-        Edge& e = curv->FindEdge([=](const Edge& e) {
-            return e.get_to() == prev;
-        });
-        route.push_back(e);
-
-        prev = cur;
-        cur = curv->get_previous();
-        curv = g_.GetVertex(cur);
-    }
-
-    // Find the correct edge of the route's first vertex == start_node_.
-    Edge& e = curv->FindEdge([=](const Edge& e) {
-        return e.get_to() == prev;
-    });
-    route.push_back(e);
-
-    std::reverse(route.begin(), route.end());;
-    return route; 
+template< typename G>
+inline std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute() {
+    return GetRoute(end_node_);
 }
 
 template <typename G>

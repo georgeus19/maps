@@ -32,7 +32,7 @@ class DijkstraTest : public testing::Test {
 TEST_F(DijkstraTest, ExistingPath) {
     Algorithm<Dijkstra<G>> alg{g_};
     alg.Run(1, 6);
-    vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
     for(auto&& e : path) {
         e.Print();
     }
@@ -48,7 +48,7 @@ TEST_F(DijkstraTest, RunTwiceExistingPath) {
     Algorithm<Dijkstra<G>> alg{g_};
     alg.Run(2, 3);
     alg.Run(1, 6);
-    vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
     for(auto&& e : path) {
         e.Print();
     }

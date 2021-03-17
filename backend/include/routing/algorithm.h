@@ -42,8 +42,8 @@ namespace routing {
          * @param end_node Endpoint of the route.
          * @return Vector of edges which represent the found route. Empty if no path found.
          */
-        std::vector<typename Implementation::Edge> GetRoute(unsigned_id_type end_node) {
-            return impl_.GetRoute(end_node);
+        std::vector<typename Implementation::Edge> GetRoute() {
+            return impl_.GetRoute();
         }
 
     };

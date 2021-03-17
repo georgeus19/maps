@@ -32,6 +32,33 @@ namespace routing {
 
         const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
     };
+
+       /**
+     * NotImplementedException is thrown when it is impossible to find the best route.
+     */
+    class NotImplementedException : public std::exception {
+        std::string message_;
+    public:
+        NotImplementedException();
+
+        NotImplementedException(const std::string & message);
+
+        NotImplementedException(std::string && message);
+
+        NotImplementedException(const NotImplementedException & other);
+
+        NotImplementedException(NotImplementedException && other);
+
+        NotImplementedException & operator=(const NotImplementedException & other);
+
+        NotImplementedException & operator=(NotImplementedException && other);
+
+        ~NotImplementedException() override;
+
+        void Swap(NotImplementedException & other);
+
+        const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
+    };
 }
 
 #endif //BACKEND_EXCEPTION_H

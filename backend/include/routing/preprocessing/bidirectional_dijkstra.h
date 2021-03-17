@@ -19,6 +19,8 @@ public:
     using Vertex = typename G::V;
     using Edge = typename G::E;
     using QueuePair = std::pair<double, Vertex*>;
+
+    friend class RouteRetriever;
     
 
     BidirectionalDijkstra(G & g);
@@ -34,10 +36,9 @@ public:
 
     /**
      * Get shortest route from the node the algorithm was run to.
-     * @param end_node Endpoint of the route.
      * @return Vector of edges which represent the found route. Empty if no path found.
      */
-    std::vector<Edge> GetRoute(unsigned_id_type end_node);
+    std::vector<Edge> GetRoute();
 
 private:
     /**
@@ -45,6 +46,8 @@ private:
      */
     G & g_;
     unsigned_id_type settled_vertex_;
+    unsigned_id_type start_node_;
+    unsigned_id_type end_node_;
     struct PriorityQueueMember;
     struct MinQueueComparator;
     class Direction;
@@ -87,7 +90,8 @@ private:
         PriorityQueue* queue_;
     public:
 
-        Direction(PriorityQueue* q) : queue_(q) {} 
+        Direction(PriorityQueue* q) : queue_(q) {}
+        Direction() : queue_() {}  
         virtual ~Direction() {}
         virtual void SetCost(Vertex& vertex, double cost) = 0;
         virtual double GetCost(Vertex& vertex) = 0;
@@ -101,6 +105,7 @@ private:
     public:
 
         ForwardDirection(PriorityQueue* q) : Direction(q) {}
+        ForwardDirection() : Direction() {}
         
         void SetCost(Vertex& vertex, double cost) override {
             vertex.set_forward_cost(cost);
@@ -132,6 +137,7 @@ private:
     public:
 
         BackwardDirection(PriorityQueue* q) : Direction(q) {}
+        BackwardDirection() : Direction() {}
 
         void SetCost(Vertex& vertex, double cost) override {
             vertex.set_backward_cost(cost);
@@ -166,6 +172,8 @@ BidirectionalDijkstra<G>::BidirectionalDijkstra(G & g) : g_(g), settled_vertex_(
 
 template <typename G>
 void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type end_node) {
+    start_node_ = start_node;
+    end_node_ = end_node;
     PriorityQueue forward_queue;
     PriorityQueue backward_queue;
     ForwardDirection forward_direction{&forward_queue};
@@ -207,7 +215,8 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
 }
 
 template <typename G>
-std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::GetRoute(unsigned_id_type end_node) {
+std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::GetRoute() {
+    
     return std::vector<Edge>{};
 }
 

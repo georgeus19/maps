@@ -35,7 +35,7 @@ class BidirectionalDijkstraTest : public testing::Test {
 TEST_F(BidirectionalDijkstraTest, ExistingPath) {
     Algorithm<BidirectionalDijkstra<G>> alg{g_};
     alg.Run(1, 6);
-    vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
     for(auto&& e : path) {
         e.Print();
     }
@@ -51,7 +51,7 @@ TEST_F(BidirectionalDijkstraTest, RunTwiceExistingPath) {
     Algorithm<Dijkstra<G>> alg{g_};
     alg.Run(2, 3);
     alg.Run(1, 6);
-    vector<Dijkstra<G>::Edge> path = alg.GetRoute(6);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
     for(auto&& e : path) {
         e.Print();
     }

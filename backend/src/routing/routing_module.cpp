@@ -69,7 +69,7 @@ string CCalculateShortestRoute(const std::string & table_name, utility::Point st
     // Run routing algorithm.
     Algorithm<Dijkstra<G>> alg{g};
     alg.Run(0, 1);
-    vector<Dijkstra<G>::Edge> res = alg.GetRoute(1);
+    vector<Dijkstra<G>::Edge> res = alg.GetRoute();
     // Construct list of geometries.
     std::string geojson_array = d.GetRouteCoordinates(res, table_name);
 
