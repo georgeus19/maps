@@ -24,7 +24,7 @@ public:
         virtual unsigned_id_type GetPrevious(const Vertex& vertex) = 0;
     };
 
-    class BiDijkstraForwardGraphInfo {
+    class BiDijkstraForwardGraphInfo : public GraphInfo {
     public:
         BiDijkstraForwardGraphInfo() {
 
@@ -34,7 +34,7 @@ public:
         }
     };
 
-    class BiDijkstraBackwardGraphInfo {
+    class BiDijkstraBackwardGraphInfo : public GraphInfo {
     public:
         BiDijkstraBackwardGraphInfo() {}
 

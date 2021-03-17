@@ -14,6 +14,11 @@ namespace routing {
 template <typename Edge>
 class ContractionSearchVertex : public BasicVertex<Edge> {
 private:
+    using BasicVertex<Edge>::osm_id_;
+    using BasicVertex<Edge>::outgoing_edges_;
+    using BasicVertex<Edge>::cost_;
+    using BasicVertex<Edge>::previous_;
+
     unsigned_id_type order_id_;
 
     std::vector<Edge> reverse_edges_;
@@ -37,11 +42,11 @@ public:
     }        
 
     inline void set_forward_cost(double cost) {
-        this->cost_ = cost;
+        cost_ = cost;
     }
 
     inline double get_forward_cost() const {
-        return this->cost_;
+        return cost_;
     } 
 
     inline void set_backward_cost(double cost) {
@@ -53,11 +58,11 @@ public:
     }
 
     inline void set_forward_previous(unsigned_id_type prev) {
-        this->previous_ = prev;
+        previous_ = prev;
     }
 
     inline unsigned_id_type get_forward_previous() const {
-        return this->previous_;
+        return previous_;
     }
 
     inline void set_backward_previous(unsigned_id_type prev) {
@@ -109,6 +114,7 @@ double ContractionSearchVertex<Edge>::GetSummedCosts() {
         return max;
     }
 }
+
 
 
 }

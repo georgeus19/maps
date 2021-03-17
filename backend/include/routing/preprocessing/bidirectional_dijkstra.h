@@ -3,6 +3,7 @@
 
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
+#include "routing/query/route_retriever.h"
 #include <vector>
 #include <set>
 #include <queue>
@@ -102,6 +103,7 @@ private:
     };
 
     class ForwardDirection : public Direction {
+        using Direction::queue_;
     public:
 
         ForwardDirection(PriorityQueue* q) : Direction(q) {}
@@ -128,12 +130,13 @@ private:
         }
 
         void Enqueue(double priority, unsigned_id_type vertex_id) override {
-            this->queue_->emplace(priority, vertex_id, this);
+            queue_->emplace(priority, vertex_id, this);
         }
 
     };
 
     class BackwardDirection : public Direction {
+        using Direction::queue_;
     public:
 
         BackwardDirection(PriorityQueue* q) : Direction(q) {}
@@ -160,7 +163,7 @@ private:
         }
 
         void Enqueue(double priority, unsigned_id_type vertex_id) override {
-            this->queue_->emplace(priority, vertex_id, this);
+            queue_->emplace(priority, vertex_id, this);
         }
 
     };
@@ -216,8 +219,13 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
 
 template <typename G>
 std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::GetRoute() {
-    
-    return std::vector<Edge>{};
+    typename RouteRetriever<G>::BiDijkstraForwardGraphInfo forward_graph_info{};
+    typename RouteRetriever<G>::BiDijkstraBackwardGraphInfo backward_graph_info{};
+    RouteRetriever<G> r{g_};
+    std::vector<Edge> forward_route = r.GetRoute(&forward_graph_info, start_node_, settled_vertex_);
+    std::vector<Edge> backward_route = r.GetRoute(&backward_graph_info, end_node_, settled_vertex_);
+    forward_route.insert(forward_route.end(), backward_route.begin(), backward_route.end());
+    return forward_route;
 }
 
 template <typename G>

@@ -63,6 +63,7 @@
         "valarray": "cpp",
         "variant": "cpp",
         "bit": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "queue": "cpp"
     }
 }
