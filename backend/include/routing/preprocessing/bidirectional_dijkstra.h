@@ -202,16 +202,17 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         direction->ForEachEdge(vertex, [&](Edge& edge) {
             Vertex& neighbour = g_.GetVertex(edge.get_to());
             double new_cost = direction->GetCost(vertex) + edge.get_length();
-            if (vertex.get_order_id() < neighbour.get_order_id() && new_cost < direction->GetCost(neighbour)) {
+            if (vertex.get_ordering_rank() < neighbour.get_ordering_rank() && new_cost < direction->GetCost(neighbour)) {
                 direction->SetCost(neighbour, new_cost);
                 direction->SetPrevious(neighbour, vertex.get_osm_id());
+                direction->Enqueue(direction->GetCost(neighbour), neighbour.get_osm_id());
 
             }
         });
 
     }
 
-    if (min_path_length != std::numeric_limits<double>::max()) {
+    if (min_path_length == std::numeric_limits<double>::max()) {
         throw RouteNotFoundException("Route from " + std::to_string(start_node) + " to " + std::to_string(end_node) + " could not be found");
     }
 
@@ -222,9 +223,12 @@ std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::G
     typename RouteRetriever<G>::BiDijkstraForwardGraphInfo forward_graph_info{};
     typename RouteRetriever<G>::BiDijkstraBackwardGraphInfo backward_graph_info{};
     RouteRetriever<G> r{g_};
-    std::vector<Edge> forward_route = r.GetRoute(&forward_graph_info, start_node_, settled_vertex_);
-    std::vector<Edge> backward_route = r.GetRoute(&backward_graph_info, end_node_, settled_vertex_);
-    forward_route.insert(forward_route.end(), backward_route.begin(), backward_route.end());
+    auto&& forward_route = r.GetRoute(&forward_graph_info, start_node_, settled_vertex_);
+    auto&& backward_route = r.GetRoute(&backward_graph_info, end_node_, settled_vertex_);
+    for(auto&& e : backward_route) {
+        e.Reverse();
+    }
+    forward_route.insert(forward_route.end(), backward_route.rbegin(), backward_route.rend());
     return forward_route;
 }
 

@@ -11,14 +11,15 @@ namespace routing {
 
 template <typename Edge>
 class ContractionVertex : public BasicVertex<Edge> {
-private:
-
-    unsigned_id_type order_id_;
-
-    bool contracted_;
-
-    std::vector<Edge> reverse_edges_;
 public:
+    inline void set_ordering_rank(unsigned_id_type ordering_rank) {
+        ordering_rank_ = ordering_rank;
+    }
+
+    inline unsigned_id_type get_ordering_rank() const {
+        return ordering_rank_;
+    }
+
     inline std::vector<Edge>& get_reverse_edges() {
         return reverse_edges_;
     }        
@@ -39,12 +40,19 @@ public:
     void AddReverseEdge(const Edge & edge);
 
     void ForEachReverseEdge(std::function<void(Edge&)> f);
+private:
+
+    unsigned_id_type ordering_rank_;
+
+    bool contracted_;
+
+    std::vector<Edge> reverse_edges_;
 
 };
 
 template <typename Edge>
 ContractionVertex<Edge>::ContractionVertex(unsigned_id_type osm_id)
-        : BasicVertex<Edge>(osm_id), contracted_(false), reverse_edges_(std::vector<Edge>{}) {}
+        : BasicVertex<Edge>(osm_id), ordering_rank_(0), contracted_(false), reverse_edges_(std::vector<Edge>{}) {}
 
 template <typename Edge>
 inline void ContractionVertex<Edge>::AddReverseEdge(Edge&& edge) {

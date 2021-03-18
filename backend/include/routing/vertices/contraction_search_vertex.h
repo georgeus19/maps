@@ -18,8 +18,9 @@ private:
     using BasicVertex<Edge>::outgoing_edges_;
     using BasicVertex<Edge>::cost_;
     using BasicVertex<Edge>::previous_;
+    
 
-    unsigned_id_type order_id_;
+    unsigned_id_type ordering_rank_;
 
     std::vector<Edge> reverse_edges_;
 
@@ -29,12 +30,14 @@ private:
 
 public:
 
-    inline void set_order_id(unsigned_id_type order_id) {
-        order_id_ = order_id;
+    using BasicVertex<Edge>::FindEdge;
+
+    inline void set_ordering_rank(unsigned_id_type ordering_rank) {
+        ordering_rank_ = ordering_rank;
     }
 
-    inline unsigned_id_type get_order_id() const {
-        return order_id_;
+    inline unsigned_id_type get_ordering_rank() const {
+        return ordering_rank_;
     }
 
     inline std::vector<Edge>& get_reverse_edges() {
@@ -83,11 +86,13 @@ public:
 
     double GetSummedCosts();
 
+    Edge& FindReverseEdge(std::function<bool(const Edge&)> f);
+
 };
 
 template <typename Edge>
 ContractionSearchVertex<Edge>::ContractionSearchVertex(unsigned_id_type osm_id)
-    : BasicVertex<Edge>(osm_id), order_id_(0), reverse_edges_(),
+    : BasicVertex<Edge>(osm_id), ordering_rank_(0), reverse_edges_(),
     backward_cost_(this->GetCostMaxValue()), backward_previous_(0) {}
 
 template <typename Edge>
@@ -115,6 +120,10 @@ double ContractionSearchVertex<Edge>::GetSummedCosts() {
     }
 }
 
+template <typename Edge>
+inline Edge& ContractionSearchVertex<Edge>::FindReverseEdge(std::function<bool(const Edge&)> f) {
+    return FindEdge(reverse_edges_, f);
+}
 
 
 }

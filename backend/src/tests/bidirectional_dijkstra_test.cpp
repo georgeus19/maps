@@ -8,6 +8,7 @@
 #include "routing/dijkstra.h"
 #include "routing/vertices/contraction_search_vertex.h"
 #include "routing/preprocessing/bidirectional_dijkstra.h"
+#include "routing/preprocessing/graph_contractor.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
@@ -28,28 +29,18 @@ class BidirectionalDijkstraTest : public testing::Test {
     
     G g_;
     void SetUp() override {
-        TestBasicReverseGraph(g_);
+        TestBasicContractedGraph(g_);
+        g_.GetVertex(1).set_ordering_rank(3);
+        g_.GetVertex(2).set_ordering_rank(5);
+        g_.GetVertex(3).set_ordering_rank(1);
+        g_.GetVertex(4).set_ordering_rank(6);
+        g_.GetVertex(5).set_ordering_rank(4);
+        g_.GetVertex(6).set_ordering_rank(2);
     }
 };
 
 TEST_F(BidirectionalDijkstraTest, ExistingPath) {
     Algorithm<BidirectionalDijkstra<G>> alg{g_};
-    alg.Run(1, 6);
-    // vector<Dijkstra<G>::Edge> path = alg.GetRoute();
-    // for(auto&& e : path) {
-    //     e.Print();
-    // }
-
-    // vector<Dijkstra<G>::Edge> expected_path{
-    //     BasicEdge{1, 1, 3, 2}, BasicEdge{3, 3, 4, 3}, BasicEdge{5, 4, 5, 2}, BasicEdge{7, 5, 6, 2}
-    // };
-
-    // EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
-}
-
-TEST_F(BidirectionalDijkstraTest, RunTwiceExistingPath) {
-    Algorithm<Dijkstra<G>> alg{g_};
-    alg.Run(2, 3);
     alg.Run(1, 6);
     vector<Dijkstra<G>::Edge> path = alg.GetRoute();
     for(auto&& e : path) {
@@ -57,26 +48,11 @@ TEST_F(BidirectionalDijkstraTest, RunTwiceExistingPath) {
     }
 
     vector<Dijkstra<G>::Edge> expected_path{
-        BasicEdge{1, 1, 3, 2}, BasicEdge{3, 3, 4, 3}, BasicEdge{5, 4, 5, 2}, BasicEdge{7, 5, 6, 2}
+        BasicEdge{1, 1, 4, 5}, BasicEdge{5, 4, 5, 2}, BasicEdge{7, 5, 6, 2}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
 }
-
-TEST_F(BidirectionalDijkstraTest, LimitedSearch) {
-    Dijkstra<G> dijkstra{g_};
-    double max_cost = 4; // Shortest path found to vertices 1, 2, 3, 4.
-    dijkstra.Run(1, [=](BasicVertex<BasicEdge>* v) { 
-            return v->get_cost() > max_cost;
-        }, [](BasicVertex<BasicEdge>*) { return false; });
-    EXPECT_EQ(g_.GetVertex(1).get_cost(), 0);
-    EXPECT_EQ(g_.GetVertex(2).get_cost(), 2);
-    EXPECT_EQ(g_.GetVertex(3).get_cost(), 2);
-    EXPECT_EQ(g_.GetVertex(4).get_cost(), 5);
-    EXPECT_EQ(g_.GetVertex(5).get_cost(), std::numeric_limits<double>::max());
-    EXPECT_EQ(g_.GetVertex(6).get_cost(), 10);
-}
-
 
 TEST_F(BidirectionalDijkstraTest, NotExistingPath) {
     Algorithm<BidirectionalDijkstra<G>> alg{g_};

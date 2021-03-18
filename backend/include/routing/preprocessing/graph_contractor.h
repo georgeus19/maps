@@ -12,8 +12,7 @@ namespace preprocessing {
 
 template <typename Graph>
 class GraphContractor {
-    Graph & g_;
-    VertexMeasures<Graph> vertex_measures_;
+    
     using Edge = Graph::E;
     using Vertex = Graph::V;
 public:
@@ -28,6 +27,9 @@ public:
 
     PriorityQueue CalculateContractionPriority();
 private:
+    Graph & g_;
+    VertexMeasures<Graph> vertex_measures_;
+    unsigned_id_type free_ordering_rank_;
 
     void AddShortcuts(std::vector<Edge> shortcuts);
 
@@ -36,10 +38,11 @@ private:
 
 template <typename Graph>
 GraphContractor<Graph>::GraphContractor(Graph &g, const ContractionParameters& parameters)
-    : g_(g), vertex_measures_(VertexMeasures<Graph>{g, parameters}) {}
+    : g_(g), vertex_measures_(VertexMeasures<Graph>{g, parameters}), free_ordering_rank_(0) {}
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractGraph() {
+    free_ordering_rank_ = 0;
     PriorityQueue q = CalculateContractionPriority();
 
     while(!q.empty()) {
@@ -53,6 +56,7 @@ void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
     std::vector<Edge> shortcuts = vertex_measures_.FindShortcuts(vertex);
     AddShortcuts(shortcuts);
     vertex.SetContracted();
+    vertex.set_ordering_rank(++free_ordering_rank_);
 }
 
 
@@ -85,13 +89,14 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
 
     AddShortcuts(shortcuts);
     v->SetContracted();
+    v->set_ordering_rank(++free_ordering_rank_);
 }
 
 template <typename Graph>
 GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContractionPriority() {
     PriorityQueue q;
     g_.forEachVertex([&](Vertex& vertex) {
-        double attractivity = CalculateContractionAttractivity(vertex);
+        double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
         q.push(std::make_pair(attractivity, &vertex));
     });
     return q;

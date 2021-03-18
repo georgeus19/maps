@@ -96,7 +96,7 @@ TEST_P(GraphContractorSimpleEdgesTests, SimpleContractionEdgesTest) {
     size_t tested_vertex_id = std::get<0>(GetParam());
     std::vector<BasicEdge> expected = std::get<1>(GetParam());
 
-    ContractionVertex<BasicEdge>& tested_vertex = g_.GetVertex(tested_vertex_id);
+    ContractionVertex<BasicEdge> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](BasicEdge& e){ e.Print(); });
     GraphContractor<G> contractor{g_, ContractionParameters{11}};
    
@@ -113,7 +113,7 @@ TEST_P(GraphContractorSimpleReverseEdgesTests, SimpleContractionReverseEdgesTest
     size_t tested_vertex_id = std::get<0>(GetParam());
     std::vector<BasicEdge> expected = std::get<1>(GetParam());
 
-    ContractionVertex<BasicEdge>& tested_vertex = g_.GetVertex(tested_vertex_id);
+    ContractionVertex<BasicEdge> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachReverseEdge([](BasicEdge& e){ e.Print(); });
     GraphContractor<G> contractor{g_, ContractionParameters{11}};
 
@@ -132,7 +132,7 @@ TEST_P(GraphContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
     std::cout << "Double contraction - tested vertex is " << tested_vertex_id << std::endl;
     std::vector<BasicEdge> expected = std::get<1>(GetParam());
 
-    ContractionVertex<BasicEdge>& tested_vertex = g_.GetVertex(tested_vertex_id);
+    ContractionVertex<BasicEdge> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](BasicEdge& e){ e.Print(); });
     GraphContractor<G> contractor{g_, ContractionParameters{11}};
 
@@ -150,7 +150,6 @@ TEST_P(GraphContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
 }
 
 void ContractVertex(G& g, GraphContractor<G> & contractor, size_t id) {
-    ContractionVertex<BasicEdge>& contracted_vertex = g.GetVertex(id);
-    contractor.ContractVertex(contracted_vertex);
+    contractor.ContractVertex(g.GetVertex(id));
 }
 

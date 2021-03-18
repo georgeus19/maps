@@ -87,6 +87,8 @@ public:
 
     Edge& FindEdge(std::function<bool(const Edge&)>);
 
+    Edge& FindEdge(std::vector<Edge>& edges, std::function<bool(const Edge&)> f);
+
     double GetCostMaxValue();
 };
 
@@ -168,9 +170,14 @@ void BasicVertex<Edge>::ForEachEdge(std::function<void(Edge&)> f) {
 }
 
 template <typename Edge>
-Edge& BasicVertex<Edge>::FindEdge(std::function<bool(const Edge&)> f) {
-    auto&& it = std::find_if(outgoing_edges_.begin(), outgoing_edges_.end(), f);
-    if (it != outgoing_edges_.end()) {
+inline Edge& BasicVertex<Edge>::FindEdge(std::function<bool(const Edge&)> f) {
+    return FindEdge(outgoing_edges_, f);
+}
+
+template <typename Edge>
+Edge& BasicVertex<Edge>::FindEdge(std::vector<Edge>& edges, std::function<bool(const Edge&)> f) {
+    auto&& it = std::find_if(edges.begin(), edges.end(), f);
+    if (it != edges.end()) {
         return *it;
     }
     throw EdgeNotFoundException("Edge not found");

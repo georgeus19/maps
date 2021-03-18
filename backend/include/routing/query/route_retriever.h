@@ -22,6 +22,8 @@ public:
         GraphInfo() {}
 
         virtual unsigned_id_type GetPrevious(const Vertex& vertex) = 0;
+
+        virtual Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) = 0;
     };
 
     class BiDijkstraForwardGraphInfo : public GraphInfo {
@@ -32,6 +34,10 @@ public:
         unsigned_id_type GetPrevious(const Vertex& vertex) override {
             return vertex.get_forward_previous();
         }
+
+        Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) override {
+            return vertex.FindEdge(f);
+        }
     };
 
     class BiDijkstraBackwardGraphInfo : public GraphInfo {
@@ -41,6 +47,10 @@ public:
         unsigned_id_type GetPrevious(const Vertex& vertex) override {
             return vertex.get_backward_previous();
         }
+
+        Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) override {
+            return vertex.FindReverseEdge(f);
+        }
     };
 
     class DijkstraGraphInfo : public GraphInfo {
@@ -49,6 +59,10 @@ public:
 
         unsigned_id_type GetPrevious(const Vertex& vertex) override {
             return vertex.get_previous();
+        }
+
+        Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) override {
+            return vertex.FindEdge(f);
         }
     };
 
@@ -76,7 +90,7 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphI
     }
 
     while (cur != start_node) {
-        Edge& e = curv.FindEdge([=](const Edge& e) {
+        Edge& e = graph_info->FindEdge(curv, [=](const Edge& e) {
             return e.get_to() == prev;
         });
         route.push_back(e);
@@ -87,7 +101,7 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphI
     }
 
     // Find the correct edge of the route's first vertex == start_node.
-    Edge& e = curv.FindEdge([=](const Edge& e) {
+    Edge& e = graph_info->FindEdge(curv, [=](const Edge& e) {
         return e.get_to() == prev;
     });
     route.push_back(e);
