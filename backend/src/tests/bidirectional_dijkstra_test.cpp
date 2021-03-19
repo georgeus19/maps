@@ -59,3 +59,24 @@ TEST_F(BidirectionalDijkstraTest, NotExistingPath) {
     EXPECT_THROW(alg.Run(5, 1), RouteNotFoundException);
 }
 
+TEST_F(BidirectionalDijkstraTest, IngoreDeadQueueMembers) {
+    G g{};
+    g.AddEdge(std::move(routing::BasicEdge{0, 1, 5, 20}));
+    g.AddReverseEdge(std::move(routing::BasicEdge{0, 1, 5, 20}));
+
+    g.AddEdge(std::move(routing::BasicEdge{1, 2, 3, 4}));
+    g.AddReverseEdge(std::move(routing::BasicEdge{1, 2, 3, 4}));
+    g.AddEdge(std::move(routing::BasicEdge{2, 2, 4, 1}));
+    g.AddReverseEdge(std::move(routing::BasicEdge{2, 2, 4, 1}));
+
+    g.AddEdge(std::move(routing::BasicEdge{3, 4, 3, 2}));
+    g.AddReverseEdge(std::move(routing::BasicEdge{3, 4, 3, 2}));
+    g.GetVertex(1).set_ordering_rank(1);
+    g.GetVertex(2).set_ordering_rank(3);
+    g.GetVertex(3).set_ordering_rank(5);
+    g.GetVertex(4).set_ordering_rank(4);
+    g.GetVertex(5).set_ordering_rank(2);
+    Algorithm<BidirectionalDijkstra<G>> alg{g};
+    EXPECT_THROW(alg.Run(2, 1), RouteNotFoundException);
+}
+

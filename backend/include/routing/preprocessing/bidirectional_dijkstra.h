@@ -62,25 +62,25 @@ private:
     
     struct MinQueueComparator {
         bool operator() (const PriorityQueueMember& a , const PriorityQueueMember& b) {
-            return a.priority > b.priority;
+            return a.cost_priority > b.cost_priority;
         }
     };
 
     struct PriorityQueueMember {
-        double priority;
+        double cost_priority;
         unsigned_id_type vertex_id;
         Direction* direction;
 
-        PriorityQueueMember() : priority(std::numeric_limits<double>::max()), vertex_id(0), direction(nullptr) {}
+        PriorityQueueMember() : cost_priority(std::numeric_limits<double>::max()), vertex_id(0), direction(nullptr) {}
 
-        PriorityQueueMember(double p, unsigned_id_type v, Direction* dir) : priority(p), vertex_id(v), direction(dir) {}
+        PriorityQueueMember(double c, unsigned_id_type v, Direction* dir) : cost_priority(c), vertex_id(v), direction(dir) {}
 
         bool operator< (const PriorityQueueMember& other) {
-            return priority < other.priority;
+            return cost_priority < other.cost_priority;
         }
 
         bool operator> (const PriorityQueueMember& other) {
-            return priority > other.priority;
+            return cost_priority > other.cost_priority;
         }
 
 
@@ -99,7 +99,7 @@ private:
         virtual void SetPrevious(Vertex& vertex, unsigned_id_type previous) = 0;
         virtual unsigned_id_type GetPrevious(Vertex& vertex) = 0;
         virtual void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) = 0;
-        virtual void Enqueue(double priority, unsigned_id_type vertex_id) = 0;
+        virtual void Enqueue(double cost_priority, unsigned_id_type vertex_id) = 0;
     };
 
     class ForwardDirection : public Direction {
@@ -129,8 +129,8 @@ private:
             vertex.ForEachEdge(f);
         }
 
-        void Enqueue(double priority, unsigned_id_type vertex_id) override {
-            queue_->emplace(priority, vertex_id, this);
+        void Enqueue(double cost_priority, unsigned_id_type vertex_id) override {
+            queue_->emplace(cost_priority, vertex_id, this);
         }
 
     };
@@ -162,8 +162,8 @@ private:
             vertex.ForEachReverseEdge(f);
         }
 
-        void Enqueue(double priority, unsigned_id_type vertex_id) override {
-            queue_->emplace(priority, vertex_id, this);
+        void Enqueue(double cost_priority, unsigned_id_type vertex_id) override {
+            queue_->emplace(cost_priority, vertex_id, this);
         }
 
     };
@@ -192,6 +192,10 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         PriorityQueueMember min_member = GetMin(forward_queue, backward_queue);
         Vertex& vertex = g_.GetVertex(min_member.vertex_id);
         Direction* direction = min_member.direction;
+        bool queue_member_is_dead = direction->GetCost(vertex) < min_member.cost_priority;
+        if (queue_member_is_dead) {
+            continue; // The element already has lower cost - dead element in queue (was added multiple time with diff costs).
+        }
         double path_length = vertex.GetSummedCosts();
         if (path_length < min_path_length) {
             min_path_length = path_length;
@@ -236,7 +240,7 @@ template <typename G>
 typename BidirectionalDijkstra<G>::PriorityQueueMember BidirectionalDijkstra<G>::GetMin(PriorityQueue& a, PriorityQueue& b) {
     PriorityQueueMember atop = ((!a.empty()) ? a.top() : PriorityQueueMember{} );
     PriorityQueueMember btop = ((!b.empty()) ? b.top() : PriorityQueueMember{} );
-    if (atop.priority < btop.priority) {
+    if (atop.cost_priority < btop.cost_priority) {
         a.pop();
         return atop;
     } else {
