@@ -15,14 +15,17 @@
 #include "routing/endpoint_handler.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
+#include "routing/edges/contraction_edge.h"
+
 #include <string>
 #include <vector>
+
 using namespace std;
 using namespace routing;
 using namespace database;
 using namespace preprocessing;
 // using namespace testing;
-using G = Graph<ContractionSearchVertex<BasicEdge>, BasicEdge>;
+using G = Graph<ContractionSearchVertex<ContractionEdge>, ContractionEdge>;
 
 class BidirectionalDijkstraTest : public testing::Test {
     protected:
@@ -48,7 +51,7 @@ TEST_F(BidirectionalDijkstraTest, ExistingPath) {
     }
 
     vector<Dijkstra<G>::Edge> expected_path{
-        BasicEdge{1, 1, 4, 5}, BasicEdge{5, 4, 5, 2}, BasicEdge{7, 5, 6, 2}
+        ContractionEdge{1, 1, 4, 5}, ContractionEdge{5, 4, 5, 2}, ContractionEdge{7, 5, 6, 2}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -61,16 +64,16 @@ TEST_F(BidirectionalDijkstraTest, NotExistingPath) {
 
 TEST_F(BidirectionalDijkstraTest, IngoreDeadQueueMembers) {
     G g{};
-    g.AddEdge(std::move(routing::BasicEdge{0, 1, 5, 20}));
-    g.AddReverseEdge(std::move(routing::BasicEdge{0, 1, 5, 20}));
+    g.AddEdge(std::move(routing::ContractionEdge{0, 1, 5, 20}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{0, 1, 5, 20}));
 
-    g.AddEdge(std::move(routing::BasicEdge{1, 2, 3, 4}));
-    g.AddReverseEdge(std::move(routing::BasicEdge{1, 2, 3, 4}));
-    g.AddEdge(std::move(routing::BasicEdge{2, 2, 4, 1}));
-    g.AddReverseEdge(std::move(routing::BasicEdge{2, 2, 4, 1}));
+    g.AddEdge(std::move(routing::ContractionEdge{1, 2, 3, 4}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{1, 2, 3, 4}));
+    g.AddEdge(std::move(routing::ContractionEdge{2, 2, 4, 1}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{2, 2, 4, 1}));
 
-    g.AddEdge(std::move(routing::BasicEdge{3, 4, 3, 2}));
-    g.AddReverseEdge(std::move(routing::BasicEdge{3, 4, 3, 2}));
+    g.AddEdge(std::move(routing::ContractionEdge{3, 4, 3, 2}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{3, 4, 3, 2}));
     g.GetVertex(1).set_ordering_rank(1);
     g.GetVertex(2).set_ordering_rank(3);
     g.GetVertex(3).set_ordering_rank(5);

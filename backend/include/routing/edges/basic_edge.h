@@ -13,28 +13,6 @@ using unsigned_id_type = std::uint64_t;
  * used only in simple algorithms.
  */
 class BasicEdge {
-private:
-    using id_type = unsigned_id_type;
-
-    /**
-     * Unique id of the edge.
-     */
-    unsigned_id_type uid_;
-
-    /**
-     * Origin of the edge.
-     */
-    unsigned_id_type from_;
-
-    /**
-     * Destination of the edge.
-     */
-    unsigned_id_type to_;
-
-    /**
-     * Length of the edge.
-     */
-    double length_;
 public:
    
     inline unsigned_id_type get_uid() const {
@@ -56,11 +34,11 @@ public:
     BasicEdge();
     BasicEdge(database::EdgeDbRow &);
     BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
-    BasicEdge(const BasicEdge & other);
-    BasicEdge(BasicEdge && other);
-    BasicEdge& operator= (const BasicEdge & other);
-    BasicEdge& operator= (BasicEdge && other);
-    ~BasicEdge();
+    BasicEdge(const BasicEdge & other) = default;
+    BasicEdge(BasicEdge && other) = default;
+    BasicEdge& operator= (const BasicEdge & other) = default;
+    BasicEdge& operator= (BasicEdge && other) = default;
+    virtual ~BasicEdge() = default;
 
     void Swap(BasicEdge & other);
     void Reverse(); 
@@ -72,6 +50,29 @@ public:
      */
     bool operator==(const BasicEdge & other) const;
     bool operator!=(const BasicEdge & other) const;
+
+protected:
+    using id_type = unsigned_id_type;
+
+    /**
+     * Unique id of the edge.
+     */
+    unsigned_id_type uid_;
+
+    /**
+     * Origin of the edge.
+     */
+    unsigned_id_type from_;
+
+    /**
+     * Destination of the edge.
+     */
+    unsigned_id_type to_;
+
+    /**
+     * Length of the edge.
+     */
+    double length_;
 };
 
 

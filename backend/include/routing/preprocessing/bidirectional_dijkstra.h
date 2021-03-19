@@ -229,9 +229,6 @@ std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::G
     RouteRetriever<G> r{g_};
     auto&& forward_route = r.GetRoute(&forward_graph_info, start_node_, settled_vertex_);
     auto&& backward_route = r.GetRoute(&backward_graph_info, end_node_, settled_vertex_);
-    for(auto&& e : backward_route) {
-        e.Reverse();
-    }
     forward_route.insert(forward_route.end(), backward_route.rbegin(), backward_route.rend());
     return forward_route;
 }

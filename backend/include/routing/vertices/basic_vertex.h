@@ -176,11 +176,18 @@ inline Edge& BasicVertex<Edge>::FindEdge(const std::function<bool(const Edge&)>&
 
 template <typename Edge>
 Edge& BasicVertex<Edge>::FindEdge(std::vector<Edge>& edges, const std::function<bool(const Edge&)>& f) {
-    auto&& it = std::find_if(edges.begin(), edges.end(), f);
-    if (it != edges.end()) {
-        return *it;
+    double min_length = GetCostMaxValue();
+    Edge* edge = nullptr;
+    for (auto&& e : edges) {
+        if (f(e) && e.get_length() < min_length) {
+            edge = &e;
+        }
     }
-    throw EdgeNotFoundException("Edge not found");
+    if (edge) {
+        return *edge;
+    } else {
+        throw EdgeNotFoundException("Edge not found");
+    }
 }
 
 template <typename Edge>
