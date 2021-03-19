@@ -82,11 +82,11 @@ public:
 
     void AddReverseEdge(const Edge & edge);
 
-    void ForEachReverseEdge(std::function<void(Edge&)> f);
+    void ForEachReverseEdge(const std::function<void(Edge&)>& f);
 
     double GetSummedCosts();
 
-    Edge& FindReverseEdge(std::function<bool(const Edge&)> f);
+    Edge& FindReverseEdge(const std::function<bool(const Edge&)>& f);
 
 };
 
@@ -106,7 +106,7 @@ inline void ContractionSearchVertex<Edge>::AddReverseEdge(const Edge & edge) {
 }
 
 template <typename Edge>
-void ContractionSearchVertex<Edge>::ForEachReverseEdge(std::function<void(Edge&)> f) {
+void ContractionSearchVertex<Edge>::ForEachReverseEdge(const std::function<void(Edge&)>& f) {
     std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
 }
 
@@ -121,7 +121,7 @@ double ContractionSearchVertex<Edge>::GetSummedCosts() {
 }
 
 template <typename Edge>
-inline Edge& ContractionSearchVertex<Edge>::FindReverseEdge(std::function<bool(const Edge&)> f) {
+inline Edge& ContractionSearchVertex<Edge>::FindReverseEdge(const std::function<bool(const Edge&)>& f) {
     return FindEdge(reverse_edges_, f);
 }
 

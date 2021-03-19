@@ -44,7 +44,7 @@ public:
 
     std::vector<Edge> GetRoute();
 
-    bool Run(unsigned_id_type start_node, std::function<bool(Vertex *)> end_condition, std::function<bool(Vertex*)> ignore);
+    bool Run(unsigned_id_type start_node, const std::function<bool(Vertex *)>& end_condition, const std::function<bool(Vertex*)>& ignore);
 
     double GetPathLength(unsigned_id_type to) const;
 private:
@@ -56,7 +56,7 @@ private:
     unsigned_id_type start_node_;
     unsigned_id_type end_node_;
 
-    void UpdateNeighbours(Vertex& v, std::set<QueuePair> & q, std::function<bool(Vertex*)> ignore);
+    void UpdateNeighbours(Vertex& v, std::set<QueuePair> & q, const std::function<bool(Vertex*)>& ignore);
 
     void InitGraph();
 };
@@ -85,7 +85,7 @@ inline std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute() {
 }
 
 template <typename G>
-bool Dijkstra<G>::Run(unsigned_id_type start_node, std::function<bool(Vertex *)> end_condition, std::function<bool(Vertex*)> ignore) {
+bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vertex *)>& end_condition, const std::function<bool(Vertex*)>& ignore) {
     // Priority queue is implemented with Set of pairs of double(=cost) and Vertex*.
     // This is the default possible implementation of std::pair.
     // So pairs with the same cost can be in the set when they belong to different vertices.
@@ -125,7 +125,7 @@ double Dijkstra<G>::GetPathLength(unsigned_id_type to) const {
 }
 
 template <typename G>
-void Dijkstra<G>::UpdateNeighbours(Vertex& v, std::set<QueuePair>& q, std::function<bool(Vertex*)> ignore) {
+void Dijkstra<G>::UpdateNeighbours(Vertex& v, std::set<QueuePair>& q, const std::function<bool(Vertex*)>& ignore) {
     v.ForEachEdge([&](Edge & edge) {
         Vertex& neighbour = g_.GetVertex(edge.get_to());
         if (!ignore(&neighbour) && neighbour.get_cost() > v.get_cost() + edge.get_length()) {

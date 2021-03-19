@@ -83,11 +83,11 @@ public:
 
     void ResetRoutingProperties();
 
-    void ForEachEdge(std::function<void(Edge&)>);
+    void ForEachEdge(const std::function<void(Edge&)>&);
 
-    Edge& FindEdge(std::function<bool(const Edge&)>);
+    Edge& FindEdge(const std::function<bool(const Edge&)>&);
 
-    Edge& FindEdge(std::vector<Edge>& edges, std::function<bool(const Edge&)> f);
+    Edge& FindEdge(std::vector<Edge>& edges, const std::function<bool(const Edge&)>& f);
 
     double GetCostMaxValue();
 };
@@ -165,17 +165,17 @@ void BasicVertex<Edge>::ResetRoutingProperties() {
 }
 
 template <typename Edge>
-void BasicVertex<Edge>::ForEachEdge(std::function<void(Edge&)> f) {
+void BasicVertex<Edge>::ForEachEdge(const std::function<void(Edge&)>& f) {
     std::for_each(outgoing_edges_.begin(), outgoing_edges_.end(), f);
 }
 
 template <typename Edge>
-inline Edge& BasicVertex<Edge>::FindEdge(std::function<bool(const Edge&)> f) {
+inline Edge& BasicVertex<Edge>::FindEdge(const std::function<bool(const Edge&)>& f) {
     return FindEdge(outgoing_edges_, f);
 }
 
 template <typename Edge>
-Edge& BasicVertex<Edge>::FindEdge(std::vector<Edge>& edges, std::function<bool(const Edge&)> f) {
+Edge& BasicVertex<Edge>::FindEdge(std::vector<Edge>& edges, const std::function<bool(const Edge&)>& f) {
     auto&& it = std::find_if(edges.begin(), edges.end(), f);
     if (it != edges.end()) {
         return *it;

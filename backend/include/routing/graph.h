@@ -53,7 +53,7 @@ public:
      */
     Vertex& GetVertex(unsigned_id_type id);
 
-    void forEachVertex(std::function<void(Vertex&)> f);
+    void forEachVertex(const std::function<void(Vertex&)>& f);
 
 private:
     /**
@@ -62,7 +62,7 @@ private:
      */
     std::unordered_map<unsigned_id_type, Vertex> g_;
 
-    void AddEdge(Edge&& edge, std::function<void(Vertex &, Edge&& e)> add_edge);
+    void AddEdge(Edge&& edge, const std::function<void(Vertex &, Edge&& e)>& add_edge);
 };
 
 template <typename Vertex, typename Edge>
@@ -84,7 +84,7 @@ inline void Graph<Vertex, Edge>::AddReverseEdge(Edge && e) {
 }
 
 template <typename Vertex, typename Edge>
-void Graph<Vertex, Edge>::AddEdge(Edge && e, std::function<void(Vertex &, Edge && e)> add_edge) {
+void Graph<Vertex, Edge>::AddEdge(Edge && e, const std::function<void(Vertex &, Edge && e)>& add_edge) {
     unsigned_id_type from_node = e.get_from();
     unsigned_id_type to_node = e.get_to();
     auto&& from_it = g_.find(from_node);
@@ -120,7 +120,7 @@ inline Vertex& Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
 }
 
 template <typename Vertex, typename Edge>
-void Graph<Vertex, Edge>::forEachVertex(std::function<void(Vertex&)> f) {
+void Graph<Vertex, Edge>::forEachVertex(const std::function<void(Vertex&)>& f) {
     for (auto&& pair : g_) {
         f(pair.second);
     }

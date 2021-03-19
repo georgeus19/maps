@@ -98,7 +98,7 @@ private:
         virtual double GetCost(Vertex& vertex) = 0;
         virtual void SetPrevious(Vertex& vertex, unsigned_id_type previous) = 0;
         virtual unsigned_id_type GetPrevious(Vertex& vertex) = 0;
-        virtual void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) = 0;
+        virtual void ForEachEdge(Vertex& vertex, const std::function<void(Edge&)>& f) = 0;
         virtual void Enqueue(double cost_priority, unsigned_id_type vertex_id) = 0;
     };
 
@@ -125,7 +125,7 @@ private:
             return vertex.get_forward_previous();
         }
 
-        void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) override {
+        void ForEachEdge(Vertex& vertex, const std::function<void(Edge&)>& f) override {
             vertex.ForEachEdge(f);
         }
 
@@ -158,7 +158,7 @@ private:
             return vertex.get_backward_previous();
         }
 
-        void ForEachEdge(Vertex& vertex, std::function<void(Edge&)> f) override {
+        void ForEachEdge(Vertex& vertex, const std::function<void(Edge&)>& f) override {
             vertex.ForEachReverseEdge(f);
         }
 

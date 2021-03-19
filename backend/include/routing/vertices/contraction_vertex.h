@@ -39,7 +39,7 @@ public:
 
     void AddReverseEdge(const Edge & edge);
 
-    void ForEachReverseEdge(std::function<void(Edge&)> f);
+    void ForEachReverseEdge(const std::function<void(Edge&)>& f);
 private:
 
     unsigned_id_type ordering_rank_;
@@ -65,7 +65,7 @@ inline void ContractionVertex<Edge>::AddReverseEdge(const Edge & edge) {
 }
 
 template <typename Edge>
-void ContractionVertex<Edge>::ForEachReverseEdge(std::function<void(Edge&)> f) {
+void ContractionVertex<Edge>::ForEachReverseEdge(const std::function<void(Edge&)>& f) {
     std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
 }
 

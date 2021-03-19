@@ -23,7 +23,7 @@ public:
 
         virtual unsigned_id_type GetPrevious(const Vertex& vertex) = 0;
 
-        virtual Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) = 0;
+        virtual Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
     };
 
     class BiDijkstraForwardGraphInfo : public GraphInfo {
@@ -35,7 +35,7 @@ public:
             return vertex.get_forward_previous();
         }
 
-        Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) override {
+        Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindEdge(f);
         }
     };
@@ -48,7 +48,7 @@ public:
             return vertex.get_backward_previous();
         }
 
-        Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) override {
+        Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindReverseEdge(f);
         }
     };
@@ -61,7 +61,7 @@ public:
             return vertex.get_previous();
         }
 
-        Edge& FindEdge(Vertex& vertex, std::function<bool(const Edge&)> f) override {
+        Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindEdge(f);
         }
     };
