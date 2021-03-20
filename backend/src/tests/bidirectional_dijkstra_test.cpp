@@ -136,3 +136,55 @@ TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraph) {
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
 }
 
+TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraphRightForwardRecursion) {
+    G g;
+    TestPathShortcutGraph(g);
+    g.GetVertex(4).set_ordering_rank(9);
+    g.GetVertex(5).set_ordering_rank(10);
+    g.GetVertex(6).set_ordering_rank(11);
+    g.GetVertex(7).set_ordering_rank(12);
+    g.GetVertex(8).set_ordering_rank(13);
+    g.GetVertex(9).set_ordering_rank(14);
+    g.GetVertex(10).set_ordering_rank(15);
+ 
+    Algorithm<BidirectionalDijkstra<G>> alg{g};
+    alg.Run(4, 10);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
+    for(auto&& e : path) {
+        e.Print();
+    }
+
+    vector<Dijkstra<G>::Edge> expected_path {
+        ContractionEdge{1, 4, 5, 4}, ContractionEdge{1, 5, 6, 5}, ContractionEdge{1, 6, 7, 4},
+        ContractionEdge{1, 7, 8, 3}, ContractionEdge{1, 8, 9, 2}, ContractionEdge{1, 9, 10, 1}
+    };
+
+    EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
+}
+
+TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraphRightBackwardRecursion) {
+    G g;
+    TestPathShortcutGraph(g);
+    g.GetVertex(1).set_ordering_rank(29);
+    g.GetVertex(2).set_ordering_rank(28);
+    g.GetVertex(3).set_ordering_rank(27);
+    g.GetVertex(4).set_ordering_rank(26);
+    g.GetVertex(5).set_ordering_rank(25);
+    g.GetVertex(6).set_ordering_rank(24);
+    g.GetVertex(7).set_ordering_rank(23);
+ 
+    Algorithm<BidirectionalDijkstra<G>> alg{g};
+    alg.Run(1, 7);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
+    for(auto&& e : path) {
+        e.Print();
+    }
+
+    vector<Dijkstra<G>::Edge> expected_path {
+        ContractionEdge{1, 1, 2, 1}, ContractionEdge{1, 2, 3, 2}, ContractionEdge{1, 3, 4, 3}, ContractionEdge{1, 4, 5, 4},
+        ContractionEdge{1, 5, 6, 5}, ContractionEdge{1, 6, 7, 4}
+    };
+
+    EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
+}
+

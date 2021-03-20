@@ -115,12 +115,15 @@ RouteRetriever<G>::RouteRetriever(G& g) : g_(g) {}
 
 template <typename G>
 std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
+    std::vector<Edge> route;
+    if (start_node == end_node) {
+        return route;
+    }
     unsigned_id_type prev = end_node;
     Vertex& end_vertex = g_.GetVertex(end_node);
     unsigned_id_type cur = graph_info->GetPrevious(end_vertex);
     Vertex& curv = g_.GetVertex(cur);
 
-    std::vector<Edge> route;
 
     if (end_vertex.GetPreviousDefaultValue() == graph_info->GetPrevious(end_vertex) ) {
         return route;
