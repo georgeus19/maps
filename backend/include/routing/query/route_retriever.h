@@ -153,11 +153,11 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::UnpackShortcut(
     std::stack<Edge> shortcut_stack{};
     Edge edge = std::move(shortcut);
     std::vector<Edge> underlying_edges{};
-    // In-order traversal of shortcut binary tree.
+    // Reverse in-order traversal of shortcut binary tree - right subtree is first added (due to route reversal later!!)
     while (!shortcut_stack.empty() || edge.IsShortcut()) {
         if (edge.IsShortcut()) {
             shortcut_stack.push(edge);
-            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex());
+            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), edge.get_to());
         } else {
             // Add the non-shortcut edges to route.
             underlying_edges.push_back(std::move(edge));
@@ -165,7 +165,6 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::UnpackShortcut(
             shortcut_stack.pop();
 
             // The shortcut itself is useless - nothing is done with it.
-
             edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex());
         }
     }

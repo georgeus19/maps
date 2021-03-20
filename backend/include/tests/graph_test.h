@@ -117,5 +117,69 @@ void TestBasicContractedGraph(G & graph, bool with_shortcuts = true) {
 
 }
 
+template <typename G>
+void TestPathGraph(G& g) {
+    g.AddEdge(std::move(routing::ContractionEdge{0, 1, 2, 1}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{0, 1, 2, 1}));
+ 
+    g.AddEdge(std::move(routing::ContractionEdge{1, 2, 3, 2}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{1, 2, 3, 2}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{2, 3, 4, 3}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{2, 3, 4, 3}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{3, 4, 5, 4}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{3, 4, 5, 4}));
+    
+    g.AddEdge(std::move(routing::ContractionEdge{4, 5, 6, 5}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{4, 5, 6, 5}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{5, 6, 7, 4}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{5, 6, 7, 4}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{6, 7, 8, 3}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{6, 7, 8, 3}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{7, 8, 9, 2}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{7, 8, 9, 2}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{77, 9, 10, 1}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{77, 9, 10, 1}));
+
+    g.GetVertex(1).set_ordering_rank(1);
+    g.GetVertex(2).set_ordering_rank(2);
+    g.GetVertex(3).set_ordering_rank(3);
+    g.GetVertex(4).set_ordering_rank(4);
+    g.GetVertex(5).set_ordering_rank(10);
+    g.GetVertex(6).set_ordering_rank(9);
+    g.GetVertex(7).set_ordering_rank(8);
+    g.GetVertex(8).set_ordering_rank(7);
+    g.GetVertex(9).set_ordering_rank(6);
+    g.GetVertex(10).set_ordering_rank(5);
+}
+
+template <typename G>
+void TestPathShortcutGraph(G& g) {
+    TestPathGraph(g);
+    g.AddEdge(std::move(routing::ContractionEdge{8, 1, 3, 3, 2}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{8, 1, 3, 3, 2}));
+    g.AddEdge(std::move(routing::ContractionEdge{9, 1, 4, 6, 3}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{9, 1, 4, 6, 3}));
+    g.AddEdge(std::move(routing::ContractionEdge{10, 1, 5, 10, 4}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{10, 1, 5, 10, 4}));
+ 
+    g.AddEdge(std::move(routing::ContractionEdge{11, 5, 10, 15, 6}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{11, 5, 10, 15, 6}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{12, 6, 10, 10, 7}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{12, 6, 10, 10, 7}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{13, 7, 10, 6, 8}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{13, 7, 10, 6, 8}));
+
+    g.AddEdge(std::move(routing::ContractionEdge{14, 8, 10, 3, 9}));
+    g.AddReverseEdge(std::move(routing::ContractionEdge{14, 8, 10, 3, 9}));
+}
+
 
 #endif // GRAPH_TEST_H

@@ -14,7 +14,7 @@ ContractionEdge::ContractionEdge(unsigned_id_type uid, unsigned_id_type from, un
         BasicEdge(uid, from, to, length), shortcut_(true), contracted_vertex_(contracted_vertex) {}
 
 bool ContractionEdge::operator==(const ContractionEdge & other) const {
-    if (uid_ == other.uid_) { return true; }
+    // if (uid_ == other.uid_) { return true; }
         // If there can be two edges with same from, to.
         if (from_ == other.from_ && to_ == other.to_ && length_ == other.length_) { return true; }
         // If a way is not oneway then there are at least 2 edges with same geography and closest edge
