@@ -14,6 +14,10 @@ public:
         return shortcut_;
     }
 
+    inline unsigned_id_type get_contracted_vertex() const {
+        return contracted_vertex_;
+    }
+
     ContractionEdge();
     ContractionEdge(database::EdgeDbRow &);
     ContractionEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex);

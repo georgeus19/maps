@@ -33,16 +33,10 @@ class BidirectionalDijkstraTest : public testing::Test {
     G g_;
     void SetUp() override {
         TestBasicContractedGraph(g_);
-        g_.GetVertex(1).set_ordering_rank(3);
-        g_.GetVertex(2).set_ordering_rank(5);
-        g_.GetVertex(3).set_ordering_rank(1);
-        g_.GetVertex(4).set_ordering_rank(6);
-        g_.GetVertex(5).set_ordering_rank(4);
-        g_.GetVertex(6).set_ordering_rank(2);
     }
 };
 
-TEST_F(BidirectionalDijkstraTest, ExistingPath) {
+TEST_F(BidirectionalDijkstraTest, ExistingPathWithShortcuts) {
     Algorithm<BidirectionalDijkstra<G>> alg{g_};
     alg.Run(1, 6);
     vector<Dijkstra<G>::Edge> path = alg.GetRoute();
@@ -50,19 +44,39 @@ TEST_F(BidirectionalDijkstraTest, ExistingPath) {
         e.Print();
     }
 
-    vector<Dijkstra<G>::Edge> expected_path{
-        ContractionEdge{1, 1, 4, 5}, ContractionEdge{5, 4, 5, 2}, ContractionEdge{7, 5, 6, 2}
+    vector<Dijkstra<G>::Edge> expected_path {
+        ContractionEdge{1, 1, 3, 5}, ContractionEdge{1, 3, 4, 3}, ContractionEdge{5, 4, 5, 2}, ContractionEdge{7, 5, 6, 2}
+        // ContractionEdge{1, 1, 4, 5}, ContractionEdge{5, 4, 5, 2}, ContractionEdge{7, 5, 6, 2}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
 }
+
+
 
 TEST_F(BidirectionalDijkstraTest, NotExistingPath) {
     Algorithm<BidirectionalDijkstra<G>> alg{g_};
     EXPECT_THROW(alg.Run(5, 1), RouteNotFoundException);
 }
 
-TEST_F(BidirectionalDijkstraTest, IngoreDeadQueueMembers) {
+TEST(BidirectionalDijkstraTestNotFixture, ExistingPathWithoutShortcuts) {
+    G g;
+    TestBasicContractedGraph(g, false);
+    Algorithm<BidirectionalDijkstra<G>> alg{g};
+    alg.Run(1, 6);
+    vector<Dijkstra<G>::Edge> path = alg.GetRoute();
+    for(auto&& e : path) {
+        e.Print();
+    }
+
+    vector<Dijkstra<G>::Edge> expected_path {
+        ContractionEdge{1, 1, 4, 5}, ContractionEdge{5, 4, 5, 2}, ContractionEdge{7, 5, 6, 2}
+    };
+
+    EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
+}
+
+TEST(BidirectionalDijkstraTestNotFixture, IngoreDeadQueueMembers) {
     G g{};
     g.AddEdge(std::move(routing::ContractionEdge{0, 1, 5, 20}));
     g.AddReverseEdge(std::move(routing::ContractionEdge{0, 1, 5, 20}));

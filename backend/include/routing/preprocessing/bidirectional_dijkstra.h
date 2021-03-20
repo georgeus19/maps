@@ -224,9 +224,9 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
 
 template <typename G>
 std::vector<typename BidirectionalDijkstra<G>::Edge> BidirectionalDijkstra<G>::GetRoute() {
-    typename RouteRetriever<G>::BiDijkstraForwardGraphInfo forward_graph_info{};
-    typename RouteRetriever<G>::BiDijkstraBackwardGraphInfo backward_graph_info{};
     RouteRetriever<G> r{g_};
+    typename RouteRetriever<G>::BiDijkstraForwardGraphInfo forward_graph_info{r};
+    typename RouteRetriever<G>::BiDijkstraBackwardGraphInfo backward_graph_info{r};
     auto&& forward_route = r.GetRoute(&forward_graph_info, start_node_, settled_vertex_);
     auto&& backward_route = r.GetRoute(&backward_graph_info, end_node_, settled_vertex_);
     forward_route.insert(forward_route.end(), backward_route.rbegin(), backward_route.rend());

@@ -5,7 +5,9 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <stack>
 #include "routing/edges/basic_edge.h"
+#include "routing/graph.h"
 
 namespace routing {
 
@@ -19,18 +21,21 @@ public:
 
     class GraphInfo {
     public:
-        GraphInfo() {}
+        GraphInfo(RouteRetriever& retriever) : retriever_(retriever) {}
 
         virtual unsigned_id_type GetPrevious(const Vertex& vertex) = 0;
 
         virtual Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
 
         virtual void AddEdge(std::vector<Edge>& route, Edge&& edge) = 0;
+    protected:
+        RouteRetriever& retriever_;
     };
 
     class BiDijkstraForwardGraphInfo : public GraphInfo {
+        using GraphInfo::retriever_;
     public:
-        BiDijkstraForwardGraphInfo() {}
+        BiDijkstraForwardGraphInfo(RouteRetriever& retriever) : GraphInfo(retriever) {}
 
         unsigned_id_type GetPrevious(const Vertex& vertex) override {
             return vertex.get_forward_previous();
@@ -41,13 +46,19 @@ public:
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
-            route.push_back(std::move(edge));
+            if (edge.IsShortcut()) {
+                std::vector<Edge> underlying_edges = retriever_.UnpackShortcut(this, std::move(edge));
+                route.insert(route.end(), underlying_edges.begin(), underlying_edges.end());
+            } else {
+                route.push_back(std::move(edge));
+            }
         }
     };
 
     class BiDijkstraBackwardGraphInfo : public GraphInfo {
+        using GraphInfo::retriever_;
     public:
-        BiDijkstraBackwardGraphInfo() {}
+        BiDijkstraBackwardGraphInfo(RouteRetriever& retriever) : GraphInfo(retriever) {}
 
         unsigned_id_type GetPrevious(const Vertex& vertex) override {
             return vertex.get_backward_previous();
@@ -58,14 +69,22 @@ public:
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
-            edge.Reverse();
-            route.push_back(std::move(edge));
+            if (edge.IsShortcut()) {
+                std::vector<Edge> underlying_edges = retriever_.UnpackShortcut(this, std::move(edge));
+                for(auto&& e : underlying_edges) {
+                    e.Reverse();
+                }
+                route.insert(route.end(), underlying_edges.begin(), underlying_edges.end());
+            } else {
+                edge.Reverse();
+                route.push_back(std::move(edge));
+            }
         }
     };
 
     class DijkstraGraphInfo : public GraphInfo {
     public:
-        DijkstraGraphInfo() {}
+        DijkstraGraphInfo(RouteRetriever& retriever) : GraphInfo(retriever) {}
 
         unsigned_id_type GetPrevious(const Vertex& vertex) override {
             return vertex.get_previous();
@@ -85,6 +104,10 @@ public:
 private:
     
     G& g_;
+
+    std::vector<Edge> UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut);
+
+    Edge& GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id);
 };
   
 template <typename G>
@@ -124,7 +147,43 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphI
     return route; 
 }
 
+template <typename G>
+std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut) {
+    assert(shortcut.IsShortcut());
+    std::stack<Edge> shortcut_stack{};
+    Edge edge = std::move(shortcut);
+    std::vector<Edge> underlying_edges{};
+    // In-order traversal of shortcut binary tree.
+    while (!shortcut_stack.empty() || edge.IsShortcut()) {
+        if (edge.IsShortcut()) {
+            shortcut_stack.push(edge);
+            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex());
+        } else {
+            // Add the non-shortcut edges to route.
+            underlying_edges.push_back(std::move(edge));
+            edge = shortcut_stack.top();
+            shortcut_stack.pop();
 
+            // The shortcut itself is useless - nothing is done with it.
+
+            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex());
+        }
+    }
+    // Last non-shortcut edge was not added due to empty stack and not being a shortcut.
+    underlying_edges.push_back(std::move(edge));
+   
+
+    return underlying_edges;
+}
+
+template <typename G>
+inline RouteRetriever<G>::Edge& RouteRetriever<G>::GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id) {
+    return graph_info->FindEdge(g_.GetVertex(former_vertex_id), [=](const Edge& e) {
+        return e.get_to() == latter_vertex_id;
+    });
+
+}
+    
 
 }
 

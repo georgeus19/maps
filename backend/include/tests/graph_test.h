@@ -56,20 +56,37 @@ void TestBasicReverseGraph(G & graph) {
 }
 
 template <typename G>
-void TestBasicContractedGraph(G & graph) {
+void TestBasicContractedGraph(G & graph, bool with_shortcuts = true) {
         graph.AddEdge(std::move(routing::ContractionEdge{0, 1, 2, 2}));
         graph.AddReverseEdge(std::move(routing::ContractionEdge{0, 1, 2, 2}));
         graph.AddEdge(std::move(routing::ContractionEdge{1, 1, 3, 2}));
         graph.AddReverseEdge(std::move(routing::ContractionEdge{1, 1, 3, 2}));
-        graph.AddEdge(std::move(routing::ContractionEdge{2, 1, 4, 5}));
-        graph.AddReverseEdge(std::move(routing::ContractionEdge{2, 1, 4, 5}));
+        if (with_shortcuts) {
+                graph.AddEdge(std::move(routing::ContractionEdge{2, 1, 4, 5, 3}));
+                graph.AddReverseEdge(std::move(routing::ContractionEdge{2, 1, 4, 5, 3}));
+        } else {
+                graph.AddEdge(std::move(routing::ContractionEdge{2, 1, 4, 5}));
+                graph.AddReverseEdge(std::move(routing::ContractionEdge{2, 1, 4, 5}));
+        }
+        
         
         graph.AddEdge(std::move(routing::ContractionEdge{3, 2, 6, 8}));
         graph.AddReverseEdge(std::move(routing::ContractionEdge{3, 2, 6, 8}));
-        graph.AddEdge(std::move(routing::ContractionEdge{4, 2, 5, 11}));
-        graph.AddReverseEdge(std::move(routing::ContractionEdge{4, 2, 5, 11}));
-        graph.AddEdge(std::move(routing::ContractionEdge{5, 2, 4, 15}));
-        graph.AddReverseEdge(std::move(routing::ContractionEdge{5, 2, 4, 15}));
+        if (with_shortcuts) {
+                graph.AddEdge(std::move(routing::ContractionEdge{4, 2, 5, 11, 6}));
+                graph.AddReverseEdge(std::move(routing::ContractionEdge{4, 2, 5, 11, 6}));
+        } else {
+                graph.AddEdge(std::move(routing::ContractionEdge{4, 2, 5, 11}));
+                graph.AddReverseEdge(std::move(routing::ContractionEdge{4, 2, 5, 11}));
+        }
+        if (with_shortcuts) {
+                graph.AddEdge(std::move(routing::ContractionEdge{5, 2, 4, 15, 5}));
+                graph.AddReverseEdge(std::move(routing::ContractionEdge{5, 2, 4, 15, 5}));
+        } else {
+                graph.AddEdge(std::move(routing::ContractionEdge{5, 2, 4, 15}));
+                graph.AddReverseEdge(std::move(routing::ContractionEdge{5, 2, 4, 15}));
+        }
+        
         
         graph.AddEdge(std::move(routing::ContractionEdge{6, 3, 4, 3}));
         graph.AddReverseEdge(std::move(routing::ContractionEdge{6, 3, 4, 3}));
@@ -90,6 +107,13 @@ void TestBasicContractedGraph(G & graph) {
 
         graph.AddEdge(std::move(routing::ContractionEdge{13, 6, 5, 3}));
         graph.AddReverseEdge(std::move(routing::ContractionEdge{13, 6, 5, 3}));
+
+        graph.GetVertex(1).set_ordering_rank(3);
+        graph.GetVertex(2).set_ordering_rank(5);
+        graph.GetVertex(3).set_ordering_rank(1);
+        graph.GetVertex(4).set_ordering_rank(6);
+        graph.GetVertex(5).set_ordering_rank(4);
+        graph.GetVertex(6).set_ordering_rank(2);
 
 }
 

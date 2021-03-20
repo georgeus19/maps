@@ -27,7 +27,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<BasicEdge>, BasicEdge>;
+using G = Graph<ContractionVertex<ContractionEdge>, ContractionEdge>;
 
 struct VertexMeasuresTest {
     int32_t edge_difference;

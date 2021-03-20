@@ -75,8 +75,9 @@ void Dijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type end_node) {
 
 template< typename G>
 inline std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute(unsigned_id_type end_node) {
-    typename RouteRetriever<G>::DijkstraGraphInfo graph_info{};
-    return RouteRetriever{g_}.GetRoute(&graph_info, start_node_, end_node);
+    RouteRetriever r{g_};
+    typename RouteRetriever<G>::DijkstraGraphInfo graph_info{r};
+    return r.GetRoute(&graph_info, start_node_, end_node);
 }
 
 template< typename G>

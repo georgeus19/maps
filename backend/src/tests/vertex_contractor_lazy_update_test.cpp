@@ -25,7 +25,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<BasicEdge>, BasicEdge>;
+using G = Graph<ContractionVertex<ContractionEdge>, ContractionEdge>;
 struct ExpectedVertexProperties;
 std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q);
 void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name); 
