@@ -20,6 +20,7 @@ add_executable(graph_builder ${OsmParserGlob})
 add_library(routing ${RoutingGLob} ${RoutingPreprocessingGlob} ${RoutingQueryGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 # add_executable(routing_preprocessing ${RoutingGLob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_library(routing_preprocessing ${RoutingGLob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
+add_executable(routing_preprocessor ${RoutingGLob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(Osmium REQUIRED)
@@ -104,9 +105,15 @@ target_link_libraries(tests routing_preprocessing)
 
 target_link_libraries(routing pqxx)
 target_link_libraries(routing pq)
+target_link_libraries(routing python3.8)
 
 target_link_libraries(routing_preprocessing pqxx)
 target_link_libraries(routing_preprocessing pq)
+target_link_libraries(routing_preprocessing python3.8)
+
+target_link_libraries(routing_preprocessor pqxx)
+target_link_libraries(routing_preprocessor pq)
+target_link_libraries(routing_preprocessor python3.8)
 
 target_link_libraries(backend_test mapnik boost_filesystem boost_regex cairo png proj tiff webp icui18n boost_system harfbuzz jpeg icuuc freetype z dl)
 target_link_libraries(backend_test libmapnik-json.a libmapnik-wkt.a )

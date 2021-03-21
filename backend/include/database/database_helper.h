@@ -215,8 +215,14 @@ public:
     template <typename Graph>
     void LoadGraph(utility::Point center, std::string radius, const std::string & table_name, Graph & graph);
 
+    template <typename Graph>
+    void LoadFullGraph(const std::string & table_name, Graph & graph);
+
 private:
     
+    template <typename Graph>
+    void LoadGraph(const std::string & sql, Graph & graph);
+
 };
 
 template <typename Edge>
@@ -357,12 +363,24 @@ void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const 
     std::string load_graph_sql = "select uid, from_node, to_node, length " \
                         "from " + table_name + " as e " \
                         "where ST_DWithin('SRID=4326;" + MakeSTPoint(center) + "'::geography, e.geog, " + radius + ") ";
+    LoadGraph(load_graph_sql, graph);
+}
+
+template <typename Graph>
+void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph) {
+    std::string load_graph_sql = "select uid, from_node, to_node, length, geog " \
+                            "from " + table_name + ";";
+    LoadGraph(load_graph_sql, graph);
+}
+
+template <typename Graph>
+void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph) {
     pqxx::nontransaction n{connection_};
-    pqxx::result result{n.exec(load_graph_sql)};
+    pqxx::result result{n.exec(sql)};
 
     for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
         EdgeDbRow row{c};
-        graph.AddEdge(row);
+        graph.AddEdge(typename Graph::E{row});
     }
 }
 

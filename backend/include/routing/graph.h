@@ -33,12 +33,6 @@ public:
     Graph();
 
     /**
-     * Add edge represented by row to graph.
-     * @param row Row representing graph edge.
-     */
-    void AddEdge(database::EdgeDbRow & row);
-
-    /**
      * Add `edge` to graph.
      * @param edge Edge which is added to graph.
      */
