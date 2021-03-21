@@ -24,6 +24,9 @@ __pychache__
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+backend/GPATH
+backend/GRTAGS
+backend/GTAGS
 
 #cmake
 CMakeLists.txt.user
