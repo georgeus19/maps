@@ -90,6 +90,10 @@ public:
     Edge& FindEdge(std::vector<Edge>& edges, const std::function<bool(const Edge&)>& f);
 
     double GetCostMaxValue();
+
+    bool operator==(const BasicVertex& other) const;
+
+    bool operator!=(const BasicVertex& other) const;
 };
 
 template <typename Edge>
@@ -193,6 +197,16 @@ Edge& BasicVertex<Edge>::FindEdge(std::vector<Edge>& edges, const std::function<
 template <typename Edge>
 inline double BasicVertex<Edge>::GetCostMaxValue() {
     return std::numeric_limits<double>::max();
+}
+
+template <typename Edge>
+inline bool BasicVertex<Edge>::operator==(const BasicVertex<Edge>& other) const {
+    return osm_id_ == other.osm_id_;
+}
+
+template <typename Edge>
+inline bool BasicVertex<Edge>::operator!=(const BasicVertex<Edge>& other) const {
+    return !((*this) == other);
 }
 
 

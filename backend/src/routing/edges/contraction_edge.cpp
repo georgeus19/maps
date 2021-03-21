@@ -13,7 +13,7 @@ ContractionEdge::ContractionEdge(unsigned_id_type uid, unsigned_id_type from, un
 ContractionEdge::ContractionEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex) :
         BasicEdge(uid, from, to, length), shortcut_(true), contracted_vertex_(contracted_vertex) {}
 
-bool ContractionEdge::operator==(const ContractionEdge & other) const {
+bool ContractionEdge::operator==(const ContractionEdge& other) const {
     // if (uid_ == other.uid_) { return true; }
         // If there can be two edges with same from, to.
         if (from_ == other.from_ && to_ == other.to_ && length_ == other.length_) { return true; }
@@ -24,7 +24,7 @@ bool ContractionEdge::operator==(const ContractionEdge & other) const {
         return false;
 }
 
-bool ContractionEdge::operator!=(const ContractionEdge & other) const {
+bool ContractionEdge::operator!=(const ContractionEdge& other) const {
     return !((*this) == other);
 }
 

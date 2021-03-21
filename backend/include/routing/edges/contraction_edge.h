@@ -28,13 +28,13 @@ public:
     ContractionEdge& operator= (ContractionEdge && other) = default;
     ~ContractionEdge() = default;
 
-    void Swap(ContractionEdge & other);
+    void Swap(ContractionEdge& other);
 
     /**
      * "Graphical" comparison of edges.
      */
-    bool operator==(const ContractionEdge & other) const;
-    bool operator!=(const ContractionEdge & other) const;
+    bool operator==(const ContractionEdge& other) const;
+    bool operator!=(const ContractionEdge& other) const;
 
 private:
     bool shortcut_;

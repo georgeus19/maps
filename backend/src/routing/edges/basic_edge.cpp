@@ -28,7 +28,7 @@ void BasicEdge::Print() {
     std::cout << get_from() << "->" << get_to() << " length: " << get_length() << std::endl;
 }
 
-bool BasicEdge::operator==(const BasicEdge & other) const {
+bool BasicEdge::operator==(const BasicEdge& other) const {
     // if (uid_ == other.uid_) { return true; }
         // If there can be two edges with same from, to.
         if (from_ == other.from_ && to_ == other.to_ && length_ == other.length_) { return true; }
@@ -39,7 +39,7 @@ bool BasicEdge::operator==(const BasicEdge & other) const {
         return false;
 }
 
-bool BasicEdge::operator!=(const BasicEdge & other) const {
+bool BasicEdge::operator!=(const BasicEdge& other) const {
     return !((*this) == other);
 }
 

@@ -55,6 +55,8 @@ public:
 
     void forEachVertex(const std::function<void(Vertex&)>& f);
 
+    void ForEachEdge(const std::function<void(Edge&)>& f);
+
 private:
     /**
      * Internal graph representaions. Unfortunately, even though the ids
@@ -126,6 +128,13 @@ void Graph<Vertex, Edge>::forEachVertex(const std::function<void(Vertex&)>& f) {
     }
 }
 
+template <typename Vertex, typename Edge>
+void Graph<Vertex, Edge>::ForEachEdge(const std::function<void(Edge&)>& f) {
+    forEachVertex([&](Vertex& vertex) {
+        vertex.ForEachEdge(f);
+    });
+    
+}
     
 }
 

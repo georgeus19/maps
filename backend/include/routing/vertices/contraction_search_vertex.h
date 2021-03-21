@@ -126,6 +126,8 @@ inline Edge& ContractionSearchVertex<Edge>::FindReverseEdge(const std::function<
 }
 
 
+
+
 }
 
 #endif //BACKEND_CONTRACTION_SEARCH_VERTEX
