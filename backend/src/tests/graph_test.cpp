@@ -27,86 +27,89 @@ using namespace preprocessing;
 // using namespace testing;
 using G = Graph<ContractionSearchVertex<ContractionEdge>, ContractionEdge>;
 
-TEST(GraphTests, ForEachEdgePathGraphTest) {
-    G g;
-    TestPathGraph(g);
+struct GraphForEachEdgeTestsParameter;
+
+
+class GraphForEachEdgeTests : public testing::TestWithParam<GraphForEachEdgeTestsParameter> {
+    protected:
+    
+    G g_;
+};
+
+struct GraphForEachEdgeTestsParameter {
+    std::function<void(G& g)> function;
+    std::vector<G::E> expected_edges;
+
+    GraphForEachEdgeTestsParameter(const std::function<void(G& g)>& f, const std::vector<G::E>& e) 
+        : function(f), expected_edges(e) {}
+};
+
+INSTANTIATE_TEST_CASE_P(
+    GraphForEachEdgeTestsParameters, 
+    GraphForEachEdgeTests,
+    ::testing::Values(
+        GraphForEachEdgeTestsParameter{
+            [](G& g){ TestPathGraph(g); },
+            std::vector<G::E> {
+                ContractionEdge{0, 1, 2, 1},
+                ContractionEdge{1, 2, 3, 2},
+                ContractionEdge{2, 3, 4, 3},
+                ContractionEdge{3, 4, 5, 4},
+                ContractionEdge{4, 5, 6, 5},
+                ContractionEdge{5, 6, 7, 4},
+                ContractionEdge{6, 7, 8, 3},
+                ContractionEdge{7, 8, 9, 2},
+                ContractionEdge{77, 9, 10, 1}
+            }
+        },
+        GraphForEachEdgeTestsParameter{
+            [](G& g){ TestBasicReverseGraph(g); },
+            std::vector<G::E> {
+                ContractionEdge{0, 1, 2, 2},
+                ContractionEdge{1, 1, 3, 2},
+                ContractionEdge{2, 2, 6, 8},
+                ContractionEdge{3, 3, 4, 3},
+                ContractionEdge{4, 4, 3, 2},
+                ContractionEdge{5, 4, 5, 2},
+                ContractionEdge{6, 5, 4, 4},
+                ContractionEdge{7, 4, 6, 6},
+                ContractionEdge{8, 5, 6, 2},
+                ContractionEdge{9, 6, 5, 3},
+                ContractionEdge{10, 5, 3, 7}
+            }
+        },
+        GraphForEachEdgeTestsParameter{
+            [](G& g){ TestBasicContractedGraph(g); },
+            std::vector<G::E> {
+                ContractionEdge{0, 1, 2, 2},
+                ContractionEdge{1, 1, 3, 2},
+                ContractionEdge{2, 1, 4, 5, 3},
+                ContractionEdge{3, 2, 6, 8},
+                ContractionEdge{4, 2, 5, 11, 6},
+                ContractionEdge{5, 2, 4, 15, 5},
+                ContractionEdge{6, 3, 4, 3},
+                ContractionEdge{7, 4, 3, 2},
+                ContractionEdge{8, 4, 5, 2},
+                ContractionEdge{9, 4, 6, 6},
+                ContractionEdge{10, 5, 4, 4},
+                ContractionEdge{11, 5, 3, 7},
+                ContractionEdge{12, 5, 6, 2},
+                ContractionEdge{13, 6, 5, 3}
+            }
+        }
+    )
+);
+
+TEST_P(GraphForEachEdgeTests, ForEachEdgeTest) {
+    auto&& parameters = GetParam();
+    parameters.function(g_);
     std::vector<G::E> actual_edges{};
-    g.ForEachEdge([&](G::E& edge) {
+    g_.ForEachEdge([&](G::E& edge) {
         actual_edges.push_back(edge);
         edge.Print();
     });
- 
 
-    std::vector<G::E> expected_edges{
-        ContractionEdge{0, 1, 2, 1},
-        ContractionEdge{1, 2, 3, 2},
-        ContractionEdge{2, 3, 4, 3},
-        ContractionEdge{3, 4, 5, 4},
-        ContractionEdge{4, 5, 6, 5},
-        ContractionEdge{5, 6, 7, 4},
-        ContractionEdge{6, 7, 8, 3},
-        ContractionEdge{7, 8, 9, 2},
-        ContractionEdge{77, 9, 10, 1}
-    };
-
-    EXPECT_THAT(actual_edges, testing::UnorderedElementsAreArray(expected_edges));
-}
-
-TEST(GraphTests, ForEachEdgeBasicGraphTest) {
-    G g;
-    TestBasicReverseGraph(g);
-    std::vector<G::E> actual_edges{};
-    g.ForEachEdge([&](G::E& edge) {
-        actual_edges.push_back(edge);
-        edge.Print();
-    });
- 
-
-    std::vector<G::E> expected_edges{
-        ContractionEdge{0, 1, 2, 2},
-        ContractionEdge{1, 1, 3, 2},
-        ContractionEdge{2, 2, 6, 8},
-        ContractionEdge{3, 3, 4, 3},
-        ContractionEdge{4, 4, 3, 2},
-        ContractionEdge{5, 4, 5, 2},
-        ContractionEdge{6, 5, 4, 4},
-        ContractionEdge{7, 4, 6, 6},
-        ContractionEdge{8, 5, 6, 2},
-        ContractionEdge{9, 6, 5, 3},
-        ContractionEdge{10, 5, 3, 7}
-    };
-
-    EXPECT_THAT(actual_edges, testing::UnorderedElementsAreArray(expected_edges));
-}
-
-TEST(GraphTests, ForEachEdgeBasicContractedGraphTest) {
-    G g;
-    TestBasicContractedGraph(g);
-    std::vector<G::E> actual_edges{};
-    g.ForEachEdge([&](G::E& edge) {
-        actual_edges.push_back(edge);
-        edge.Print();
-    });
- 
-
-    std::vector<G::E> expected_edges{
-        ContractionEdge{0, 1, 2, 2},
-        ContractionEdge{1, 1, 3, 2},
-        ContractionEdge{2, 1, 4, 5, 3},
-        ContractionEdge{3, 2, 6, 8},
-        ContractionEdge{4, 2, 5, 11, 6},
-        ContractionEdge{5, 2, 4, 15, 5},
-        ContractionEdge{6, 3, 4, 3},
-        ContractionEdge{7, 4, 3, 2},
-        ContractionEdge{8, 4, 5, 2},
-        ContractionEdge{9, 4, 6, 6},
-        ContractionEdge{10, 5, 4, 4},
-        ContractionEdge{11, 5, 3, 7},
-        ContractionEdge{12, 5, 6, 2},
-        ContractionEdge{13, 6, 5, 3}
-    };
-
-    EXPECT_THAT(actual_edges, testing::UnorderedElementsAreArray(expected_edges));
+    EXPECT_THAT(actual_edges, testing::UnorderedElementsAreArray(parameters.expected_edges));
 }
 
 TEST(GraphTests, ForEachVertexBasicGraphTest) {
