@@ -116,7 +116,7 @@ TEST(GraphTests, ForEachVertexBasicGraphTest) {
     G g;
     TestBasicContractedGraph(g);
     std::vector<G::V> actual_vertices{};
-    g.forEachVertex([&](G::V& vertex) {
+    g.ForEachVertex([&](G::V& vertex) {
         actual_vertices.push_back(vertex);
     });
  

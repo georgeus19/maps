@@ -53,7 +53,7 @@ public:
      */
     Vertex& GetVertex(unsigned_id_type id);
 
-    void forEachVertex(const std::function<void(Vertex&)>& f);
+    void ForEachVertex(const std::function<void(Vertex&)>& f);
 
     void ForEachEdge(const std::function<void(Edge&)>& f);
 
@@ -122,7 +122,7 @@ inline Vertex& Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
 }
 
 template <typename Vertex, typename Edge>
-void Graph<Vertex, Edge>::forEachVertex(const std::function<void(Vertex&)>& f) {
+void Graph<Vertex, Edge>::ForEachVertex(const std::function<void(Vertex&)>& f) {
     for (auto&& pair : g_) {
         f(pair.second);
     }
@@ -130,7 +130,7 @@ void Graph<Vertex, Edge>::forEachVertex(const std::function<void(Vertex&)>& f) {
 
 template <typename Vertex, typename Edge>
 void Graph<Vertex, Edge>::ForEachEdge(const std::function<void(Edge&)>& f) {
-    forEachVertex([&](Vertex& vertex) {
+    ForEachVertex([&](Vertex& vertex) {
         vertex.ForEachEdge(f);
     });
     

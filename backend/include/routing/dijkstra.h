@@ -148,7 +148,7 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, std::set<QueuePair>& q, const std:
 template <typename G>
 void Dijkstra<G>::InitGraph() {
     
-    g_.forEachVertex([](Vertex&  v) {
+    g_.ForEachVertex([](Vertex&  v) {
         v.ResetRoutingProperties();
     }); 
 }
