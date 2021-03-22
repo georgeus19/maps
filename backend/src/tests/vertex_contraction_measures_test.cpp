@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/graph.h"
 #include "routing/edges/basic_edge.h"
+#include "routing/edges/ch_preprocessing_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
@@ -27,7 +28,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<ContractionEdge>, ContractionEdge>;
+using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 
 struct VertexMeasuresTest {
     int32_t edge_difference;
@@ -69,7 +70,7 @@ class VertexContractionMeasuresTests : public testing::TestWithParam<VertexMeasu
 };
 
 INSTANTIATE_TEST_CASE_P(
-    SimpleContractionEdgesTestParameters, 
+    SimpleCHPreprocessingEdgesTestParameters, 
     VertexContractionMeasuresTests,
     ::testing::Values(
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 1, std::vector<unsigned_id_type>{}},

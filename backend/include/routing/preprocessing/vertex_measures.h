@@ -82,7 +82,7 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
         if (g_.GetVertex(end_vertex_id).IsContracted() || shortcut_length > path_length) {
             continue;
         }
-        shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), start_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id()});
+        shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), start_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
     }
 }
 

@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/graph.h"
 #include "routing/edges/basic_edge.h"
+#include "routing/edges/ch_preprocessing_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
@@ -25,7 +26,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<ContractionEdge>, ContractionEdge>;
+using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 struct ExpectedVertexProperties;
 std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q);
 void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name); 

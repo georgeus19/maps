@@ -7,9 +7,12 @@
 #include <unordered_map>
 #include <vector>
 #include <numeric>
+#include <fstream>
+#include <exception>
 #include <functional>
 #include <utility>
 #include "utility/point.h"
+#include "database/csv_convertor.h"
 
 namespace database {
 
@@ -218,6 +221,13 @@ public:
     template <typename Graph>
     void LoadFullGraph(const std::string & table_name, Graph & graph);
 
+    bool AddShortcutColumns(const std::string& table_name);
+
+    template <typename Graph>
+    void AddShortcuts(const std::string& table_name, Graph& graph);
+
+    template <typename Graph>
+    void AddVertexOrdering(const std::string& table_name, Graph& graph);
 private:
     
     template <typename Graph>
@@ -368,10 +378,42 @@ void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const 
 
 template <typename Graph>
 void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph) {
-    std::string load_graph_sql = "select uid, from_node, to_node, length, geog " \
+    std::string load_graph_sql = "select uid, from_node, to_node, length, ST_AsText(geog) " \
                             "from " + table_name + ";";
     LoadGraph(load_graph_sql, graph);
 }
+
+
+template <typename Graph>
+void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
+    std::string data_path{"shortcuts.csv"};
+    std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV;";
+    CsvConvertor convertor{data_path};
+    convertor.SaveEdges(graph, [](const Graph::E& edge) {
+        return edge.IsShortcut();
+    });
+
+    pqxx::nontransaction n{connection_};
+    pqxx::result result{n.exec(sql)};
+}
+
+
+template <typename Graph>
+void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& graph) {
+    std::string data_path{"vertex_ordering.csv"};
+    std::string create_table_sql = "CREATE TABLE " + table_name + "("  \
+        "osm_id BIGINT PRIMARY KEY, " \
+        "ordering_rank BIGINT NOT NULL); ";
+    std::string copy_sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV; ";
+    // string create_index = "CREATE INDEX " + table_name + "_osm_id_idx ON " + table_name + " (osm_id);";
+    CsvConvertor convertor{data_path};
+    convertor.SaveVertexOrdering(graph);
+    std::string sql = create_table_sql + " " + copy_sql;
+    pqxx::nontransaction n{connection_};
+    pqxx::result result{n.exec(sql)};
+
+}
+
 
 template <typename Graph>
 void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph) {
@@ -383,6 +425,7 @@ void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph) {
         graph.AddEdge(typename Graph::E{row});
     }
 }
+
 
 
 }
