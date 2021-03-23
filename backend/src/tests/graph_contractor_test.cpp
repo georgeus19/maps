@@ -154,7 +154,31 @@ void ContractVertex(G& g, GraphContractor<G> & contractor, size_t id) {
     contractor.ContractVertex(g.GetVertex(id));
 }
 
-TEST(GraphContractorGeographyTest, SimpleGeographyTest) {
-    
+TEST(GraphContractorContractionPriority, BasicGraphPriority) {
+    G g{};
+    TestBasicReverseGraph(g);
+
+    std::vector<std::pair<double, unsigned_id_type>> expected_priorities {
+        std::make_pair(-2, 1),
+        std::make_pair(-2, 2),
+        std::make_pair(-3, 3),
+        std::make_pair(-2, 4),
+        std::make_pair(-2, 5),
+        std::make_pair(-3, 6)
+    };
+
+
+    GraphContractor<G> contractor(g,  ContractionParameters{11});
+    auto&& q = contractor.CalculateContractionPriority();
+
+    std::vector<std::pair<double, unsigned_id_type>> actual_priorities{};
+    while(!q.empty()) {
+        auto pair = q.top();
+        actual_priorities.push_back(pair);
+        q.pop();
+    }
+    EXPECT_THAT(actual_priorities, testing::UnorderedElementsAreArray(expected_priorities));
+
 }
+
 

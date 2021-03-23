@@ -30,6 +30,7 @@ const string kPassword = "wtz2trln";
 const string kHostAddress = "127.0.0.1";
 const string kPort = "5432";
 int main(int argv, const char ** argc) {
+    return 0;
     try {
         DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
         G g{};

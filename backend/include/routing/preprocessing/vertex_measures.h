@@ -47,9 +47,13 @@ private:
 template <typename Graph>
 std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindShortcuts(Vertex & vertex) {
     std::vector<Edge> shortcuts{};
-    double max_outgoing_length = std::max_element(vertex.get_edges().begin(), vertex.get_edges().end(), [](const Edge & a, const Edge & b) {
+    auto&& it = std::max_element(vertex.get_edges().begin(), vertex.get_edges().end(), [](const Edge & a, const Edge & b) {
         return a.get_length() < b.get_length();
-    })->get_length();
+    });
+    if (it == vertex.get_edges().end()) {
+        return shortcuts;
+    }
+    double max_outgoing_length = it->get_length();
 
     for(auto&& reverse_edge : vertex.get_reverse_edges()) {
         FindShortcuts(shortcuts, vertex, reverse_edge, max_outgoing_length);
