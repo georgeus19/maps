@@ -16,7 +16,7 @@ class GraphContractor {
     using Edge = Graph::E;
     using Vertex = Graph::V;
 public:
-    using PriorityQueue = std::priority_queue<std::pair<double, Vertex*>, std::vector<std::pair<double, Vertex*>>,  std::greater<std::pair<double, Vertex*>>>;
+    using PriorityQueue = std::priority_queue<std::pair<double, unsigned_id_type>, std::vector<std::pair<double, unsigned_id_type>>,  std::greater<std::pair<double, unsigned_id_type>>>;
     GraphContractor<Graph>(Graph & g, const ContractionParameters& parameters);
 
     void ContractGraph();
@@ -66,30 +66,33 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
     assert(!q.empty());
 
     std::vector<Edge> shortcuts;
-    Vertex* v;
+    unsigned_id_type vertex_id;
     if (q.size() != 1) {
         double priority_threshold;
         double new_priority;
         while(true) {
-            v = q.top().second;
+            vertex_id = q.top().second;
+            auto&& vertex = g_.GetVertex(vertex_id);
             q.pop();
             double priority_threshold = q.top().first;
-            shortcuts = vertex_measures_.FindShortcuts(*v);
-            double new_priority = vertex_measures_.CalculateContractionAttractivity(*v, shortcuts);
+            shortcuts = vertex_measures_.FindShortcuts(vertex);
+            double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts);
             if (new_priority <= priority_threshold) {
                 break;
             }
-            q.push(std::make_pair(new_priority, v));
+            q.push(std::make_pair(new_priority, vertex_id));
         }
     } else {
-        v = q.top().second;
-        shortcuts = vertex_measures_.FindShortcuts(*v);
+        vertex_id = q.top().second;
+        auto&& vertex = g_.GetVertex(vertex_id);
+        shortcuts = vertex_measures_.FindShortcuts(vertex);
         q.pop();
     }
 
     AddShortcuts(shortcuts);
-    v->SetContracted();
-    v->set_ordering_rank(++free_ordering_rank_);
+    auto&& contracted_vertex = g_.GetVertex(vertex_id);
+    contracted_vertex.SetContracted();
+    contracted_vertex.set_ordering_rank(++free_ordering_rank_);
 }
 
 template <typename Graph>
@@ -97,7 +100,7 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
     PriorityQueue q;
     g_.ForEachVertex([&](Vertex& vertex) {
         double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
-        q.push(std::make_pair(attractivity, &vertex));
+        q.push(std::make_pair(attractivity, vertex.get_osm_id()));
     });
     return q;
 }

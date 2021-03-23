@@ -68,8 +68,8 @@ TEST_F(GraphContractorLazyUpdateTests, GraphContractorLazyUpdateTest) {
     GraphContractor<G> contractor{g_, ContractionParameters{11}};
     std::vector<ExpectedVertexProperties> expected{ ExpectedVertexProperties{2, -2} };
     GraphContractor<G>::PriorityQueue q{};
-    q.emplace(-4, &(g_.GetVertex(2)));
-    q.emplace(-3, &(g_.GetVertex(3)));
+    q.emplace(-4, 2);
+    q.emplace(-3, 3);
     contractor.ContractMinVertex(q);
     auto&& actual = QueueToVector(q);
     Print(actual, "actual");
@@ -84,7 +84,7 @@ std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::Priority
     std::vector<ExpectedVertexProperties> v{};
     while(!q.empty()) {
         auto&& pair = q.top();
-        v.emplace_back(pair.second->get_osm_id(), pair.first);
+        v.emplace_back(pair.second, pair.first);
         q.pop();
     }
     return v;
