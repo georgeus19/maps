@@ -42,6 +42,33 @@ public:
         return c_[i].as<T>();
     }
 
+    inline uint64_t get_uid() const {
+        return c_[0].as<uint64_t>();
+    }
+
+    inline uint64_t get_from() const {
+        return c_[1].as<uint64_t>();
+    }
+
+    inline uint64_t get_to() const {
+        return c_[2].as<uint64_t>();
+    }
+
+    inline double get_length() const {
+        return c_[3].as<double>();
+    }
+
+    inline bool get_shortcut() const {
+        return c_[4].as<bool>();
+    }
+
+    inline uint64_t get_contracted_vertex() const {
+        return c_[5].as<uint64_t>();
+    }
+
+    inline std::string get_geography() const {
+        return c_[6].as<std::string>();
+    }
 };
 
 /**
@@ -385,7 +412,7 @@ from czedges as e where ST_DWithin('SRID=4326;POINT(13.393348750000001 49.723055
 template <typename Graph>
 void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const std::string & table_name, Graph & graph) {
     // Select all edges within the `radius` of center.
-    std::string load_graph_sql = "select uid, from_node, to_node, length " \
+    std::string load_graph_sql = "select uid, from_node, to_node, length, shortcut, contracted_vertex " \
                         "from " + table_name + " as e " \
                         "where ST_DWithin('SRID=4326;" + MakeSTPoint(center) + "'::geography, e.geog, " + radius + ") ";
     LoadGraph(load_graph_sql, graph);
@@ -393,7 +420,7 @@ void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const 
 
 template <typename Graph>
 void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph) {
-    std::string load_graph_sql = "select uid, from_node, to_node, length, ST_AsText(geog) " \
+    std::string load_graph_sql = "select uid, from_node, to_node, length, shortcut, contracted_vertex, ST_AsText(geog) " \
                             "from " + table_name + ";";
     LoadGraph(load_graph_sql, graph);
 }

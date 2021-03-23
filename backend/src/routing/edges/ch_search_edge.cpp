@@ -5,7 +5,7 @@ namespace routing {
 CHSearchEdge::CHSearchEdge(): BasicEdge(), shortcut_(false), contracted_vertex_(0) {}
 
 CHSearchEdge::CHSearchEdge(database::EdgeDbRow & r) :
-    BasicEdge(r) {}
+    BasicEdge(r), shortcut_(r.get_shortcut()), contracted_vertex_(r.get_contracted_vertex()) {}
 
 CHSearchEdge::CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
         BasicEdge(uid, from, to, length), shortcut_(false), contracted_vertex_(0) {}
