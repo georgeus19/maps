@@ -218,16 +218,31 @@ public:
     template <typename Graph>
     void LoadGraph(utility::Point center, std::string radius, const std::string & table_name, Graph & graph);
 
+    /**
+     * Load the entire graph from the database table (edgelist)
+     */
     template <typename Graph>
     void LoadFullGraph(const std::string & table_name, Graph & graph);
 
+    /**
+     * Add columns to edge list table which consider shortcut edges.
+     */
     bool AddShortcutColumns(const std::string& table_name);
 
+    /**
+     * Appends shortcuts of the graph to the given table - needs to have appropriate columns.
+     */ 
     template <typename Graph>
     void AddShortcuts(const std::string& table_name, Graph& graph);
 
+    /**
+     * Creates a table with vertex ordering of the graph. Indexed by vertex ids.
+     */ 
     template <typename Graph>
     void AddVertexOrdering(const std::string& table_name, Graph& graph);
+
+    uint64_t GetMaxEdgeId(const std::string& table_name);
+    
 private:
     
     template <typename Graph>
@@ -393,10 +408,9 @@ void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
         return edge.IsShortcut();
     });
 
-    pqxx::nontransaction n{connection_};
-    pqxx::result result{n.exec(sql)};
+    pqxx::work w(connection_);
+    w.exec(sql);
 }
-
 
 template <typename Graph>
 void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& graph) {
@@ -409,9 +423,8 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     CsvConvertor convertor{data_path};
     convertor.SaveVertexOrdering(graph);
     std::string sql = create_table_sql + " " + copy_sql;
-    pqxx::nontransaction n{connection_};
-    pqxx::result result{n.exec(sql)};
-
+    pqxx::work w(connection_);
+    w.exec(sql);
 }
 
 

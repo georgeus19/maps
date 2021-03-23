@@ -154,3 +154,7 @@ void ContractVertex(G& g, GraphContractor<G> & contractor, size_t id) {
     contractor.ContractVertex(g.GetVertex(id));
 }
 
+TEST(GraphContractorGeographyTest, SimpleGeographyTest) {
+    
+}
+

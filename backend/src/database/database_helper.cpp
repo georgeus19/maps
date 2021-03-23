@@ -229,4 +229,11 @@ SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s
       return true;
       
     }
+
+    uint64_t DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
+      std::string sql = "select max(uid) from czedges;";
+      pqxx::nontransaction n{connection_};
+      pqxx::result result{n.exec(sql)};
+      return (result.begin())[0].as<uint64_t>();
+    }
 }
