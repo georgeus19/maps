@@ -11,6 +11,8 @@
 #include "routing/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
+#include "database/db_graph.h"
+#include "database/db_edge_iterator.h"
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
 #include "routing/basic_edge_endpoint_handler.h"
@@ -46,7 +48,8 @@ string CCalculateShortestRoute(const std::string & table_name, utility::Point st
     G g{};
     DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
     string radius = d.CalculateRadius(start, end, 0.7);
-    d.LoadGraph<G>(graph_center, radius, table_name, g);
+    UnpreprocessedDbGraph db_graph{};
+    d.LoadGraph<G>(graph_center, radius, table_name, g, &db_graph);
 
     // Add start segments to graph.
     EndpointHandler<BasicEdgeEndpointHandler> start_handler{1, 1, 0, 0};

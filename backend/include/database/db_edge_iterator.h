@@ -1,5 +1,5 @@
-#ifndef BACKEND_DATABASEHELPER_H
-#define BACKEND_DATABASEHELPER_H
+#ifndef BACKEND_DB_EDGE_ITERATOR_H
+#define BACKEND_DB_EDGE_ITERATOR_H
 #include <string>
 #include <string_view>
 #include <pqxx/pqxx>
@@ -174,4 +174,4 @@ public:
 
 
 }
-#endif //BACKEND_DATABASEHELPER_H
+#endif //BACKEND_DB_EDGE_ITERATOR_H

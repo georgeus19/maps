@@ -1,5 +1,5 @@
-#ifndef BACKEND_EDGE_DB_ROW_H
-#define BACKEND_EDGE_DB_ROW_H
+#ifndef BACKEND_DB_GRAPH_H
+#define BACKEND_DB_GRAPH_H
 
 #include <vector>
 #include <set>
@@ -21,29 +21,26 @@
 #include <utility>
 #include <memory>
 #include "utility/point.h"
-#include "database/edge_db_iterator.h"
+#include "database/db_edge_iterator.h"
 #include "database/csv_convertor.h"
 namespace database {
 
 class DbGraph {
 public:
-    virtual std::string CreateEdgeSelect() const = 0;
-    virtual std::unique_ptr<EdgeDbIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const = 0;
-protected:
-    std::unique_ptr<EdgeDbIterator> iterator_;
-
-    DbGraph(std::unique_ptr<EdgeDbIterator>&& iterator) : iterator_(std::move(iterator)) {}
+    DbGraph() {}
+    virtual std::string GetEdgeSelect() const = 0;
+    virtual std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const = 0;
 };
 
 class UnpreprocessedDbGraph : public DbGraph {
 public:
-    UnpreprocessedDbGraph() : DbGraph(std::make_unique<UnpreprocessedEdgeDbIterator>()) {}
+    UnpreprocessedDbGraph() : DbGraph() {}
 
-    std::unique_ptr<EdgeDbIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
-        return std::make_unique<UnpreprocessedEdgeDbIterator>(begin, end);
+    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
+        return std::make_unique<UnpreprocessedDbEdgeIterator>(begin, end);
     }
 
-    std::string CreateEdgeSelect() const {
+    std::string GetEdgeSelect() const {
         return " SELECT uid, from_node, to_node, length, ST_AsText(geog) ";
     }
 
@@ -51,27 +48,27 @@ public:
 
 class CHPreprocessingDbGraph : public DbGraph {
 public:
-    CHPreprocessingDbGraph() : DbGraph(std::make_unique<CHPreprocessingEdgeDbIterator>()) {}
+    CHPreprocessingDbGraph() : DbGraph() {}
 
-    std::unique_ptr<EdgeDbIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
-        return std::make_unique<CHPreprocessingEdgeDbIterator>(begin, end);
+    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
+        return std::make_unique<CHPreprocessingDbEdgeIterator>(begin, end);
     }
 
-    std::string CreateEdgeSelect() const {
+    std::string GetEdgeSelect() const {
         return " SELECT uid, from_node, to_node, length, ST_AsText(geog), shortcut, contracted_vertex ";
     }
 };
 
 class CHSearchDbGraph : public DbGraph {
 public:
-    CHSearchDbGraph() : DbGraph(std::make_unique<CHSearchEdgeDbIterator>()) {}
+    CHSearchDbGraph() : DbGraph() {}
 
-    std::unique_ptr<EdgeDbIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
-        return std::make_unique<CHSearchEdgeDbIterator>(begin, end);
+    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
+        return std::make_unique<CHSearchDbEdgeIterator>(begin, end);
     }
 
 
-    std::string CreateEdgeSelect() const {
+    std::string GetEdgeSelect() const {
         return " SELECT uid, from_node, to_node, length, shortcut, contracted_vertex ";
     }
 };
@@ -81,4 +78,4 @@ public:
 
 }
 
-#endif //BACKEND_EDGE_DB_ROW_H
+#endif //BACKEND_DB_GRAPH_H

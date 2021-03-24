@@ -36,7 +36,8 @@ int main(int argv, const char ** argc) {
         std::string table_name{"cztmp"};
       
         std::cout << "Load graph from czedges." << std::endl;
-        d.LoadFullGraph<G>(table_name, g);
+        UnpreprocessedDbGraph db_graph{};
+        d.LoadFullGraph<G>(table_name, g, &db_graph);
 
         std::cout << "Contract graph from czedges." << std::endl;
         ContractionParameters parameters{d.GetMaxEdgeId(table_name)};
