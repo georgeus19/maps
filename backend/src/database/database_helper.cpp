@@ -223,6 +223,8 @@ SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s
                           "ALTER TABLE " + table_name + " ADD COLUMN contracted_vertex bigint; " \
                           "UPDATE " + table_name + " set shortcut = false; " \
                           "UPDATE " + table_name + " set contracted_vertex = 0; ";
+        pqxx::work w(connection_);
+        w.exec(sql);
       } catch (const std::exception& e) {
           return false; 
       }

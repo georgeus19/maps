@@ -13,63 +13,12 @@
 #include <utility>
 #include "utility/point.h"
 #include "database/csv_convertor.h"
+#include "database/db_graph.h"
+#include "database/db_edge_iterator.h"
 
 namespace database {
 
-/**
- * EdgeDbRow provides an interface to read a row of data representing graph edge from database
- * that can be used to create instance of Edge class so that
- * Edge itself does not need to know the detail interface of
- * library pqxx.
- */
-class EdgeDbRow {
-    /**
-     * Iterator that represents an output row from db.
-     */
-    pqxx::result::const_iterator c_;
-public:
-    EdgeDbRow(const pqxx::result::const_iterator & c) : c_(c) {}
 
-    /**
-     * Get data from specified column from db row.
-     *
-     * @tparam T Type of data to return.
-     * @param i Index of column.
-     * @return Data from column i cast to T type.
-     */
-    template <typename T>
-    T get(int i) {
-        return c_[i].as<T>();
-    }
-
-    inline uint64_t get_uid() const {
-        return c_[0].as<uint64_t>();
-    }
-
-    inline uint64_t get_from() const {
-        return c_[1].as<uint64_t>();
-    }
-
-    inline uint64_t get_to() const {
-        return c_[2].as<uint64_t>();
-    }
-
-    inline double get_length() const {
-        return c_[3].as<double>();
-    }
-
-    inline bool get_shortcut() const {
-        return c_[4].as<bool>();
-    }
-
-    inline uint64_t get_contracted_vertex() const {
-        return c_[5].as<uint64_t>();
-    }
-
-    inline std::string get_geography() const {
-        return c_[6].as<std::string>();
-    }
-};
 
 /**
  * DbRow provides an interface to read a row of data from database
@@ -419,9 +368,9 @@ void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const 
 }
 
 template <typename Graph>
-void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph) {
-    std::string load_graph_sql = "select uid, from_node, to_node, length, shortcut, contracted_vertex, ST_AsText(geog) " \
-                            "from " + table_name + ";";
+void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph, DbGraph* db_graph) {
+
+    std::string load_graph_sql = db_graph->GetEdgeSelect() " FROM " + table_name + ";";
     LoadGraph(load_graph_sql, graph);
 }
 
@@ -456,14 +405,17 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
 
 
 template <typename Graph>
-void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph) {
+void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph, DbGraph* db_graph) {
     pqxx::nontransaction n{connection_};
     pqxx::result result{n.exec(sql)};
-
-    for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
-        EdgeDbRow row{c};
-        graph.AddEdge(typename Graph::E{row});
+    
+    for (std::unique_ptr<EdgeDbIterator> it = db_graph->GetEdgeIterator(result.begin(), result.end()); !(it->IsEnd()); it->Inc()) {
+        graph.AddEdge(typename Graph::E{it.get()});
     }
+    // for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
+    //     EdgeDbRow row{c};
+    //     graph.AddEdge(typename Graph::E{row});
+    // }
 }
 
 

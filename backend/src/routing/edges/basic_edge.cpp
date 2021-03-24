@@ -4,11 +4,11 @@ namespace routing {
 
 BasicEdge::BasicEdge(): uid_(0), from_(0), to_(0), length_(0) {}
 
-BasicEdge::BasicEdge(database::EdgeDbRow & r) :
-    uid_(r.get_uid()),
-    from_(r.get_from()),
-    to_(r.get_to()),
-    length_(r.get_length()) {}
+BasicEdge::BasicEdge(database::DbEdgeIterator* it) :
+    uid_(it->GetUid()),
+    from_(it->GetFrom()),
+    to_(it->GetTo()),
+    length_(it->GetLength()) {}
 
 BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
         uid_(uid), from_(from), to_(to), length_(length) {}

@@ -1,7 +1,7 @@
 #ifndef BACKEND_CH_PREPROCESSING_EDGE_H
 #define BACKEND_CH_PREPROCESSING_EDGE_H
 #include <string>
-#include "database/database_helper.h"
+#include "database/db_edge_iterator.h"
 #include "routing/edges/basic_edge.h"
 
 
@@ -25,7 +25,7 @@ public:
     }
 
     CHPreprocessingEdge();
-    CHPreprocessingEdge(database::EdgeDbRow &);
+    CHPreprocessingEdge(database::DbEdgeIterator*);
     CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex, const std::string& geography);
     CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
     CHPreprocessingEdge(const CHPreprocessingEdge & other) = default;

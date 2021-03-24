@@ -1,7 +1,7 @@
 #ifndef BACKEND_EDGE_H
 #define BACKEND_EDGE_H
 #include <string>
-#include "database/database_helper.h"
+#include "database/db_edge_iterator.h"
 
 #include <iostream>
 
@@ -32,7 +32,7 @@ public:
     }
 
     BasicEdge();
-    BasicEdge(database::EdgeDbRow &);
+    BasicEdge(database::DbEdgeIterator*);
     BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
     BasicEdge(const BasicEdge & other) = default;
     BasicEdge(BasicEdge && other) = default;

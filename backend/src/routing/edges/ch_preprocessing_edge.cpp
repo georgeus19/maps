@@ -4,8 +4,11 @@ namespace routing {
 
 CHPreprocessingEdge::CHPreprocessingEdge(): BasicEdge(), shortcut_(false), contracted_vertex_(0) {}
 
-CHPreprocessingEdge::CHPreprocessingEdge(database::EdgeDbRow & r) :
-    BasicEdge(r), shortcut_(r.get_shortcut()), contracted_vertex_(r.get_contracted_vertex()), geography_(std::move(r.get_geography())) {}
+CHPreprocessingEdge::CHPreprocessingEdge(database::DbEdgeIterator*it) :
+    BasicEdge(it),
+    shortcut_(it->GetShortcut()),
+    contracted_vertex_(it->GetContractedVertex()),
+    geography_(std::move(it->GetGeography())) {}
 
 CHPreprocessingEdge::CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
         BasicEdge(uid, from, to, length), shortcut_(false), contracted_vertex_(0), geography_() {}

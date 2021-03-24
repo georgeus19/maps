@@ -1,7 +1,7 @@
 #ifndef BACKEND_CH_SEARCH_EDGE_H
 #define BACKEND_CH_SEARCH_EDGE_H
 #include <string>
-#include "database/database_helper.h"
+#include "database/db_edge_iterator.h"
 #include "routing/edges/basic_edge.h"
 #include <iostream>
 
@@ -19,7 +19,7 @@ public:
     }
 
     CHSearchEdge();
-    CHSearchEdge(database::EdgeDbRow &);
+    CHSearchEdge(database::DbEdgeIterator*);
     CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex);
     CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
     CHSearchEdge(const CHSearchEdge & other) = default;
