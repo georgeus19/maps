@@ -15,6 +15,7 @@
 #include "database/db_edge_iterator.h"
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
+#include "routing/bidirectional_graph.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include <string>
 

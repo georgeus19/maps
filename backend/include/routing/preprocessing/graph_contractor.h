@@ -111,7 +111,7 @@ void GraphContractor<Graph>::AddShortcuts(std::vector<Edge> shortcuts) {
     for(auto&& edge : shortcuts) {
         Edge reversed_edge{edge};
         g_.AddEdge(std::move(edge));
-        g_.AddReverseEdge(std::move(reversed_edge));
+        // g_.AddReverseEdge(std::move(reversed_edge));
     }
 }
 

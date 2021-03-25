@@ -65,16 +65,16 @@ template <typename Vertex, typename Edge>
 Graph<Vertex, Edge>::Graph() : g_(std::unordered_map<unsigned_id_type, Vertex>{}) {}
 
 template <typename Vertex, typename Edge>
-inline void Graph<Vertex, Edge>::AddEdge(Edge && e) {
-    AddEdge(std::move(e), [](Vertex& v, Edge&& e) {
+inline void Graph<Vertex, Edge>::AddEdge(Edge && edge) {
+    AddEdge(std::move(edge), [](Vertex& v, Edge&& e) {
         v.AddEdge(std::move(e));            
     });
 }
 
 template <typename Vertex, typename Edge>
-inline void Graph<Vertex, Edge>::AddReverseEdge(Edge && e) {
-    e.Reverse();
-    AddEdge(std::move(e), [](Vertex& v, Edge&& e){
+inline void Graph<Vertex, Edge>::AddReverseEdge(Edge && edge) {
+    edge.Reverse();
+    AddEdge(std::move(edge), [](Vertex& v, Edge&& e){
         v.AddReverseEdge(std::move(e));
     });
 }

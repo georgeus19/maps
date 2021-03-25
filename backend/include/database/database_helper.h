@@ -412,10 +412,6 @@ void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph, DbGraph* 
     for (std::unique_ptr<DbEdgeIterator> it = db_graph->GetEdgeIterator(result.begin(), result.end()); !(it->IsEnd()); it->Inc()) {
         graph.AddEdge(typename Graph::E{it.get()});
     }
-    // for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
-    //     EdgeDbRow row{c};
-    //     graph.AddEdge(typename Graph::E{row});
-    // }
 }
 
 

@@ -20,6 +20,7 @@ public:
     using Vertex = typename G::V;
     using Edge = typename G::E;
     using QueuePair = std::pair<double, Vertex*>;
+    using Graph = G;
 
     friend class RouteRetriever;
     

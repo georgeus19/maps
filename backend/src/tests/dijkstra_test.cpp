@@ -10,6 +10,7 @@
 #include "database/database_helper.h"
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
+#include "routing/bidirectional_graph.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
 #include <string>

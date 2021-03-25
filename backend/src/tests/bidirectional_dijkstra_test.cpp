@@ -6,6 +6,7 @@
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
 #include "routing/dijkstra.h"
+#include "routing/bidirectional_graph.h"
 #include "routing/vertices/contraction_search_vertex.h"
 #include "routing/preprocessing/bidirectional_dijkstra.h"
 #include "routing/preprocessing/graph_contractor.h"
@@ -25,7 +26,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 // using namespace testing;
-using G = Graph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>;
+using G = BidirectionalGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>;
 
 class BidirectionalDijkstraTests : public testing::Test {
     protected:
@@ -78,15 +79,11 @@ TEST(BidirectionalDijkstraTestsNotFixture, ExistingPathWithoutShortcuts) {
 TEST(BidirectionalDijkstraTestsNotFixture, IngoreDeadQueueMembers) {
     G g{};
     g.AddEdge(std::move(routing::CHSearchEdge{0, 1, 5, 20}));
-    g.AddReverseEdge(std::move(routing::CHSearchEdge{0, 1, 5, 20}));
 
     g.AddEdge(std::move(routing::CHSearchEdge{1, 2, 3, 4}));
-    g.AddReverseEdge(std::move(routing::CHSearchEdge{1, 2, 3, 4}));
     g.AddEdge(std::move(routing::CHSearchEdge{2, 2, 4, 1}));
-    g.AddReverseEdge(std::move(routing::CHSearchEdge{2, 2, 4, 1}));
 
     g.AddEdge(std::move(routing::CHSearchEdge{3, 4, 3, 2}));
-    g.AddReverseEdge(std::move(routing::CHSearchEdge{3, 4, 3, 2}));
     g.GetVertex(1).set_ordering_rank(1);
     g.GetVertex(2).set_ordering_rank(3);
     g.GetVertex(3).set_ordering_rank(5);

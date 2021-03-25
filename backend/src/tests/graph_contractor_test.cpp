@@ -12,6 +12,7 @@
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
 #include "routing/basic_edge_endpoint_handler.h"
+#include "routing/bidirectional_graph.h"
 #include "tests/graph_test.h"
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
@@ -24,7 +25,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = BidirectionalGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 void ContractVertex(G& g, GraphContractor<G> & contractor, size_t id);
 
 class GraphContractorSimpleEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<CHPreprocessingEdge>>> {

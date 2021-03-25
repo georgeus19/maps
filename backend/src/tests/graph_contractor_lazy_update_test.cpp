@@ -16,6 +16,7 @@
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/preprocessing/contraction_parameters.h"
+#include "routing/bidirectional_graph.h"
 #include <string>
 #include <vector>
 #include <tuple>
@@ -26,7 +27,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = BidirectionalGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 struct ExpectedVertexProperties;
 std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q);
 void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name); 

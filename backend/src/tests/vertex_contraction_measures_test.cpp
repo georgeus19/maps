@@ -15,6 +15,7 @@
 #include "tests/graph_test.h"
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
+#include "routing/bidirectional_graph.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/preprocessing/bidirectional_dijkstra.h"
 
@@ -28,7 +29,7 @@ using namespace routing;
 using namespace database;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = BidirectionalGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 
 struct VertexMeasuresTest {
     int32_t edge_difference;
@@ -118,12 +119,10 @@ TEST_P(VertexContractionMeasuresTests, VertexContractionMeasuresTest) {
 
 TEST(GraphContractorGeographyTest, SimpleGeographyTest) {
     G g{};
-    std::string expected_geography{"Geo121Reverse"};
-    g.AddEdge(std::move(CHPreprocessingEdge{0, 1, 2, 1, 0, "Geo121"}));
-    g.AddReverseEdge(std::move(CHPreprocessingEdge{0, 1, 2, 1, 0, expected_geography}));
+    std::string expected_geography{"Geo121"};
+    g.AddEdge(std::move(CHPreprocessingEdge{0, 1, 2, 1, 0, expected_geography}));
 
     g.AddEdge(std::move(CHPreprocessingEdge{1, 2, 3, 1, 0, "Geo231"}));
-    g.AddReverseEdge(std::move(CHPreprocessingEdge{1, 2, 3, 1, 0, "Geo231Reverse"}));
 
     VertexMeasures measures{g, ContractionParameters{11}};
     auto&& shortcuts = measures.FindShortcuts(g.GetVertex(2));

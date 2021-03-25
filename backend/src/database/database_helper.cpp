@@ -231,7 +231,7 @@ bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
 }
 
 uint64_t DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
-	std::string sql = "select max(uid) from czedges;";
+	std::string sql = "select max(uid) from " + table_name + ";";
 	pqxx::nontransaction n{connection_};
 	pqxx::result result{n.exec(sql)};
 	return (result.begin())[0].as<uint64_t>();

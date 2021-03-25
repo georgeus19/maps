@@ -9,6 +9,7 @@
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
 #include "utility/point.h"
+#include "routing/bidirectional_graph.h"
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
 
@@ -23,7 +24,7 @@ using namespace database;
 using namespace routing;
 using namespace preprocessing;
 
-using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = BidirectionalGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 const string kDbName = "gis";
 const string kUser = "postgres";
 const string kPassword = "wtz2trln";
@@ -38,12 +39,26 @@ int main(int argv, const char ** argc) {
         std::cout << "Load graph from czedges." << std::endl;
         UnpreprocessedDbGraph db_graph{};
         d.LoadFullGraph<G>(table_name, g, &db_graph);
+        size_t count = 0;
+        g.ForEachVertex([&](typename G::V&){
+            ++count;
+        });
+
+        size_t ecount = 0;
+        g.ForEachEdge([&](typename G::E&){
+            ++ecount;
+        });
 
         std::cout << "Contract graph from czedges." << std::endl;
         ContractionParameters parameters{d.GetMaxEdgeId(table_name)};
         GraphContractor<G> c{g, parameters};
         c.ContractGraph();
         std::cout << "Contraction done." << std::endl;
+
+        size_t eaccount = 0;
+        g.ForEachEdge([&](typename G::E&){
+            ++eaccount;
+        });
 
         // bool columns_added = d.AddShortcutColumns(table_name);
         // std::cout << "Add shortcut columns if not there -> " << (columns_added ? "added" : "were already present") << "." << std::endl;

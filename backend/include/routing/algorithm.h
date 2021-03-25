@@ -24,7 +24,7 @@ namespace routing {
          *
          * @param graph Graph where routing happens.
          */
-        Algorithm(Graph<typename Implementation::Vertex, typename Implementation::Edge>  & graph) : impl_(graph) {}
+        Algorithm(typename Implementation::Graph& graph) : impl_(graph) {}
 
         /**
          * Find the best route from `start_node` to `end_node`.
