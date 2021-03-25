@@ -24,7 +24,7 @@ public:
 
     std::vector<Edge> FindShortcuts(Vertex & vertex);
 
-    void FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge, double max_outgoing_length); 
+    void FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge); 
 
     int32_t CalculateEdgeDifference(Vertex& vertex); 
 
@@ -42,39 +42,38 @@ private:
 
     size_t CalculateCurrentEdgeCount(const std::vector<Edge>& edges);
 
+
+    double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
+
 };
 
 template <typename Graph>
 std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindShortcuts(Vertex & vertex) {
     std::vector<Edge> shortcuts{};
-    auto&& it = std::max_element(vertex.get_edges().begin(), vertex.get_edges().end(), [](const Edge & a, const Edge & b) {
-        return a.get_length() < b.get_length();
-    });
-    if (it == vertex.get_edges().end()) {
-        return shortcuts;
-    }
-    double max_outgoing_length = it->get_length();
-
     for(auto&& reverse_edge : vertex.get_reverse_edges()) {
-        FindShortcuts(shortcuts, vertex, reverse_edge, max_outgoing_length);
+        FindShortcuts(shortcuts, vertex, reverse_edge);
     }
     return shortcuts;
 }
 
 template <typename Graph>
-void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge, double max_outgoing_length) {
-    unsigned_id_type start_vertex_id = reversed_first_edge.get_to();
-    Vertex& start_vertex = g_.GetVertex(start_vertex_id);
+void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge) {
+    unsigned_id_type source_vertex_id = reversed_first_edge.get_to();
+    Vertex& source_vertex = g_.GetVertex(source_vertex_id);
 
-    if (start_vertex.IsContracted()) {
+    if (source_vertex.IsContracted()) {
+        return;
+    }
+    double outgoing_max_length = GetMaxOutgoingLength(source_vertex, contracted_vertex);
+    if (outgoing_max_length < 0) {
         return;
     }
     Dijkstra<Graph> dijkstra{g_};
-    double max_cost = max_outgoing_length + reversed_first_edge.get_length();
+    double max_cost = reversed_first_edge.get_length() + outgoing_max_length;
     auto&& end_condition = [=](Vertex* v) {
         return v->get_cost() > max_cost;
     };
-    dijkstra.Run(start_vertex_id, end_condition, [&](Vertex* v) {
+    dijkstra.Run(source_vertex_id, end_condition, [&](Vertex* v) {
         return v->get_osm_id() == contracted_vertex.get_osm_id() || v->IsContracted();
     });
 
@@ -83,10 +82,9 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
         unsigned_id_type end_vertex_id = second_edge.get_to();
         double path_length = dijkstra.GetPathLength(end_vertex_id);
         
-        if (g_.GetVertex(end_vertex_id).IsContracted() || shortcut_length > path_length) {
-            continue;
+        if (!g_.GetVertex(end_vertex_id).IsContracted() &&  shortcut_length < path_length) {
+            shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
         }
-        shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), start_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
     }
 }
 
@@ -144,6 +142,19 @@ size_t VertexMeasures<Graph>::CalculateCurrentEdgeCount(const std::vector<Edge>&
     return count;
 }
 
+template <typename Graph>
+double VertexMeasures<Graph>::GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex) {
+    double max_length = -1;
+    for(auto&& edge : contracted_vertex.get_edges()) {
+        bool outgoing_vertex_not_contracted = !(g_.GetVertex(edge.get_to()).IsContracted());
+        bool not_edge_to_source_vertex = edge.get_to() != source_vertex.get_osm_id();
+        bool bigger_length = edge.get_length() > max_length;
+        if (outgoing_vertex_not_contracted && bigger_length && not_edge_to_source_vertex) {
+            max_length = edge.get_length();
+        }
+    }
+    return max_length;
+}
 
 
 }

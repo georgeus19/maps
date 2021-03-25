@@ -34,7 +34,7 @@ int main(int argv, const char ** argc) {
     try {
         DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
         G g{};
-        std::string table_name{"cztmp"};
+        std::string table_name{"luxbre"};
       
         std::cout << "Load graph from czedges." << std::endl;
         UnpreprocessedDbGraph db_graph{};
@@ -43,11 +43,13 @@ int main(int argv, const char ** argc) {
         g.ForEachVertex([&](typename G::V&){
             ++count;
         });
+        std::cout << "vertices: " << count << std::endl;
 
         size_t ecount = 0;
         g.ForEachEdge([&](typename G::E&){
             ++ecount;
         });
+        std::cout << "edges before contraction: " << ecount << std::endl;
 
         std::cout << "Contract graph from czedges." << std::endl;
         ContractionParameters parameters{d.GetMaxEdgeId(table_name)};
@@ -59,6 +61,7 @@ int main(int argv, const char ** argc) {
         g.ForEachEdge([&](typename G::E&){
             ++eaccount;
         });
+        std::cout << "edges after contraction: " << eaccount << std::endl;
 
         // bool columns_added = d.AddShortcutColumns(table_name);
         // std::cout << "Add shortcut columns if not there -> " << (columns_added ? "added" : "were already present") << "." << std::endl;
@@ -66,7 +69,7 @@ int main(int argv, const char ** argc) {
         // Save shortcuts.
         d.AddShortcuts(table_name, g);
         // Save vertex ordering.
-        d.AddVertexOrdering(table_name, g);
+        d.AddVertexOrdering("vertex_ordering_table", g);
 
     } catch (const std::exception& e) {
         e.what();
