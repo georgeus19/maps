@@ -12,6 +12,7 @@
 #include <functional>
 #include <utility>
 #include "utility/point.h"
+#include <filesystem>
 #include "database/csv_convertor.h"
 #include "database/db_graph.h"
 #include "database/db_edge_iterator.h"
@@ -377,7 +378,8 @@ void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph
 
 template <typename Graph>
 void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
-    std::string data_path{"shortcuts.csv"};
+    auto&& current_dir = std::filesystem::current_path();
+    std::string data_path{current_dir.string() + "/shortcuts.csv"};
     std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV;";
     CsvConvertor convertor{data_path};
     convertor.SaveEdges(graph, [](const Graph::E& edge) {

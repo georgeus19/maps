@@ -64,6 +64,7 @@
         "variant": "cpp",
         "bit": "cpp",
         "typeindex": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "codecvt": "cpp"
     }
 }
