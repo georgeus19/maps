@@ -35,7 +35,7 @@ public:
         contracted_ = true;
     }
 
-    inline bool IsContracted() {
+    inline bool IsContracted() const {
         return contracted_;
     }
 

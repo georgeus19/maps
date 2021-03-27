@@ -2,6 +2,7 @@
 #define VERTEX_MEASURES_H
 
 #include "routing/edges/basic_edge.h"
+#include "routing/preprocessing/ch_dijkstra.h"
 #include <vector>
 #include <set>
 #include <queue>
@@ -68,21 +69,23 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
     if (outgoing_max_length < 0) {
         return;
     }
-    Dijkstra<Graph> dijkstra{g_};
     double max_cost = reversed_first_edge.get_length() + outgoing_max_length;
     auto&& end_condition = [=](Vertex* v) {
         return v->get_cost() > max_cost;
     };
-    dijkstra.Run(source_vertex_id, end_condition, [&](Vertex* v) {
-        return v->get_osm_id() == contracted_vertex.get_osm_id() || v->IsContracted();
-    });
+    // Dijkstra<Graph> dijkstra{g_};
+    // dijkstra.Run(source_vertex_id, end_condition, [&](Vertex* v) {
+    //     return v->get_osm_id() == contracted_vertex.get_osm_id() || v->IsContracted();
+    // });
+    CHDijkstra<Graph> dijkstra{g_};
+    dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, 5, 20});
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
         double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
         unsigned_id_type end_vertex_id = second_edge.get_to();
         double path_length = dijkstra.GetPathLength(end_vertex_id);
         
-        if (!g_.GetVertex(end_vertex_id).IsContracted() &&  shortcut_length < path_length) {
+        if (!g_.GetVertex(end_vertex_id).IsContracted() && shortcut_length < path_length) {
             shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
         }
     }

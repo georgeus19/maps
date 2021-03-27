@@ -98,7 +98,12 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
 template <typename Graph>
 GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContractionPriority() {
     PriorityQueue q;
+    size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
+        ++count;
+        if (count % 10000 == 0) {
+            std::cout << count << " iterations" << std::endl;
+        }
         double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
         q.push(std::make_pair(attractivity, vertex.get_osm_id()));
     });
