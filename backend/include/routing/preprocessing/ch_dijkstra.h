@@ -15,7 +15,7 @@
 #include "routing/graph.h"
 
 namespace routing {
-
+namespace preprocessing {
 /**
  * Implementation of dijkstra's routing algorithm.
  */
@@ -29,9 +29,8 @@ public:
     struct SearchRangeLimits {
         double max_cost;
         size_t max_hop_count;
-        size_t max_space_size;
 		
-		SearchRangeLimits(double c, size_t h, size_t s) : max_cost(c), max_hop_count(h), max_space_size(s) {}
+		SearchRangeLimits(double c, size_t h) : max_cost(c), max_hop_count(h) {}
 
     };
 
@@ -116,7 +115,6 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 	touched_vertices_.insert_or_assign(source_vertex, VertexRoutingInfo{0, 0});
 	PriorityQueue q{};
 	q.emplace(0, source_vertex, 0);
-	size_t space_size = 0;
 	
 	while(!q.empty()) {
 		PriorityQueueMember min_member = q.top();
@@ -129,7 +127,7 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		if (queue_member_is_dead) {
 			continue;
 		}
-		if (vertex_info.cost > limits.max_cost /* || space_size > limits.max_space_size */ ) {
+		if (vertex_info.cost > limits.max_cost) {
 			return true;
 		}
 		assert(vertex_info.cost == min_member.cost);
@@ -137,7 +135,6 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		for(auto&& edge : vertex.get_edges()) {
 			UpdateNeighbour(min_member, edge, q, limits);
 		}
-		++space_size;
 	}
 	return false;
 }
@@ -162,12 +159,6 @@ void CHDijkstra<G>::UpdateNeighbour(const PriorityQueueMember& min_member, const
 	}
 }
 
-// template <typename G>
-// bool CHDijkstra<G>::UpdateNeighbour(const VertexRoutingInfo& vertex_info, const Edge& edge, const SearchRangeLimits& limits) {
-
-// }
-
-
 template <typename G>
 double CHDijkstra<G>::GetPathLength(unsigned_id_type to) const {
 	auto&& it = touched_vertices_.find(to);
@@ -178,6 +169,6 @@ double CHDijkstra<G>::GetPathLength(unsigned_id_type to) const {
 	return std::numeric_limits<double>::max();
 }
 
-
+}
 }
 #endif //BACKEND_CH_DIJKSTRA_H

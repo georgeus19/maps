@@ -34,7 +34,7 @@ int main(int argv, const char ** argc) {
     try {
         DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
         G g{};
-        std::string table_name{"luxbre"};
+        std::string table_name{"cztmp"};
       
         std::cout << "Load graph from czedges." << std::endl;
         UnpreprocessedDbGraph db_graph{};
@@ -52,7 +52,7 @@ int main(int argv, const char ** argc) {
         std::cout << "edges before contraction: " << ecount << std::endl;
 
         std::cout << "Contract graph from czedges." << std::endl;
-        ContractionParameters parameters{d.GetMaxEdgeId(table_name)};
+        ContractionParameters parameters{d.GetMaxEdgeId(table_name), 5, 190, 120, 1};
         GraphContractor<G> c{g, parameters};
         c.ContractGraph();
         std::cout << "Contraction done." << std::endl;

@@ -98,8 +98,8 @@ INSTANTIATE_TEST_CASE_P(
 
 TEST_P(VertexContractionMeasuresTests, VertexContractionMeasuresTest) {
     VertexMeasuresTestParameters parameters = GetParam();
-    GraphContractor<G> contractor{g_, ContractionParameters{11}};
-    VertexMeasures measures{g_, ContractionParameters{11}};
+    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 1}};
+    VertexMeasures measures{g_, ContractionParameters{11, 5, 1, 1, 1}};
     
     for(auto&& v : parameters.vertices_to_contract) {
         contractor.ContractVertex(g_.GetVertex(v));
@@ -124,7 +124,7 @@ TEST(GraphContractorGeographyTest, SimpleGeographyTest) {
 
     g.AddEdge(std::move(CHPreprocessingEdge{1, 2, 3, 1, 0, "Geo231"}));
 
-    VertexMeasures measures{g, ContractionParameters{11}};
+    VertexMeasures measures{g, ContractionParameters{11, 5, 1, 1, 1}};
     auto&& shortcuts = measures.FindShortcuts(g.GetVertex(2));
     
     std::cout << shortcuts[0].get_geography() << std::endl;

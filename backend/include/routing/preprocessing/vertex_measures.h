@@ -73,12 +73,8 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
     auto&& end_condition = [=](Vertex* v) {
         return v->get_cost() > max_cost;
     };
-    // Dijkstra<Graph> dijkstra{g_};
-    // dijkstra.Run(source_vertex_id, end_condition, [&](Vertex* v) {
-    //     return v->get_osm_id() == contracted_vertex.get_osm_id() || v->IsContracted();
-    // });
     CHDijkstra<Graph> dijkstra{g_};
-    dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, 5, 20});
+    dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count()});
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
         double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
@@ -112,14 +108,16 @@ int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
 }
 
 template <typename Graph>
-double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
+inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
     auto&& shortcuts = FindShortcuts(vertex);
     return CalculateContractionAttractivity(vertex, shortcuts);
 }
 
 template <typename Graph>
-double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
-    return static_cast<double>(CalculateEdgeDifference(vertex, shortcuts) + CalculateDeletedNeighbours(vertex));
+inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
+    int32_t edge_difference = CalculateEdgeDifference(vertex, shortcuts) * parameters_.get_edge_difference_coefficient();
+    int32_t deleted_neighbours = CalculateDeletedNeighbours(vertex) * parameters_.get_deleted_neighbours_coefficient();
+    return static_cast<double>(edge_difference + deleted_neighbours);
 }
 
 template <typename Graph>
