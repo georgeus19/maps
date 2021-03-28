@@ -44,9 +44,14 @@ template <typename Graph>
 void GraphContractor<Graph>::ContractGraph() {
     free_ordering_rank_ = 0;
     PriorityQueue q = CalculateContractionPriority();
-
+    std::cout << "Contraction starting - queue completed." << std::endl;
+    size_t count = 0;
     while(!q.empty()) {
+        if (count % 10000 == 0) {
+            std::cout << count << " iterations" << std::endl;
+        } 
         ContractMinVertex(q);
+        ++count;
     }
 
 }

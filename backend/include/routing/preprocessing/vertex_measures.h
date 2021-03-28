@@ -43,7 +43,6 @@ private:
 
     size_t CalculateCurrentEdgeCount(const std::vector<Edge>& edges);
 
-
     double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
 
 };
@@ -74,12 +73,12 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
         return v->get_cost() > max_cost;
     };
     CHDijkstra<Graph> dijkstra{g_};
-    dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count()});
+    dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1});
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
-        double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
         unsigned_id_type end_vertex_id = second_edge.get_to();
-        double path_length = dijkstra.GetPathLength(end_vertex_id);
+        double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
+        double path_length = dijkstra.OneHopBackwardSearch(end_vertex_id);
         
         if (!g_.GetVertex(end_vertex_id).IsContracted() && shortcut_length < path_length) {
             shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});

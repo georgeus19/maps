@@ -39,6 +39,8 @@ public:
     bool Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits);
 
     double GetPathLength(unsigned_id_type to) const;
+
+	double OneHopBackwardSearch(unsigned_id_type end_vertex_id) const;
 private:
     struct VertexRoutingInfo;
 	struct PriorityQueueMember;
@@ -104,11 +106,12 @@ private:
 };
 
 template< typename G>
-CHDijkstra<G>::CHDijkstra(G & g) : g_(g), touched_vertices_(), source_vertex_(0) {}
+CHDijkstra<G>::CHDijkstra(G & g) : g_(g), touched_vertices_(), source_vertex_(0), contracted_vertex_(0) {}
 
 
 template <typename G>
 bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits) {
+	assert(source_vertex != contracted_vertex);
 	touched_vertices_.clear();
 	source_vertex_ = source_vertex;
 	contracted_vertex_ = contracted_vertex;
@@ -137,6 +140,25 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		}
 	}
 	return false;
+}
+
+template <typename G>
+double CHDijkstra<G>::OneHopBackwardSearch(unsigned_id_type end_vertex_id) const {
+	assert(GetPathLength(contracted_vertex_) == std::numeric_limits<double>::max());
+	auto&& end_vertex = g_.GetVertex(end_vertex_id);
+	
+	double min_path_length = GetPathLength(end_vertex_id);
+	for(auto&& edge : end_vertex.get_reverse_edges()) {
+		double d = GetPathLength(edge.get_to());
+		if (d == std::numeric_limits<double>::max()) {
+			continue;
+		}
+		double path_length = d + edge.get_length(); 
+		if (min_path_length > path_length) {
+			min_path_length = path_length;
+		}
+	}
+	return min_path_length;
 }
 
 template <typename G>
