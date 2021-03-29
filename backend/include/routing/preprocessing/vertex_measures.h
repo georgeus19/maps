@@ -16,9 +16,6 @@ template <typename Graph>
 class VertexMeasures {
     using Vertex = Graph::V;
     using Edge = Graph::E;
-    Graph & g_;
-    ContractionParameters parameters_;
-    
 public:
 
     VertexMeasures(Graph & g, const ContractionParameters& parameters) : g_(g), parameters_(parameters) {}
@@ -39,11 +36,16 @@ public:
 
 private:
 
+    Graph & g_;
+    ContractionParameters parameters_;
+
     void CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices);
 
     size_t CalculateCurrentEdgeCount(const std::vector<Edge>& edges);
 
     double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
+
+    double GetMinTargetsIngoingLength(Vertex& contracted_vertex);
 
 };
 
@@ -68,20 +70,18 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
     if (outgoing_max_length < 0) {
         return;
     }
-    double max_cost = reversed_first_edge.get_length() + outgoing_max_length;
-    auto&& end_condition = [=](Vertex* v) {
-        return v->get_cost() > max_cost;
-    };
+    double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
+    double max_cost = reversed_first_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
     CHDijkstra<Graph> dijkstra{g_};
     dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1});
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
-        unsigned_id_type end_vertex_id = second_edge.get_to();
+        unsigned_id_type target_vertex_id = second_edge.get_to();
         double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
-        double path_length = dijkstra.OneHopBackwardSearch(end_vertex_id);
+        double path_length = dijkstra.OneHopBackwardSearch(target_vertex_id);
         
-        if (!g_.GetVertex(end_vertex_id).IsContracted() && shortcut_length < path_length) {
-            shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, end_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
+        if (!g_.GetVertex(target_vertex_id).IsContracted() && shortcut_length < path_length) {
+            shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
         }
     }
 }
@@ -156,8 +156,30 @@ double VertexMeasures<Graph>::GetMaxOutgoingLength(Vertex& source_vertex, Vertex
     return max_length;
 }
 
+template <typename Graph>
+double VertexMeasures<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vertex) {
+    double min_length = std::numeric_limits<double>::max();
+    for(auto&& edge : contracted_vertex.get_edges()) {
+        auto&& target_vertex = g_.GetVertex(edge.get_to());
+        for(auto&& redge : target_vertex.get_reverse_edges()) {
+            if (redge.get_length() < min_length) {
+                min_length = redge.get_length();
+            }
+        }
+    }
+    return min_length;
+}
+    
+
+
+
+
+
 
 }
+
+
+
 }
 
 #endif //VERTEX_MEASURES_H
