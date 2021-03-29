@@ -120,3 +120,5 @@ target_link_libraries(backend_test libmapnik-json.a libmapnik-wkt.a )
 target_link_libraries(backend_test pqxx)
 target_link_libraries(backend_test pq)
 
+# SET(CMAKE_CXX_FLAGS_RELEASE "-g -pg -O2")
+# SET(CMAKE_CXX_FLAGS_BUILD "-g -pg -O2")

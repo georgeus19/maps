@@ -164,6 +164,9 @@ namespace osm_parser {
          * @param oneway If oneway is false reciprocal segment is also saved.
          */
         void SaveEdge(const_nodelist_iterator &from, const_nodelist_iterator &to, Edge &edge, bool oneway) {
+            if (edge.from_ == edge.to_) {
+                return; // Running stadium lines, circle around oil station -> useless for routing..
+            }
             auto &&linestring = CreateLineString(from, to);
             if (linestring != "") {
                 if (oneway == false) {
