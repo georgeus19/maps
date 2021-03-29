@@ -66,10 +66,10 @@ int main(int argv, const char ** argc) {
         // bool columns_added = d.AddShortcutColumns(table_name);
         // std::cout << "Add shortcut columns if not there -> " << (columns_added ? "added" : "were already present") << "." << std::endl;
         
-        // Save shortcuts.
-        d.AddShortcuts(table_name, g);
-        // Save vertex ordering.
-        d.AddVertexOrdering("vertex_ordering_table", g);
+        // // Save shortcuts.
+        // d.AddShortcuts(table_name, g);
+        // // Save vertex ordering.
+        // d.AddVertexOrdering("vertex_ordering_table", g);
 
     } catch (const std::exception& e) {
         e.what();

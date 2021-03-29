@@ -18,7 +18,7 @@ class VertexMeasures {
     using Edge = Graph::E;
 public:
 
-    VertexMeasures(Graph & g, const ContractionParameters& parameters) : g_(g), parameters_(parameters) {}
+    VertexMeasures(Graph & g, const ContractionParameters& parameters) : g_(g), parameters_(parameters), dijkstra_(g) {}
 
     std::vector<Edge> FindShortcuts(Vertex & vertex);
 
@@ -38,6 +38,7 @@ private:
 
     Graph & g_;
     ContractionParameters parameters_;
+    CHDijkstra<Graph> dijkstra_;
 
     void CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices);
 
@@ -72,13 +73,13 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
     }
     double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
     double max_cost = reversed_first_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
-    CHDijkstra<Graph> dijkstra{g_};
-    dijkstra.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1});
+    // CHDijkstra<Graph> dijkstra{g_};
+    dijkstra_.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1});
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
         unsigned_id_type target_vertex_id = second_edge.get_to();
         double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
-        double path_length = dijkstra.OneHopBackwardSearch(target_vertex_id);
+        double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (!g_.GetVertex(target_vertex_id).IsContracted() && shortcut_length < path_length) {
             shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});

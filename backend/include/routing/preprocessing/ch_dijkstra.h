@@ -13,6 +13,8 @@
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
 #include "routing/graph.h"
+#include "robin_hood/robin_hood.h"
+#include "tsl/robin_map.h"
 
 namespace routing {
 namespace preprocessing {
@@ -48,7 +50,10 @@ private:
     using PriorityQueue = std::priority_queue<PriorityQueueMember, std::vector<PriorityQueueMember>, PriorityQueueMemberMinComparator>;
     G& g_;
 
-    std::unordered_map<unsigned_id_type, VertexRoutingInfo> touched_vertices_;
+	// using UnorderedMap = std::unordered_map<unsigned_id_type, VertexRoutingInfo>;
+	// using UnorderedMap = robin_hood::unordered_map<unsigned_id_type, VertexRoutingInfo>;
+	using UnorderedMap = tsl::robin_map<unsigned_id_type, VertexRoutingInfo>;
+    UnorderedMap touched_vertices_;
 
     unsigned_id_type source_vertex_;
 	unsigned_id_type contracted_vertex_;
@@ -131,6 +136,9 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 			continue;
 		}
 		if (vertex_info.cost > limits.max_cost) {
+			// if (touched_vertices_.size() > 1000) {
+			// 	std::cout << "TRUE_CHDijkstra<G>::touched_vertices_.size() = " << touched_vertices_.size() << std::endl;
+			// }
 			return true;
 		}
 		assert(vertex_info.cost == min_member.cost);
@@ -139,6 +147,9 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 			UpdateNeighbour(min_member, edge, q, limits);
 		}
 	}
+	// if (touched_vertices_.size() > 1000) {
+	// 	std::cout << "FALSE_CHDijkstra<G>::touched_vertices_.size() = " << touched_vertices_.size() << std::endl;
+	// }
 	return false;
 }
 

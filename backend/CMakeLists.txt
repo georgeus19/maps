@@ -90,6 +90,7 @@ include_directories(include/routing/preprocessing)
 target_link_libraries(graph_builder -lpthread -lz -lexpat -lbz2)
 
 include_directories(/usr/include/python3.8/)
+include_directories(lib)
 
 link_directories(render /usr/local/li)
 
