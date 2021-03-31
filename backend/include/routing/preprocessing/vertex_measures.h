@@ -21,9 +21,9 @@ public:
 
     VertexMeasures(Graph & g, const ContractionParameters& parameters) : g_(g), parameters_(parameters), dijkstra_(g) {}
 
-    std::vector<Edge> FindShortcuts(Vertex & vertex);
+    std::vector<Edge> FindShortcuts(Vertex& vertex);
 
-    void FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge); 
+    std::vector<Edge> FindShortcuts(Vertex& contracted_vertex, const Edge& reversed_first_edge); 
 
     int32_t CalculateEdgeDifference(Vertex& vertex); 
 
@@ -52,25 +52,27 @@ private:
 };
 
 template <typename Graph>
-std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindShortcuts(Vertex & vertex) {
+std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindShortcuts(Vertex& vertex) {
     std::vector<Edge> shortcuts{};
     for(auto&& reverse_edge : vertex.get_reverse_edges()) {
-        FindShortcuts(shortcuts, vertex, reverse_edge);
+        auto&& s = FindShortcuts(vertex, reverse_edge);
+        shortcuts.insert(shortcuts.end(), s.begin(), s.end());
     }
     return shortcuts;
 }
 
 template <typename Graph>
-void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex & contracted_vertex, const Edge & reversed_first_edge) {
+std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindShortcuts(Vertex& contracted_vertex, const Edge& reversed_first_edge) {
+    std::vector<Edge> shortcuts{};
     unsigned_id_type source_vertex_id = reversed_first_edge.get_to();
     Vertex& source_vertex = g_.GetVertex(source_vertex_id);
 
     if (source_vertex.IsContracted()) {
-        return;
+        return shortcuts;
     }
     double outgoing_max_length = GetMaxOutgoingLength(source_vertex, contracted_vertex);
     if (outgoing_max_length < 0) {
-        return;
+        return shortcuts;
     }
     double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
     double max_cost = reversed_first_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
@@ -97,6 +99,7 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
             shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
         }
     }
+    return shortcuts;
 }
 
 template <typename Graph>

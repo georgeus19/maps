@@ -34,8 +34,8 @@ int main(int argv, const char ** argc) {
     try {
         DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
         G g{};
-        std::string table_name{"cznoloops"};
-        // std::string table_name{"lux31"};
+        // std::string table_name{"cznoloops"};
+        std::string table_name{"lux31"};
       
         std::cout << "Load graph from cznoloops." << std::endl;
         UnpreprocessedDbGraph db_graph{};

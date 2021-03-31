@@ -100,7 +100,7 @@ TEST_P(GraphContractorSimpleEdgesTests, SimpleCHPreprocessingEdgesTest) {
 
     ContractionVertex<CHPreprocessingEdge> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 1}};
+    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
    
     ContractVertex(g_, contractor, 4);
     std::cout << "After contraction." << std::endl;
@@ -117,7 +117,7 @@ TEST_P(GraphContractorSimpleReverseEdgesTests, SimpleContractionReverseEdgesTest
 
     ContractionVertex<CHPreprocessingEdge> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachReverseEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 1}};
+    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
 
     ContractVertex(g_, contractor, 4);
    
@@ -136,7 +136,7 @@ TEST_P(GraphContractorDoubleCHPreprocessingEdgesTests, DoubleCHPreprocessingEdge
 
     ContractionVertex<CHPreprocessingEdge> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 1}};
+    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
 
     ContractVertex(g_, contractor, 4);
     std::cout << "After first contraction." << std::endl;
@@ -169,7 +169,7 @@ TEST(GraphContractorContractionPriority, BasicGraphPriority) {
     };
 
 
-    GraphContractor<G> contractor(g,  ContractionParameters{11, 5, 1, 1, 1});
+    GraphContractor<G> contractor(g,  ContractionParameters{11, 5, 1, 1, 0});
     auto&& q = contractor.CalculateContractionPriority();
 
     std::vector<std::pair<double, unsigned_id_type>> actual_priorities{};
