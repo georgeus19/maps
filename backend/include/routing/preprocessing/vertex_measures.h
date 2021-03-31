@@ -8,6 +8,7 @@
 #include <queue>
 #include <cassert>
 #include "routing/preprocessing/contraction_parameters.h"
+#include "tsl/robin_set.h"
 
 namespace routing {
 namespace preprocessing {
@@ -73,15 +74,26 @@ void VertexMeasures<Graph>::FindShortcuts(std::vector<Edge>& shortcuts, Vertex &
     }
     double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
     double max_cost = reversed_first_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
+    tsl::robin_set<unsigned_id_type> target_vertices;
+    for(auto&& second_edge : contracted_vertex.get_edges()) {
+        unsigned_id_type target_vertex_id = second_edge.get_to();
+        auto&& target_vertex = g_.GetVertex(target_vertex_id);
+        if (!target_vertex.IsContracted()) {
+            target_vertices.insert(target_vertex_id);
+        }
+    }
     // CHDijkstra<Graph> dijkstra{g_};
-    dijkstra_.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1});
+    dijkstra_.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1}, target_vertices);
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
         unsigned_id_type target_vertex_id = second_edge.get_to();
+        if (g_.GetVertex(target_vertex_id).IsContracted()) {
+            continue;
+        }
         double shortcut_length = reversed_first_edge.get_length() + second_edge.get_length();
         double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
-        if (!g_.GetVertex(target_vertex_id).IsContracted() && shortcut_length < path_length) {
+        if (shortcut_length < path_length) {
             shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
         }
     }
@@ -117,7 +129,8 @@ template <typename Graph>
 inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
     int32_t edge_difference = CalculateEdgeDifference(vertex, shortcuts) * parameters_.get_edge_difference_coefficient();
     int32_t deleted_neighbours = CalculateDeletedNeighbours(vertex) * parameters_.get_deleted_neighbours_coefficient();
-    return static_cast<double>(edge_difference + deleted_neighbours);
+    int32_t settled_vertices = dijkstra_.GetSearchSpaceSize() * parameters_.get_space_size_coefficient();
+    return static_cast<double>(edge_difference + deleted_neighbours + settled_vertices);
 }
 
 template <typename Graph>
@@ -162,11 +175,15 @@ double VertexMeasures<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vert
     double min_length = std::numeric_limits<double>::max();
     for(auto&& edge : contracted_vertex.get_edges()) {
         auto&& target_vertex = g_.GetVertex(edge.get_to());
-        for(auto&& redge : target_vertex.get_reverse_edges()) {
-            if (redge.get_length() < min_length) {
-                min_length = redge.get_length();
+        if (!target_vertex.IsContracted()) {
+            for(auto&& redge : target_vertex.get_reverse_edges()) {
+                auto&& v = g_.GetVertex(edge.get_to());
+                if (!v.IsContracted() && redge.get_length() < min_length) {
+                    min_length = redge.get_length();
+                }
             }
         }
+        
     }
     return min_length;
 }

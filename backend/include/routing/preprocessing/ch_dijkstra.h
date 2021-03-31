@@ -15,6 +15,7 @@
 #include "routing/graph.h"
 #include "robin_hood/robin_hood.h"
 #include "tsl/robin_map.h"
+#include "tsl/robin_set.h"
 
 namespace routing {
 namespace preprocessing {
@@ -38,11 +39,15 @@ public:
 
     CHDijkstra(G & g);
 
-    bool Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits);
+    bool Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits, const tsl::robin_set<unsigned_id_type>& target_vertices);
 
     double GetPathLength(unsigned_id_type to) const;
 
 	double OneHopBackwardSearch(unsigned_id_type target_vertex_id) const;
+
+	size_t GetSearchSpaceSize() const {
+		return settled_vertices_;
+	}
 private:
     struct VertexRoutingInfo;
 	struct PriorityQueueMember;
@@ -57,6 +62,7 @@ private:
 
     unsigned_id_type source_vertex_;
 	unsigned_id_type contracted_vertex_;
+	size_t settled_vertices_;
 
     struct VertexRoutingInfo {
         double cost;
@@ -86,17 +92,25 @@ private:
         PriorityQueueMember& operator= (PriorityQueueMember&& other) = default;
         ~PriorityQueueMember() = default;
 
-		bool operator< (const PriorityQueueMember& other) {
-            return cost < other.cost;
+		bool operator< (const PriorityQueueMember& other) const {
+			// if (cost == other.cost) {
+			// 	return vertex_id < other.vertex_id;
+			// }
+            // return cost < other.cost;
+			return cost < other.cost ||
+               (!(other.cost < cost) && vertex_id < other.vertex_id);
         }
 
-        bool operator> (const PriorityQueueMember& other) {
-            return cost > other.cost;
-        }
+        // bool operator> (const PriorityQueueMember& other) const {
+		// 	if (cost == other.cost) {
+		// 		return vertex_id > other.vertex_id;
+		// 	}
+        //     return cost > other.cost;
+        // }
 	};
 
     struct PriorityQueueMemberMinComparator {
-        bool operator() (const PriorityQueueMember& a , const PriorityQueueMember& b) {
+        bool operator() (const PriorityQueueMember& a , const PriorityQueueMember& b) const {
             return a.cost > b.cost;
         }
     };
@@ -106,50 +120,73 @@ private:
 
 	void UpdateNeighbour(const PriorityQueueMember& min_member, const Edge& edge, PriorityQueue& q, const SearchRangeLimits& limits);
 
+	void UpdateNeighbour(const PriorityQueueMember& min_member, const Edge& edge, std::set<PriorityQueueMember>& q, const SearchRangeLimits& limits);
+
 	// bool UpdateNeighbour(const VertexRoutingInfo& vertex_info, const Edge& edge, const SearchRangeLimits& limits);
 
 };
 
 template< typename G>
-CHDijkstra<G>::CHDijkstra(G & g) : g_(g), touched_vertices_(), source_vertex_(0), contracted_vertex_(0) {}
+CHDijkstra<G>::CHDijkstra(G & g) : g_(g), touched_vertices_(1000), source_vertex_(0), contracted_vertex_(0), settled_vertices_(0) {}
 
 
 template <typename G>
-bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits) {
+bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits, const tsl::robin_set<unsigned_id_type>& target_vertices) {
 	assert(source_vertex != contracted_vertex);
+	
 	touched_vertices_.clear();
 	source_vertex_ = source_vertex;
+	settled_vertices_ = 0;
 	contracted_vertex_ = contracted_vertex;
 	touched_vertices_.insert_or_assign(source_vertex, VertexRoutingInfo{0, 0});
-	PriorityQueue q{};
-	q.emplace(0, source_vertex, 0);
-	
-	while(!q.empty()) {
-		PriorityQueueMember min_member = q.top();
-		q.pop();
+	// PriorityQueue q{};
+	std::set<PriorityQueueMember> qset;
+	qset.emplace(0, source_vertex, 0);
+	// q.emplace(0, source_vertex, 0);
+	size_t dead_members = 0;
+	size_t target_vertices_found = 0;
+	// while(!q.empty()) {
+	while(!qset.empty()) {
+		// PriorityQueueMember min_member = q.top();
+		// q.pop();
+		++settled_vertices_;
+		auto&& it = qset.begin();
+		PriorityQueueMember min_member = *it;
+		qset.erase(it);
 		assert(touched_vertices_.contains(min_member.vertex_id));
 		assert(min_member.hop_count < limits.max_hop_count);
 		auto&& vertex = g_.GetVertex(min_member.vertex_id);
 		auto&& vertex_info = touched_vertices_[min_member.vertex_id];
+		
 		bool queue_member_is_dead = vertex_info.cost < min_member.cost;
 		if (queue_member_is_dead) {
+			++dead_members;
+			std::cout << "DEAD MEMBER!!!" << std::endl;
 			continue;
 		}
+		if (target_vertices.contains(min_member.vertex_id)) {
+			++target_vertices_found; 
+		}
+		if (target_vertices_found == target_vertices.size()) {
+			// std::cout << "Target vertices found!!" << std::endl;
+			return true;
+		}
 		if (vertex_info.cost > limits.max_cost) {
-			// if (touched_vertices_.size() > 1000) {
-			// 	std::cout << "TRUE_CHDijkstra<G>::touched_vertices_.size() = " << touched_vertices_.size() << std::endl;
-			// }
+			if (dead_members > 0) {
+				std::cout << "dead members count " << dead_members << std::endl;
+			}
 			return true;
 		}
 		assert(vertex_info.cost == min_member.cost);
 		
 		for(auto&& edge : vertex.get_edges()) {
-			UpdateNeighbour(min_member, edge, q, limits);
+			// UpdateNeighbour(min_member, edge, q, limits);
+			UpdateNeighbour(min_member, edge, qset, limits);
 		}
 	}
-	// if (touched_vertices_.size() > 1000) {
-	// 	std::cout << "FALSE_CHDijkstra<G>::touched_vertices_.size() = " << touched_vertices_.size() << std::endl;
-	// }
+	if (dead_members > 0) {
+		std::cout << "dead members count " << dead_members << std::endl;
+	}
 	return false;
 }
 
@@ -186,6 +223,25 @@ void CHDijkstra<G>::UpdateNeighbour(const PriorityQueueMember& min_member, const
 		neighbour_info.cost = update_cost;
 		neighbour_info.previous = min_member.vertex_id;
 		size_t update_hop_count = min_member.hop_count + 1;
+		if (update_hop_count < limits.max_hop_count) {
+			q.emplace(neighbour_info.cost, neighbour_id, update_hop_count);
+		}
+	}
+}
+
+template <typename G>
+void CHDijkstra<G>::UpdateNeighbour(const PriorityQueueMember& min_member, const Edge& edge, std::set<PriorityQueueMember>& q, const SearchRangeLimits& limits) {
+	unsigned_id_type neighbour_id = edge.get_to();
+	auto&& neighbour_info = touched_vertices_[neighbour_id];
+	double update_cost = min_member.cost + edge.get_length();
+	if (update_cost < neighbour_info.cost && !IgnoreNeighbour(g_.GetVertex(neighbour_id)) ) {
+		double previous_neighbour_cost = neighbour_info.cost;
+		neighbour_info.cost = update_cost;
+		neighbour_info.previous = min_member.vertex_id;
+		size_t update_hop_count = min_member.hop_count + 1;
+		if (previous_neighbour_cost != std::numeric_limits<double>::max()) {
+			q.erase(PriorityQueueMember{previous_neighbour_cost, neighbour_id, limits.max_hop_count});
+		}
 		if (update_hop_count < limits.max_hop_count) {
 			q.emplace(neighbour_info.cost, neighbour_id, update_hop_count);
 		}

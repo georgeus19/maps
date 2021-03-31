@@ -33,6 +33,8 @@ private:
 
     void AddShortcuts(std::vector<Edge> shortcuts);
 
+    double CalculateOverlayGraphAverageDegree() const;
+
    
 };
 
@@ -46,16 +48,26 @@ void GraphContractor<Graph>::ContractGraph() {
     PriorityQueue q = CalculateContractionPriority();
     std::cout << "Contraction starting - queue completed." << std::endl;
     size_t count = 0;
+    g_.ForEachVertex([&](Vertex& vertex) {
+           ++count;
+    });
     while(!q.empty()) {
-        if (count == 1800000) {
-            return;
-        }
         if (count % 10000 == 0) {
-            std::cout << count << " iterations" << std::endl;
+            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
         } 
+        if (count < 50000 && count % 1000 == 0) {
+            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+        } 
+        if (count < 1000 && count % 10 == 0) {
+            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+        }
+        if (count < 10) {
+            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+        }
         ContractMinVertex(q);
-        ++count;
+        --count;
     }
+    std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
 
 }
 
@@ -72,6 +84,7 @@ void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
 template <typename Graph>
 void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQueue& q) {
     assert(!q.empty());
+    size_t repeat = 0;
 
     std::vector<Edge> shortcuts;
     unsigned_id_type vertex_id;
@@ -89,6 +102,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
                 break;
             }
             q.push(std::make_pair(new_priority, vertex_id));
+            ++repeat;
         }
     } else {
         vertex_id = q.top().second;
@@ -96,6 +110,9 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
         shortcuts = vertex_measures_.FindShortcuts(vertex);
         q.pop();
     }
+    // if (repeat > 10) {
+    //     std::cout << " lazy update repeat is " << repeat << std::endl;
+    // }
 
     AddShortcuts(shortcuts);
     auto&& contracted_vertex = g_.GetVertex(vertex_id);
@@ -108,12 +125,16 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
     PriorityQueue q;
     size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
-        ++count;
-        if (count % 10000 == 0) {
-            std::cout << count << " iterations" << std::endl;
+        if (!vertex.IsContracted()) {
+            ++count;
+            if (count % 10000 == 0) {
+
+                std::cout << count << " CalculateContractionPriority iterations" << std::endl;
+            }
+            double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
+            q.push(std::make_pair(attractivity, vertex.get_osm_id()));
         }
-        double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
-        q.push(std::make_pair(attractivity, vertex.get_osm_id()));
+        
     });
     return q;
 }
@@ -126,6 +147,21 @@ void GraphContractor<Graph>::AddShortcuts(std::vector<Edge> shortcuts) {
         g_.AddEdge(std::move(edge));
         // g_.AddReverseEdge(std::move(reversed_edge));
     }
+}
+
+
+template <typename Graph>
+double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
+    size_t deg = 0;
+    size_t count = 0;
+    g_.ForEachVertex([&](Vertex& vertex) {
+        if (!vertex.IsContracted()) {
+           deg += vertex.get_edges().size();
+           ++count;
+        }
+        
+    });
+    return ((double)deg) / ((double)count);
 }
 
 }
