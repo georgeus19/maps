@@ -49,6 +49,8 @@ private:
 
     double GetMinTargetsIngoingLength(Vertex& contracted_vertex);
 
+    std::vector<Edge> FilterDuplicateEdges(const std::vector<Edge>& edges);
+
 };
 
 template <typename Graph>
@@ -56,6 +58,7 @@ std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FindSho
     std::vector<Edge> shortcuts{};
     for(auto&& reverse_edge : vertex.get_reverse_edges()) {
         auto&& s = FindShortcuts(vertex, reverse_edge);
+        s = FilterDuplicateEdges(s);
         shortcuts.insert(shortcuts.end(), s.begin(), s.end());
     }
     return shortcuts;
@@ -192,15 +195,39 @@ double VertexMeasures<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vert
 }
     
 
+template <typename Graph>
+std::vector<typename VertexMeasures<Graph>::Edge> VertexMeasures<Graph>::FilterDuplicateEdges(const std::vector<Edge>& edges) {
+    std::vector<Edge> unique_edges;
+    unique_edges.reserve(edges.size());
+    for(auto&& a : edges) {
+        bool add = true;
+        for(auto&& b : edges) {
+            bool same_origin = a.get_from() == b.get_from();
+            bool same_destination = a.get_to() == b.get_to();
+            bool not_the_same_edge = a.get_uid() != b.get_uid(); 
+            
+            if (same_origin && same_destination && not_the_same_edge) {
+                if (a.get_length() > b.get_length()) {
+                    add = false;
+                } else if (a.get_length() == b.get_length()) {
+                    if (a.get_uid() > b.get_uid()) {
+                        add = false;
+                    }
+                }
+            }
+        }
+        if (add) {
+            unique_edges.push_back(a);
+        }
+    }
+    return unique_edges;
+}
 
 
 
 
 
 }
-
-
-
 }
 
 #endif //VERTEX_MEASURES_H
