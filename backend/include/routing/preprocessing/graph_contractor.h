@@ -3,6 +3,7 @@
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/contraction_parameters.h"
+#include "routing/preprocessing/shortcut_finder.h"
 #include <vector>
 #include <set>
 #include <queue>
@@ -28,6 +29,7 @@ public:
     PriorityQueue CalculateContractionPriority();
 private:
     Graph & g_;
+    ShortcutFinder<Graph> shortcut_finder_;
     VertexMeasures<Graph> vertex_measures_;
     unsigned_id_type free_ordering_rank_;
 
@@ -40,7 +42,7 @@ private:
 
 template <typename Graph>
 GraphContractor<Graph>::GraphContractor(Graph &g, const ContractionParameters& parameters)
-    : g_(g), vertex_measures_(VertexMeasures<Graph>{g, parameters}), free_ordering_rank_(0) {}
+    : g_(g), shortcut_finder_(g, parameters), vertex_measures_(g, parameters), free_ordering_rank_(0) {}
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractGraph() {
@@ -67,13 +69,13 @@ void GraphContractor<Graph>::ContractGraph() {
         ContractMinVertex(q);
         --count;
     }
-    std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+    // std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
 
 }
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
-    std::vector<Edge> shortcuts = vertex_measures_.FindShortcuts(vertex);
+    std::vector<Edge> shortcuts = shortcut_finder_.FindShortcuts(vertex);
     AddShortcuts(shortcuts);
     vertex.SetContracted();
     vertex.set_ordering_rank(++free_ordering_rank_);
@@ -96,7 +98,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
             auto&& vertex = g_.GetVertex(vertex_id);
             q.pop();
             double priority_threshold = q.top().first;
-            shortcuts = vertex_measures_.FindShortcuts(vertex);
+            shortcuts = shortcut_finder_.FindShortcuts(vertex);
             double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts);
             if (new_priority <= priority_threshold) {
                 break;
@@ -107,7 +109,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
     } else {
         vertex_id = q.top().second;
         auto&& vertex = g_.GetVertex(vertex_id);
-        shortcuts = vertex_measures_.FindShortcuts(vertex);
+        shortcuts = shortcut_finder_.FindShortcuts(vertex);
         q.pop();
     }
     // if (repeat > 10) {

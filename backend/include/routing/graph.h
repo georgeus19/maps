@@ -79,30 +79,9 @@ inline void Graph<Vertex, Edge>::AddReverseEdge(Edge && edge) {
     });
 }
 
-template <typename Vertex, typename Edge>
-void Graph<Vertex, Edge>::AddEdge(Edge && e, const std::function<void(Vertex &, Edge && e)>& add_edge) {
-    unsigned_id_type from_node = e.get_from();
-    unsigned_id_type to_node = e.get_to();
-    auto&& from_it = g_.find(from_node);
-    if (from_it == g_.end()) {
-        unsigned_id_type from_node = e.get_from();
-        // Vertex is not in the graph. Add Vertex with the edge.
-        Vertex v{from_node};
-        add_edge(v, std::move(e));
-        g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(from_node), std::move(v)));
-    } else {
-        // Vertex exists. Add edge.
-        add_edge(from_it->second, std::move(e));
-    }
 
-    // e.to_ might not be added to the graph.
-    // So try add it with no outgoing edges.
-    auto && to_it = g_.find(to_node);
-    if (to_it == g_.end()) {
-        Vertex to_vertex{to_node};
-        g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(to_node), std::move(to_vertex)));
-    }
-}
+
+
 
 
 template <typename Vertex, typename Edge>
@@ -128,6 +107,31 @@ void Graph<Vertex, Edge>::ForEachEdge(const std::function<void(Edge&)>& f) {
         vertex.ForEachEdge(f);
     });
     
+}
+
+template <typename Vertex, typename Edge>
+void Graph<Vertex, Edge>::AddEdge(Edge && e, const std::function<void(Vertex &, Edge && e)>& add_edge) {
+    unsigned_id_type from_node = e.get_from();
+    unsigned_id_type to_node = e.get_to();
+    auto&& from_it = g_.find(from_node);
+    if (from_it == g_.end()) {
+        unsigned_id_type from_node = e.get_from();
+        // Vertex is not in the graph. Add Vertex with the edge.
+        Vertex v{from_node};
+        add_edge(v, std::move(e));
+        g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(from_node), std::move(v)));
+    } else {
+        // Vertex exists. Add edge.
+        add_edge(from_it->second, std::move(e));
+    }
+
+    // e.to_ might not be added to the graph.
+    // So try add it with no outgoing edges.
+    auto && to_it = g_.find(to_node);
+    if (to_it == g_.end()) {
+        Vertex to_vertex{to_node};
+        g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(to_node), std::move(to_vertex)));
+    }
 }
     
 }

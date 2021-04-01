@@ -37,7 +37,7 @@ int main(int argv, const char ** argc) {
         // std::string table_name{"cznoloops"};
         std::string table_name{"lux31"};
       
-        std::cout << "Load graph from cznoloops." << std::endl;
+        std::cout << "Load graph from " << table_name << std::endl;
         UnpreprocessedDbGraph db_graph{};
         d.LoadFullGraph<G>(table_name, g, &db_graph);
         size_t count = 0;
@@ -52,8 +52,7 @@ int main(int argv, const char ** argc) {
         });
         std::cout << "edges before contraction: " << ecount << std::endl;
 
-        std::cout << "Contract graph from czedges." << std::endl;
-        ContractionParameters parameters{d.GetMaxEdgeId(table_name), 5, 190, 120, 1};
+        ContractionParameters parameters{d.GetMaxEdgeId(table_name), 5, 190, 120, 0};
         GraphContractor<G> c{g, parameters};
         c.ContractGraph();
         std::cout << "Contraction done." << std::endl;
