@@ -1,14 +1,17 @@
-#ifndef BACKEND_SHORTCUT_FINDER
-#define BACKEND_SHORTCUT_FINDER
+#ifndef BACKEND_SHORTCUT_FINDER_H
+#define BACKEND_SHORTCUT_FINDER_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/ch_dijkstra.h"
 #include <vector>
+#include <iterator>
 #include <set>
 #include <queue>
 #include <cassert>
 #include "routing/preprocessing/contraction_parameters.h"
 #include "tsl/robin_set.h"
+#include "routing/preprocessing/shortcut_container.h"
+#include "routing/preprocessing/shortcut_filter.h"
 
 namespace routing {
 namespace preprocessing {
@@ -20,11 +23,13 @@ class ShortcutFinder {
 public:
     ShortcutFinder(Graph& g, const ContractionParameters& p);
 
-    std::vector<Edge> FindShortcuts(Vertex& vertex);
+    ShortcutContainer<Edge> FindShortcuts(Vertex& vertex);
 
     std::vector<Edge> FindShortcuts(Vertex& contracted_vertex, const Edge& reversed_first_edge); 
 
     size_t GetSearchSpaceSize();
+
+
 private:
     Graph& g_;
     ContractionParameters parameters_;
@@ -33,9 +38,6 @@ private:
     double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
 
     double GetMinTargetsIngoingLength(Vertex& contracted_vertex);
-
-    std::vector<Edge> FilterDuplicateEdges(const std::vector<Edge>& edges);
-
 };
 
 
@@ -44,14 +46,15 @@ ShortcutFinder<Graph>::ShortcutFinder(Graph& g, const ContractionParameters& p) 
     g_(g), parameters_(p), dijkstra_(g) {}
 
 template <typename Graph>
-std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& vertex) {
+ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& vertex) {
     std::vector<Edge> shortcuts{};
+    ShortcutFilter filter{g_};
     for(auto&& reverse_edge : vertex.get_reverse_edges()) {
         auto&& s = FindShortcuts(vertex, reverse_edge);
-        s = FilterDuplicateEdges(s);
-        shortcuts.insert(shortcuts.end(), s.begin(), s.end());
+        s = filter.FilterDuplicateEdges(s);
+        shortcuts.insert(shortcuts.end(), std::make_move_iterator(s.begin()), std::make_move_iterator(s.end()));
     }
-    return shortcuts;
+    return filter.ClassifyShortcuts(std::move(shortcuts));
 }
 
 template <typename Graph>
@@ -94,6 +97,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
     }
     return shortcuts;
 }
+
 template <typename Graph>
 size_t ShortcutFinder<Graph>::GetSearchSpaceSize() {
     return dijkstra_.GetSearchSpaceSize();
@@ -132,34 +136,6 @@ double ShortcutFinder<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vert
 }
     
 
-template <typename Graph>
-std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FilterDuplicateEdges(const std::vector<Edge>& edges) {
-    std::vector<Edge> unique_edges;
-    unique_edges.reserve(edges.size());
-    for(auto&& a : edges) {
-        bool add = true;
-        for(auto&& b : edges) {
-            bool same_origin = a.get_from() == b.get_from();
-            bool same_destination = a.get_to() == b.get_to();
-            bool not_the_same_edge = a.get_uid() != b.get_uid(); 
-            
-            if (same_origin && same_destination && not_the_same_edge) {
-                if (a.get_length() > b.get_length()) {
-                    add = false;
-                } else if (a.get_length() == b.get_length()) {
-                    if (a.get_uid() > b.get_uid()) {
-                        add = false;
-                    }
-                }
-            }
-        }
-        if (add) {
-            unique_edges.push_back(a);
-        }
-    }
-    return unique_edges;
-}
-
 
 
 
@@ -167,4 +143,4 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FilterD
 }
 }
 
-#endif //BACKEND_SHORTCUT_FINDER
+#endif //BACKEND_SHORTCUT_FINDER_H

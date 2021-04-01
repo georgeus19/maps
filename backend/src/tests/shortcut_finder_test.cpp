@@ -42,8 +42,8 @@ TEST(ShortcutFinderGeographyTest, SimpleGeographyCopyTest) {
     ShortcutFinder<G> shortcut_finder{g, ContractionParameters{11, 5, 1, 1, 0}};
     auto&& shortcuts = shortcut_finder.FindShortcuts(g.GetVertex(2));
     
-    std::cout << shortcuts[0].get_geography() << std::endl;
-    EXPECT_EQ(shortcuts.size(), 1);
-    EXPECT_EQ(shortcuts[0].get_geography(), expected_geography);
+    std::cout << shortcuts.new_edges[0].get_geography() << std::endl;
+    EXPECT_EQ(shortcuts.new_edges.size(), 1);
+    EXPECT_EQ(shortcuts.new_edges[0].get_geography(), expected_geography);
     
 }

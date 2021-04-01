@@ -40,10 +40,10 @@ public:
     BasicEdge& operator= (BasicEdge && other) = default;
     virtual ~BasicEdge() = default;
 
-    void Swap(BasicEdge & other);
+    void Swap(BasicEdge& other);
     void Reverse(); 
 
-    void Print();
+    void Print() const;
 
     /**
      * "Graphical" comparison of edges.

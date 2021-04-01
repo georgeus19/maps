@@ -24,7 +24,7 @@ void BasicEdge::Reverse() {
     std::swap(from_, to_);
 }
 
-void BasicEdge::Print() {
+void BasicEdge::Print() const {
     std::cout << get_from() << "->" << get_to() << " length: " << get_length() << std::endl;
 }
 

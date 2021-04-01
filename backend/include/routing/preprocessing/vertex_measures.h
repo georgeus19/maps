@@ -22,8 +22,6 @@ public:
 
     VertexMeasures(Graph & g, const ContractionParameters& parameters) : g_(g), shortcut_finder_(g, parameters), parameters_(parameters) {}
 
-    
-
     int32_t CalculateEdgeDifference(Vertex& vertex); 
 
     int32_t CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts);
@@ -50,7 +48,7 @@ private:
 template <typename Graph>
 int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex) {
     auto&& shortcuts = shortcut_finder_.FindShortcuts(vertex);
-    return CalculateEdgeDifference(vertex, shortcuts);
+    return CalculateEdgeDifference(vertex, shortcuts.new_edges);
 }
 
 template <typename Graph>
@@ -70,7 +68,7 @@ int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
 template <typename Graph>
 inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
     auto&& shortcuts = shortcut_finder_.FindShortcuts(vertex);
-    return CalculateContractionAttractivity(vertex, shortcuts);
+    return CalculateContractionAttractivity(vertex, shortcuts.new_edges);
 }
 
 template <typename Graph>

@@ -16,6 +16,9 @@ class ContractionVertex : public BasicVertex<Edge> {
     using BasicVertex<Edge>::cost_;
     using BasicVertex<Edge>::previous_;
 public:
+
+    using BasicVertex<Edge>::FindEdge;
+    
     inline void set_ordering_rank(unsigned_id_type ordering_rank) {
         ordering_rank_ = ordering_rank;
     }
@@ -45,6 +48,8 @@ public:
 
     void ForEachReverseEdge(const std::function<void(Edge&)>& f);
 
+    Edge& FindReverseEdge(const std::function<bool(const Edge&)>& f);
+
 private:
 
     unsigned_id_type ordering_rank_;
@@ -72,6 +77,11 @@ inline void ContractionVertex<Edge>::AddReverseEdge(const Edge & edge) {
 template <typename Edge>
 void ContractionVertex<Edge>::ForEachReverseEdge(const std::function<void(Edge&)>& f) {
     std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
+}
+
+template <typename Edge>
+inline Edge& ContractionVertex<Edge>::FindReverseEdge(const std::function<bool(const Edge&)>& f) {
+    return FindEdge(reverse_edges_, f);
 }
 
 

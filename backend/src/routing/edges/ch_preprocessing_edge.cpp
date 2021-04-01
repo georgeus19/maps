@@ -17,6 +17,11 @@ CHPreprocessingEdge::CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type 
     double length, unsigned_id_type contracted_vertex, const std::string& geography) :
         BasicEdge(uid, from, to, length), shortcut_(true), contracted_vertex_(contracted_vertex), geography_(geography) {}
 
-
+void CHPreprocessingEdge::Swap(CHPreprocessingEdge& other) {
+    BasicEdge::Swap(other);
+    std::swap(shortcut_, other.shortcut_);
+    std::swap(contracted_vertex_, other.contracted_vertex_);
+    std::swap(geography_, other.geography_);
+}
 
 }

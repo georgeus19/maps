@@ -34,6 +34,7 @@ public:
     CHPreprocessingEdge& operator= (CHPreprocessingEdge && other) = default;
     ~CHPreprocessingEdge() = default;
 
+    void Swap(CHPreprocessingEdge& other);
 
 private:
     bool shortcut_;

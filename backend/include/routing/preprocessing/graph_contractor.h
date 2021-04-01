@@ -4,6 +4,7 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/preprocessing/shortcut_finder.h"
+#include "routing/preprocessing/shortcut_container.h"
 #include <vector>
 #include <set>
 #include <queue>
@@ -33,7 +34,7 @@ private:
     VertexMeasures<Graph> vertex_measures_;
     unsigned_id_type free_ordering_rank_;
 
-    void AddShortcuts(std::vector<Edge> shortcuts);
+    void AddShortcuts(ShortcutContainer<Edge>&& shortcuts);
 
     double CalculateOverlayGraphAverageDegree() const;
 
@@ -75,8 +76,8 @@ void GraphContractor<Graph>::ContractGraph() {
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
-    std::vector<Edge> shortcuts = shortcut_finder_.FindShortcuts(vertex);
-    AddShortcuts(shortcuts);
+    ShortcutContainer<Edge> shortcuts = shortcut_finder_.FindShortcuts(vertex);
+    AddShortcuts(std::move(shortcuts));
     vertex.SetContracted();
     vertex.set_ordering_rank(++free_ordering_rank_);
 }
@@ -88,7 +89,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
     assert(!q.empty());
     size_t repeat = 0;
 
-    std::vector<Edge> shortcuts;
+    ShortcutContainer<Edge> shortcuts;
     unsigned_id_type vertex_id;
     if (q.size() != 1) {
         double priority_threshold;
@@ -99,7 +100,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
             q.pop();
             double priority_threshold = q.top().first;
             shortcuts = shortcut_finder_.FindShortcuts(vertex);
-            double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts);
+            double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts.new_edges);
             if (new_priority <= priority_threshold) {
                 break;
             }
@@ -116,7 +117,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
     //     std::cout << " lazy update repeat is " << repeat << std::endl;
     // }
 
-    AddShortcuts(shortcuts);
+    AddShortcuts(std::move(shortcuts));
     auto&& contracted_vertex = g_.GetVertex(vertex_id);
     contracted_vertex.SetContracted();
     contracted_vertex.set_ordering_rank(++free_ordering_rank_);
@@ -143,11 +144,25 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
 
 
 template <typename Graph>
-void GraphContractor<Graph>::AddShortcuts(std::vector<Edge> shortcuts) {
-    for(auto&& edge : shortcuts) {
-        Edge reversed_edge{edge};
+void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
+    for(auto&& edge : shortcuts.new_edges) {
         g_.AddEdge(std::move(edge));
-        // g_.AddReverseEdge(std::move(reversed_edge));
+    }
+
+    for(auto&& shortcut : shortcuts.improving_edges) {
+        Edge rshortcut = shortcut;
+        rshortcut.Reverse();
+        auto&& source_vertex = g_.GetVertex(shortcut.get_from());
+        Edge& edge = source_vertex.FindEdge([&](const Edge& e) {
+            return e.get_to() == shortcut.get_to();
+        });
+        edge.Swap(shortcut);
+
+        auto&& target_vertex = g_.GetVertex(rshortcut.get_from());
+        Edge& redge = target_vertex.FindReverseEdge([&](const Edge& e) {
+            return e.get_to() == rshortcut.get_to();
+        });
+        redge.Swap(rshortcut);
     }
 }
 
