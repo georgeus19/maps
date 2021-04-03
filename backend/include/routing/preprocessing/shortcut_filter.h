@@ -21,7 +21,7 @@ class ShortcutFilter {
 public:
     ShortcutFilter(Graph& g);
 
-    std::vector<Edge> FilterDuplicateEdges(const std::vector<Edge>& edges);
+    std::vector<Edge> FilterDuplicateShortcuts(const std::vector<Edge>& shortcuts);
 
     ShortcutContainer<Edge> ClassifyShortcuts(std::vector<Edge>&& shortcuts);
 
@@ -35,12 +35,12 @@ template <typename Graph>
 ShortcutFilter<Graph>::ShortcutFilter(Graph& g) : g_(g) {}
 
 template <typename Graph>
-std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::FilterDuplicateEdges(const std::vector<Edge>& edges) {
-    std::vector<Edge> unique_edges;
-    unique_edges.reserve(edges.size());
-    for(auto&& a : edges) {
+std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::FilterDuplicateShortcuts(const std::vector<Edge>& shortcuts) {
+    std::vector<Edge> unique_shortcuts;
+    unique_shortcuts.reserve(shortcuts.size());
+    for(auto&& a : shortcuts) {
         bool add = true;
-        for(auto&& b : edges) {
+        for(auto&& b : shortcuts) {
             bool same_origin = a.get_from() == b.get_from();
             bool same_destination = a.get_to() == b.get_to();
             bool not_the_same_edge = a.get_uid() != b.get_uid(); 
@@ -56,10 +56,10 @@ std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::FilterD
             }
         }
         if (add) {
-            unique_edges.push_back(a);
+            unique_shortcuts.push_back(a);
         }
     }
-    return unique_edges;
+    return unique_shortcuts;
 }
 
 template <typename Graph>

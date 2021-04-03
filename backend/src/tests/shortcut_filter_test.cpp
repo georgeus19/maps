@@ -64,7 +64,7 @@ INSTANTIATE_TEST_CASE_P(
             }
         },
         ClassifyShortcutsParameter{ // More edges go to improving, one discarded.
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 4, 6, 5}, CHPreprocessingEdge{12, 2, 6, 7}},
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 4, 6, 5}, CHPreprocessingEdge{12, 2, 6, 9}},
             ShortcutContainer<CHPreprocessingEdge>{
                 std::vector<CHPreprocessingEdge>{},
                 std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 4, 6, 5}}
@@ -104,10 +104,10 @@ TEST_P(ShortcutFilterClassifyShortcutsTests, ClassifyShortcutsSimpleTest) {
     auto&& actual = filter.ClassifyShortcuts(std::move(param.input_shortcuts));
     Print(input, "Input shortcuts");
     Print(actual.new_edges, "Actual new edges");
-    Print(param.expected_shortcuts.new_edges, "Actual new edges");
+    Print(param.expected_shortcuts.new_edges, "Expected new edges");
 
     Print(actual.improving_edges, "Actual improve edges");
-    Print(param.expected_shortcuts.improving_edges, "Actual improve edges");
+    Print(param.expected_shortcuts.improving_edges, "Expected improve edges");
     EXPECT_THAT(actual.new_edges, testing::ElementsAreArray(param.expected_shortcuts.new_edges));
     EXPECT_THAT(actual.improving_edges, testing::ElementsAreArray(param.expected_shortcuts.improving_edges));
 }
@@ -118,3 +118,61 @@ void Print(const std::vector<CHPreprocessingEdge>& edges, const std::string& nam
         edge.Print();
     }
 }
+
+
+struct FilterShortcutsParameter {
+    std::vector<CHPreprocessingEdge> input_shortcuts;
+    std::vector<CHPreprocessingEdge> expected_shortcuts;
+
+    FilterShortcutsParameter(const std::vector<CHPreprocessingEdge>& is, const std::vector<CHPreprocessingEdge>& es) :
+        input_shortcuts(is), expected_shortcuts(es) {}
+};
+
+class ShortcutFilterFilterShortcutsTests : public testing::TestWithParam<FilterShortcutsParameter> {
+    protected:
+    
+    G g_;
+    void SetUp() override {
+        TestBasicReverseGraph(g_);
+    }
+};
+
+INSTANTIATE_TEST_CASE_P(
+    ShortcutFilterFilterShortcutsTestParameters, 
+    ShortcutFilterFilterShortcutsTests,
+    ::testing::Values(
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 4, 1}},
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 4, 1}}
+        },
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}},
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}}
+        },
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 6, 1}, CHPreprocessingEdge{11, 1, 4, 1}, CHPreprocessingEdge{12, 1, 6, 2}},
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 6, 1}, CHPreprocessingEdge{11, 1, 4, 1}}
+        },
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}, CHPreprocessingEdge{12, 1, 3, 1}},
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}}
+        },
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 6, 4}, CHPreprocessingEdge{11, 1, 3, 2}, CHPreprocessingEdge{12, 1, 6, 3}},
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{11, 1, 3, 2}, CHPreprocessingEdge{12, 1, 6, 3}}
+        }
+    )
+);
+
+TEST_P(ShortcutFilterFilterShortcutsTests, FilterShortcutsSimpleTest) {
+    FilterShortcutsParameter param = GetParam();
+    ShortcutFilter<G> filter{g_};
+    auto&& actual_shortcuts = filter.FilterDuplicateShortcuts(param.input_shortcuts);
+    Print(param.input_shortcuts, "Input shortcuts");
+    Print(actual_shortcuts, "Actual shorctuts");
+    Print(param.expected_shortcuts, "Expected shortcuts");
+
+    EXPECT_THAT(actual_shortcuts, testing::ElementsAreArray(param.expected_shortcuts));
+}
+
+

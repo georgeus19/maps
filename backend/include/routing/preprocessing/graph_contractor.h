@@ -173,7 +173,11 @@ double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
     size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {
-           deg += vertex.get_edges().size();
+           for(auto&& e : vertex.get_edges()) {
+               if (!g_.GetVertex(e.get_to()).IsContracted()) {
+                   ++deg;
+               }
+           }
            ++count;
         }
         

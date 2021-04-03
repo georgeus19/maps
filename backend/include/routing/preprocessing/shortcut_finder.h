@@ -51,7 +51,7 @@ ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::F
     ShortcutFilter filter{g_};
     for(auto&& reverse_edge : vertex.get_reverse_edges()) {
         auto&& s = FindShortcuts(vertex, reverse_edge);
-        s = filter.FilterDuplicateEdges(s);
+        s = filter.FilterDuplicateShortcuts(s);
         shortcuts.insert(shortcuts.end(), std::make_move_iterator(s.begin()), std::make_move_iterator(s.end()));
     }
     return filter.ClassifyShortcuts(std::move(shortcuts));
