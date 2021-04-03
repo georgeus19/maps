@@ -45,7 +45,7 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(2, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 2, 6, 8}}),
         std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 4, 3}, CHPreprocessingEdge{1, 3, 5, 5}, CHPreprocessingEdge{1, 3, 6, 9}}),
         std::make_tuple(4, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 4, 3, 2}, CHPreprocessingEdge{1, 4, 5, 2}, CHPreprocessingEdge{1, 4, 6, 6}}),
-        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 7}, CHPreprocessingEdge{1, 5, 3, 6}}),
+        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 6}}),
         std::make_tuple(6, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 6, 5, 3}})
     )
 );
@@ -65,9 +65,9 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         std::make_tuple(1, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 1, 2, 2}, CHPreprocessingEdge{1, 1, 3, 2}}),
         std::make_tuple(2, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 2, 6, 8}}),
-        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 4, 3}, CHPreprocessingEdge{1, 3, 5, 5}, CHPreprocessingEdge{1, 3, 6, 9}, CHPreprocessingEdge{1, 3, 6, 7}}),
+        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 4, 3}, CHPreprocessingEdge{1, 3, 5, 5}, CHPreprocessingEdge{1, 3, 6, 7}}),
         std::make_tuple(4, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 4, 3, 2}, CHPreprocessingEdge{1, 4, 5, 2}, CHPreprocessingEdge{1, 4, 6, 6}}),
-        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 7}, CHPreprocessingEdge{1, 5, 3, 6}}),
+        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 6}}),
         std::make_tuple(6, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 6, 5, 3}, CHPreprocessingEdge{1, 6, 3, 9}})
     )
 );
@@ -85,7 +85,7 @@ INSTANTIATE_TEST_CASE_P(
     SimpleContractionReverseEdgesTestParameters, 
     GraphContractorSimpleReverseEdgesTests,
     ::testing::Values(
-        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 1, 2}, CHPreprocessingEdge{1, 3, 4, 2}, CHPreprocessingEdge{1, 3, 5, 7}, CHPreprocessingEdge{1, 3, 5, 6}}),
+        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 1, 2}, CHPreprocessingEdge{1, 3, 4, 2}, CHPreprocessingEdge{1, 3, 5, 6}}),
         std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 2}, CHPreprocessingEdge{1, 5, 6, 3}, CHPreprocessingEdge{1, 5, 3, 5}}),
         std::make_tuple(6, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 6, 2, 8}, CHPreprocessingEdge{1, 6, 4, 6}, CHPreprocessingEdge{1, 6, 5, 2}, CHPreprocessingEdge{1, 6, 3, 9}}),
         std::make_tuple(2, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 2, 1, 2}}),
@@ -163,8 +163,8 @@ TEST(GraphContractorContractionPriority, BasicGraphPriority) {
         std::make_pair(-2, 1),
         std::make_pair(-2, 2),
         std::make_pair(-3, 3),
-        std::make_pair(-2, 4),
-        std::make_pair(-2, 5),
+        std::make_pair(-3, 4),
+        std::make_pair(-3, 5),
         std::make_pair(-3, 6)
     };
 
