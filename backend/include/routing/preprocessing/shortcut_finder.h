@@ -10,6 +10,7 @@
 #include <cassert>
 #include "routing/preprocessing/contraction_parameters.h"
 #include "tsl/robin_set.h"
+#include "tsl/robin_map.h"
 #include "routing/preprocessing/shortcut_container.h"
 #include "routing/preprocessing/shortcut_filter.h"
 
@@ -38,6 +39,8 @@ private:
     double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
 
     double GetMinTargetsIngoingLength(Vertex& contracted_vertex);
+
+    typename CHDijkstra<Graph>::TargetVerticesMap GetTargetVertices(Vertex& contracted_vertex);
 };
 
 
@@ -72,16 +75,10 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
     }
     double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
     double max_cost = reversed_first_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
-    tsl::robin_set<unsigned_id_type> target_vertices;
-    for(auto&& second_edge : contracted_vertex.get_edges()) {
-        unsigned_id_type target_vertex_id = second_edge.get_to();
-        auto&& target_vertex = g_.GetVertex(target_vertex_id);
-        if (!target_vertex.IsContracted()) {
-            target_vertices.insert(target_vertex_id);
-        }
-    }
-    // CHDijkstra<Graph> dijkstra{g_};
-    dijkstra_.Run(source_vertex_id, contracted_vertex.get_osm_id(), typename CHDijkstra<Graph>::SearchRangeLimits{max_cost, parameters_.get_hop_count() - 1}, target_vertices);
+    
+    typename CHDijkstra<Graph>::SearchRangeLimits limits{max_cost, parameters_.get_hop_count() - 1};
+    typename CHDijkstra<Graph>::TargetVerticesMap target_vertices = GetTargetVertices(contracted_vertex);
+    dijkstra_.Run(source_vertex_id, contracted_vertex.get_osm_id(), limits, target_vertices);
 
     for(auto&& second_edge : contracted_vertex.get_edges()) {
         unsigned_id_type target_vertex_id = second_edge.get_to();
@@ -135,7 +132,18 @@ double ShortcutFinder<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vert
     return min_length;
 }
     
-
+template <typename Graph>
+typename CHDijkstra<Graph>::TargetVerticesMap ShortcutFinder<Graph>::GetTargetVertices(Vertex& contracted_vertex) {
+    typename CHDijkstra<Graph>::TargetVerticesMap target_vertices;
+    for(auto&& second_edge : contracted_vertex.get_edges()) {
+        unsigned_id_type target_vertex_id = second_edge.get_to();
+        auto&& target_vertex = g_.GetVertex(target_vertex_id);
+        if (!target_vertex.IsContracted()) {
+            target_vertices.emplace(target_vertex_id, false);
+        }
+    }
+    return target_vertices;
+}
 
 
 

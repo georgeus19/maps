@@ -56,17 +56,17 @@ void GraphContractor<Graph>::ContractGraph() {
     });
     while(!q.empty()) {
         if (count % 10000 == 0) {
-            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+            std::cout << count << " vertices left, average degree = " << std::endl; //CalculateOverlayGraphAverageDegree() << std::endl;
         } 
-        if (count < 50000 && count % 1000 == 0) {
-            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
-        } 
-        if (count < 1000 && count % 10 == 0) {
-            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
-        }
-        if (count < 10) {
-            std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
-        }
+        // if (count < 50000 && count % 1000 == 0) {
+        //     std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+        // } 
+        // if (count < 1000 && count % 10 == 0) {
+        //     std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+        // }
+        // if (count < 10) {
+        //     std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
+        // }
         ContractMinVertex(q);
         --count;
     }
@@ -129,11 +129,11 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
     size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {
-            ++count;
-            if (count % 10000 == 0) {
+            // ++count;
+            // if (count % 10000 == 0) {
 
-                std::cout << count << " CalculateContractionPriority iterations" << std::endl;
-            }
+            //     std::cout << count << " CalculateContractionPriority iterations" << std::endl;
+            // }
             double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
             q.push(std::make_pair(attractivity, vertex.get_osm_id()));
         }
