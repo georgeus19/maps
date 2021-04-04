@@ -14,6 +14,11 @@
 namespace routing {
 namespace preprocessing {
 
+/**
+ * Class with the functionality for filtering useless new shortcuts and classifying the new shortcuts
+ * to `ShortcutContainer`.
+ * @see ShortcutContainer
+ */
 template <typename Graph>
 class ShortcutFilter {
     using Vertex = Graph::V;
@@ -21,8 +26,16 @@ class ShortcutFilter {
 public:
     ShortcutFilter(Graph& g);
 
+    /**
+     * Filter out shortcuts from `shortcuts` which are in the vector multiple times - only 
+     * the edge with the smallest length is preserved.
+     */
     std::vector<Edge> FilterDuplicateShortcuts(const std::vector<Edge>& shortcuts);
 
+    /**
+     * Classify shortcuts into `ShortcutContainer`.
+     * @see ShortcutContainer
+     */
     ShortcutContainer<Edge> ClassifyShortcuts(std::vector<Edge>&& shortcuts);
 
 private:

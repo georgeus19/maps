@@ -20,7 +20,9 @@
 namespace routing {
 namespace preprocessing {
 /**
- * Implementation of dijkstra's routing algorithm.
+ * Implementation of dijkstra's algorithm modified for Contraction Hierarchies' local search.
+ * There are lots of search limits or custom CH conditions. Especially function for one hop
+ * backwards from target vertices of the search.
  */
 template <typename G>
 class CHDijkstra {
@@ -40,10 +42,26 @@ public:
 
     CHDijkstra(G & g);
 
+	/**
+	 * Main function of this class which initiates the dijkstra search.
+	 * 
+	 * @param source_vertex The vertex where the search begins.
+	 * @param contracted_vertex The vertex that is about to be contracted - needs to be ingored.
+	 * @param limits Limits for the local search - e.g. max cost
+	 * @param target_vertices Vertices to which paths are found.
+	 * @return True if local limits was triggered. False if no more vertices can be visited.
+	 */
     bool Run(unsigned_id_type source_vertex, unsigned_id_type contracted_vertex, const SearchRangeLimits& limits, TargetVerticesMap& target_vertices);
 
+	/**
+	 * Get length of the shortest path to a vertex that was found before by running `Run` function.
+	 */
     double GetPathLength(unsigned_id_type to) const;
 
+	/**
+	 * Perform one hop back search - scan all incoming edges of the target vertex
+	 * and return the length of the path to the target vertex.
+	 */
 	double OneHopBackwardSearch(unsigned_id_type target_vertex_id) const;
 
 	size_t GetSearchSpaceSize() const {
@@ -56,6 +74,10 @@ private:
     using PriorityQueue = std::priority_queue<PriorityQueueMember, std::vector<PriorityQueueMember>, PriorityQueueMemberMinComparator>;
     G& g_;
 
+	/**
+	 * Stores all reached vertices from Run function. STL unordered map is not used,
+	 * since slows the entire preprocessing wrt performance and memory usage.
+	 */
 	// using UnorderedMap = std::unordered_map<unsigned_id_type, VertexRoutingInfo>;
 	// using UnorderedMap = robin_hood::unordered_map<unsigned_id_type, VertexRoutingInfo>;
 	using UnorderedMap = tsl::robin_map<unsigned_id_type, VertexRoutingInfo>;
@@ -63,8 +85,16 @@ private:
 
     unsigned_id_type source_vertex_;
 	unsigned_id_type contracted_vertex_;
+
+	/**
+	 * Number of visited vertices in Run function.
+	 */
 	size_t settled_vertices_;
 
+	/**
+	 * Stores information from the search. It is memory & performance inefficient to store it in vertices
+	 * since a small portion of graph is searched.
+	 */
     struct VertexRoutingInfo {
         double cost;
         unsigned_id_type previous;
@@ -80,6 +110,9 @@ private:
         ~VertexRoutingInfo() = default;
     };
 
+	/**
+	 * Struct for priority queue used in Run function.
+	 */
 	struct PriorityQueueMember {
 		double cost;
 		unsigned_id_type vertex_id;
@@ -108,7 +141,9 @@ private:
         }
     };
 
-
+	/**
+	 * Some vertices are always ingorned in the search - already contracted vertices, the to be contracted vertex.
+	 */
 	bool IgnoreNeighbour(const Vertex& neighbour);
 
 	void UpdateNeighbour(const PriorityQueueMember& min_member, const Edge& edge, PriorityQueue& q, const SearchRangeLimits& limits);
@@ -127,7 +162,6 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 	settled_vertices_ = 0;
 	contracted_vertex_ = contracted_vertex;
 	touched_vertices_.insert_or_assign(source_vertex, VertexRoutingInfo{0, 0});
-	std::set<PriorityQueueMember> qset;
 	PriorityQueue q{};
 	q.emplace(0, source_vertex, 0);
 	size_t dead_members = 0;
@@ -141,6 +175,7 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		auto&& vertex = g_.GetVertex(min_member.vertex_id);
 		auto&& vertex_info = touched_vertices_[min_member.vertex_id];
 		
+		// There might be more members in the `q` for one vertex - always use only the minimal one.
 		bool queue_member_is_dead = vertex_info.cost < min_member.cost;
 		if (queue_member_is_dead) {
 			++dead_members;

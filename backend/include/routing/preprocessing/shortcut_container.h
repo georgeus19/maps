@@ -13,9 +13,18 @@
 namespace routing {
 namespace preprocessing {
 
+/**
+ * Container for new shortcut edges.
+ */
 template <typename Edge>
 struct ShortcutContainer {
+    /**
+     * Edges that are not in the graph yet.
+     */
     std::vector<Edge> new_edges;
+    /**
+     * Edges that are in the graph but these have lower lengths.
+     */
     std::vector<Edge> improving_edges;
     ShortcutContainer() : new_edges(), improving_edges() {}
     ShortcutContainer(std::vector<Edge> && ne, std::vector<Edge>&& ie) : new_edges(std::move(ne)), improving_edges(std::move(ie)) {}

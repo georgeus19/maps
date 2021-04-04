@@ -70,7 +70,6 @@ void GraphContractor<Graph>::ContractGraph() {
         ContractMinVertex(q);
         --count;
     }
-    // std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
 
 }
 
