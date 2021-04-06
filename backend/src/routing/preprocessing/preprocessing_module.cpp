@@ -18,6 +18,7 @@
 #include <tuple>
 #include <string>
 #include <iostream>
+#include "pqxx/except.hxx"
 
 using namespace std;
 using namespace database;
@@ -30,49 +31,52 @@ const string kUser = "postgres";
 const string kPassword = "wtz2trln";
 const string kHostAddress = "127.0.0.1";
 const string kPort = "5432";
-int main(int argv, const char ** argc) {
+int main(int argc, const char ** argv) {
+    if (argc != 2) {
+        std::cout << "There must be 1 argument: input_graph_table" << std::endl;
+        return 1;
+    }
+
     try {
         DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
         G g{};
-        std::string table_name{"cznoloops"};
-        // std::string table_name{"lux31"};
+        std::string input_graph_table{argv[1]};
+        std::string output_graph_table{"CH" + input_graph_table};
+        std::string output_ordering_table{output_graph_table + "_vertex_ordering"};
       
-        std::cout << "Load graph from " << table_name << std::endl;
-        UnpreprocessedDbGraph db_graph{};
-        d.LoadFullGraph<G>(table_name, g, &db_graph);
-        size_t count = 0;
-        g.ForEachVertex([&](typename G::V&){
-            ++count;
-        });
-        std::cout << "vertices: " << count << std::endl;
+        std::cout << "Load graph from " << input_graph_table << "." << std::endl;
+        UnpreprocessedDbGraph unpreprocessed_db_graph{};
+        d.LoadFullGraph<G>(input_graph_table, g, &unpreprocessed_db_graph);
 
-        size_t ecount = 0;
-        g.ForEachEdge([&](typename G::E&){
-            ++ecount;
-        });
-        std::cout << "edges before contraction: " << ecount << std::endl;
+        std::cout << "Vertices: " << g.GetVertexCount() << std::endl;
 
-        ContractionParameters parameters{d.GetMaxEdgeId(table_name), 5, 190, 120, 0};
+        std::cout << "Edges before contraction: " << g.GetEdgeCount() << std::endl;
+
+        ContractionParameters parameters{d.GetMaxEdgeId(input_graph_table), 5, 190, 120, 0};
         GraphContractor<G> c{g, parameters};
         c.ContractGraph();
         std::cout << "Contraction done." << std::endl;
 
-        size_t eaccount = 0;
-        g.ForEachEdge([&](typename G::E&){
-            ++eaccount;
-        });
-        std::cout << "edges after contraction: " << eaccount << std::endl;
+        std::cout << "Edges after contraction: " << g.GetEdgeCount() << std::endl;
 
-        // bool columns_added = d.AddShortcutColumns(table_name);
-        // std::cout << "Add shortcut columns if not there -> " << (columns_added ? "added" : "were already present") << "." << std::endl;
+        CHDbGraph ch_db_graph{};
+        d.CreateGraphTable(input_graph_table, output_graph_table, &ch_db_graph);
+
+        d.DropGeographyIndex(output_graph_table);
+        std::cout << "Geography index dropped." << std::endl;
         
-        // // Save shortcuts.
-        // d.AddShortcuts(table_name, g);
-        // // Save vertex ordering.
-        // d.AddVertexOrdering("vertex_ordering_table", g);
+        // Save shortcuts.
+        d.AddShortcuts(output_graph_table, g);
+        std::cout << "Shortcuts added to " + output_graph_table << "."<< std::endl;
+        d.CreateGeographyIndex(output_graph_table);
+        std::cout << "Geography index restored." << std::endl;
+
+        d.AddVertexOrdering(output_ordering_table, g);
+        std::cout << "Vertex ordering saved to " << output_ordering_table << "." << std::endl;
+
 
     } catch (const std::exception& e) {
-        e.what();
+        std::cout << e.what() << std::endl;
     }
     
 }

@@ -57,6 +57,14 @@ public:
         g_.ForEachEdge(f);
     }
 
+    size_t GetVertexCount() const {
+        return g_.GetVertexCount();
+    }
+
+    size_t GetEdgeCount() {
+        return g_.GetEdgeCount();
+    }
+
 private:
     Graph<Vertex, Edge> g_;
 };

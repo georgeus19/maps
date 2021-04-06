@@ -30,48 +30,59 @@ public:
     DbGraph() {}
     virtual std::string GetEdgeSelect() const = 0;
     virtual std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const = 0;
+    virtual std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const = 0;
 };
 
 class UnpreprocessedDbGraph : public DbGraph {
 public:
     UnpreprocessedDbGraph() : DbGraph() {}
 
-    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
+    std::string GetEdgeSelect() const override {
+        return " SELECT uid, ST_AsText(geog), from_node, to_node, length ";
+    }
+
+
+    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const override {
         return std::make_unique<UnpreprocessedDbEdgeIterator>(begin, end);
     }
 
-    std::string GetEdgeSelect() const {
-        return " SELECT uid, from_node, to_node, length, ST_AsText(geog) ";
+    std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
+        return "CREATE TABLE " + new_table + " AS SELECT * FROM " + basic_graph_table + ";";
     }
 
 };
 
-class CHPreprocessingDbGraph : public DbGraph {
+class CHDbGraph : public DbGraph {
 public:
-    CHPreprocessingDbGraph() : DbGraph() {}
+    CHDbGraph() : DbGraph() {}
 
-    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
-        return std::make_unique<CHPreprocessingDbEdgeIterator>(begin, end);
+    std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
+        std::string create_table_sql = "CREATE TABLE " + new_table + " ( " \
+				"osm_id BIGINT NOT NULL, " \
+				"uid BIGINT PRIMARY KEY, " \
+				"geog geography(LINESTRING) NOT NULL, " \
+				"from_node BIGINT NOT NULL, " \
+				"to_node BIGINT NOT NULL, " \
+                "length DOUBLE PRECISION NOT NULL, "
+				"shortcut BOOLEAN NOT NULL, " \
+				"contracted_vertex BIGINT NOT NULL); ";
+        std::string insert_basic_graph_sql = "INSERT INTO " + new_table + "(osm_id, uid, geog, from_node, to_node, length, shortcut, contracted_vertex) " \
+                "( " \
+                "SELECT osm_id, uid, geog, from_node, to_node, length, false, 0 FROM "+ basic_graph_table + " " \
+                "); ";
+        return create_table_sql + insert_basic_graph_sql;
     }
 
-    std::string GetEdgeSelect() const {
-        return " SELECT uid, from_node, to_node, length, ST_AsText(geog), shortcut, contracted_vertex ";
+    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const override {
+        return std::make_unique<CHDbEdgeIterator>(begin, end);
+    }
+
+    std::string GetEdgeSelect() const override {
+        return " SELECT uid, ST_AsText(geog), from_node, to_node, length, shortcut, contracted_vertex ";
     }
 };
 
-class CHSearchDbGraph : public DbGraph {
-public:
-    CHSearchDbGraph() : DbGraph() {}
 
-    std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const {
-        return std::make_unique<CHSearchDbEdgeIterator>(begin, end);
-    }
-
-
-    std::string GetEdgeSelect() const {
-        return " SELECT uid, from_node, to_node, length, shortcut, contracted_vertex ";
-    }
-};
 
 
 

@@ -219,11 +219,19 @@ public:
     void AddVertexOrdering(const std::string& table_name, Graph& graph);
 
     uint64_t GetMaxEdgeId(const std::string& table_name);
+
+    void DropGeographyIndex(const std::string& table_name);
+
+    void CreateGeographyIndex(const std::string& table_name);
+
+    void CreateGraphTable(const std::string& graph_table_name, const std::string& new_table_name, DbGraph* db_graph);
     
 private:
     
     template <typename Graph>
     void LoadGraph(const std::string & sql, Graph & graph, DbGraph* db_graph);
+
+    std::string GetGeographyIndexName(const std::string& table_name);
 
 };
 
@@ -370,7 +378,6 @@ void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const 
 
 template <typename Graph>
 void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph, DbGraph* db_graph) {
-
     std::string load_graph_sql = db_graph->GetEdgeSelect() + " FROM " + table_name + ";";
     LoadGraph(load_graph_sql, graph, db_graph);
 }
@@ -388,11 +395,14 @@ void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
 
     pqxx::work w(connection_);
     w.exec(sql);
+    w.commit();
 }
 
 template <typename Graph>
 void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& graph) {
-    std::string data_path{"vertex_ordering.csv"};
+    auto&& current_dir = std::filesystem::current_path();
+    std::string data_path{current_dir.string() + "/" + table_name + ".csv"};
+    std::string drop_table_sql = "DROP TABLE IF EXISTS " + table_name + "; ";
     std::string create_table_sql = "CREATE TABLE " + table_name + "("  \
         "osm_id BIGINT PRIMARY KEY, " \
         "ordering_rank BIGINT NOT NULL); ";
@@ -400,9 +410,10 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     // string create_index = "CREATE INDEX " + table_name + "_osm_id_idx ON " + table_name + " (osm_id);";
     CsvConvertor convertor{data_path};
     convertor.SaveVertexOrdering(graph);
-    std::string sql = create_table_sql + " " + copy_sql;
+    std::string sql = drop_table_sql + create_table_sql + " " + copy_sql;
     pqxx::work w(connection_);
     w.exec(sql);
+    w.commit();
 }
 
 

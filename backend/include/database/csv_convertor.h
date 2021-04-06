@@ -55,6 +55,7 @@ void CsvConvertor::SaveEdges(Graph& graph, const std::function<bool(const typena
 template <typename Graph>
 void CsvConvertor::SaveVertexOrdering(Graph& graph) {
     try {
+        f_.open(file_);
         graph.ForEachVertex([&](typename Graph::V& vertex) {
             SaveOrderingRank<typename Graph::V&>(vertex);
         });

@@ -51,6 +51,10 @@ public:
 
     void ForEachEdge(const std::function<void(Edge&)>& f);
 
+    size_t GetVertexCount() const;
+
+    size_t GetEdgeCount();
+
 private:
     /**
      * Internal graph representaions. Unfortunately, even though the ids
@@ -78,11 +82,6 @@ inline void Graph<Vertex, Edge>::AddReverseEdge(Edge && edge) {
         v.AddReverseEdge(std::move(e));
     });
 }
-
-
-
-
-
 
 template <typename Vertex, typename Edge>
 inline Vertex& Graph<Vertex, Edge>::GetVertex(unsigned_id_type id) {
@@ -133,7 +132,23 @@ void Graph<Vertex, Edge>::AddEdge(Edge && e, const std::function<void(Vertex &, 
         g_.insert(std::make_pair<unsigned_id_type, Vertex>(std::move(to_node), std::move(to_vertex)));
     }
 }
-    
+
+template <typename Vertex, typename Edge>
+size_t Graph<Vertex, Edge>::GetVertexCount() const {
+    return g_.size();
+}
+
+template <typename Vertex, typename Edge>
+size_t Graph<Vertex, Edge>::GetEdgeCount() {
+    size_t count = 0;
+    ForEachEdge([&](Edge&){
+        ++count;
+    });
+    return count;
+}
+
+
+
 }
 
 #endif //BACKEND_GRAPH_H

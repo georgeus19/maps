@@ -217,12 +217,13 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 
 bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
 	try {
-	std::string sql = "ALTER TABLE " + table_name + " ADD COLUMN shortcut boolean; " \
-						"ALTER TABLE " + table_name + " ADD COLUMN contracted_vertex bigint; " \
+	std::string sql = "ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS shortcut boolean; " \
+						"ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS contracted_vertex bigint; " \
 						"UPDATE " + table_name + " set shortcut = false; " \
 						"UPDATE " + table_name + " set contracted_vertex = 0; ";
 	pqxx::work w(connection_);
 	w.exec(sql);
+	w.commit();
 	} catch (const std::exception& e) {
 		return false; 
 	}
@@ -236,6 +237,35 @@ uint64_t DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
 	pqxx::result result{n.exec(sql)};
 	return (result.begin())[0].as<uint64_t>();
 }
+
+void DatabaseHelper::DropGeographyIndex(const std::string& table_name) {
+	std::string sql = "DROP INDEX IF EXISTS " + GetGeographyIndexName(table_name);
+	pqxx::work w(connection_);
+	w.exec(sql);
+	w.commit();
+}
+
+void DatabaseHelper::CreateGeographyIndex(const std::string& table_name) {
+	std::string sql = "CREATE INDEX IF NOT EXISTS " + GetGeographyIndexName(table_name) + " ON " + table_name + " USING GIST (geog);";
+	pqxx::work w(connection_);
+	w.exec(sql);
+	w.commit();
+}
+
+void DatabaseHelper::CreateGraphTable(const std::string& graph_table_name, const std::string& new_table_name, DbGraph* db_graph) {
+	std::string drop_table_sql = "DROP TABLE IF EXISTS " + new_table_name + "; ";
+					
+	std::string create_table_sql = db_graph->GetCreateGraphTable(graph_table_name, new_table_name);
+	std::string sql = drop_table_sql + create_table_sql;
+	pqxx::work w(connection_);
+	w.exec(sql);
+	w.commit();
+}
+
+std::string DatabaseHelper::GetGeographyIndexName(const std::string& table_name) {
+	return table_name + "_gix";
+}
+
 
 
 }

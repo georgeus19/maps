@@ -59,24 +59,25 @@ public:
     UnpreprocessedDbEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end)
         : DbEdgeIterator(begin, end) {}
 
+
     uint64_t GetUid() const override {
         return it_[0].as<uint64_t>();
     }
-
-    uint64_t GetFrom() const override {
-        return it_[1].as<uint64_t>();
+   
+    std::string GetGeography() const override {
+        return it_[1].as<std::string>();
     }
 
-    uint64_t GetTo() const override {
+    uint64_t GetFrom() const override {
         return it_[2].as<uint64_t>();
     }
 
-    double GetLength() const override {
-        return it_[3].as<double>();
+    uint64_t GetTo() const override {
+        return it_[3].as<uint64_t>();
     }
 
-    std::string GetGeography() const override {
-        return it_[4].as<std::string>();
+    double GetLength() const override {
+        return it_[4].as<double>();
     }
 
     bool GetShortcut() const override {
@@ -87,6 +88,7 @@ public:
         return 0;
     }
 
+
 };
 
 
@@ -96,30 +98,29 @@ public:
  * Edge itself does not need to know the detail interface of
  * library pqxx.
  */
-class CHPreprocessingDbEdgeIterator : public DbEdgeIterator {
+class CHDbEdgeIterator : public DbEdgeIterator {
 public:
-    CHPreprocessingDbEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end)
+    CHDbEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end)
         : DbEdgeIterator(begin, end) {}
-
 
     uint64_t GetUid() const override {
         return it_[0].as<uint64_t>();
     }
-
-    uint64_t GetFrom() const override {
-        return it_[1].as<uint64_t>();
+   
+    std::string GetGeography() const override {
+        return it_[1].as<std::string>();
     }
 
-    uint64_t GetTo() const override {
+    uint64_t GetFrom() const override {
         return it_[2].as<uint64_t>();
     }
 
-    double GetLength() const override {
-        return it_[3].as<double>();
+    uint64_t GetTo() const override {
+        return it_[3].as<uint64_t>();
     }
-   
-    std::string GetGeography() const override {
-        return it_[4].as<std::string>();
+
+    double GetLength() const override {
+        return it_[4].as<double>();
     }
 
     bool GetShortcut() const override {
@@ -132,45 +133,6 @@ public:
 
 };
 
-/**
- * CHSearchDbEdgeRow provides an interface to read a row of data representing graph edge from database
- * that can be used to create instance of Edge class so that
- * Edge itself does not need to know the detail interface of
- * library pqxx.
- */
-class CHSearchDbEdgeIterator : public DbEdgeIterator {
-public:
-    CHSearchDbEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) 
-        : DbEdgeIterator(begin, end) {}
-
-    uint64_t GetUid() const override {
-        return it_[0].as<uint64_t>();
-    }
-
-    uint64_t GetFrom() const override {
-        return it_[1].as<uint64_t>();
-    }
-
-    uint64_t GetTo() const override {
-        return it_[2].as<uint64_t>();
-    }
-
-    double GetLength() const override {
-        return it_[3].as<double>();
-    }
-
-    bool GetShortcut() const override {
-        return it_[4].as<bool>();
-    }
-
-    uint64_t GetContractedVertex() const override {
-        return it_[5].as<uint64_t>();
-    }
-
-    std::string GetGeography() const override {
-        return std::string{};
-    }
-};
 
 
 }
