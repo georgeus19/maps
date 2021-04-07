@@ -5,10 +5,9 @@
 
 #define PY_SSIZE_T_CLEAN
 #include <python3.8/Python.h>
-#include "routing/graph.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
-#include "routing/dijkstra.h"
+#include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "database/db_graph.h"
@@ -17,72 +16,14 @@
 #include "routing/endpoint_handler.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/basic_edge_endpoint_handler.h"
+#include "routing/query/module.h"
 #include <string>
 
 using namespace std;
 using namespace routing;
+using namespace query;
 using namespace database;
 
-/**
- * Info to connect to the database with a routing graph.
- */
-const string kDbName = "gis";
-const string kUser = "postgres";
-const string kPassword = "wtz2trln";
-const string kHostAddress = "127.0.0.1";
-const string kPort = "5432";
-/**
- * Calculate shortest path between `start` and `end` points.
- *
- * @param table_name Table where routing graph is.
- * @param start Route start.
- * @param end Route end.
- * @return geoJson list of geometries of edges that are part of the shortest route all in string.
- */
-string CCalculateShortestRoute(const std::string & table_name, utility::Point start, utility::Point end) {
-    if (start.lat_ == end.lat_ && start.lon_ == end.lon_) {
-        throw RouteNotFoundException("Start and end point are the same.");
-    }
-    using G = Graph<BasicVertex<BasicEdge>, BasicEdge>;
-    // Load graph.
-    utility::Point graph_center{(start.lon_ + end.lon_) / 2, (start.lat_ + end.lat_) / 2};
-    G g{};
-    DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
-    string radius = d.CalculateRadius(start, end, 0.7);
-    UnpreprocessedDbGraph db_graph{};
-    d.LoadGraph<G>(graph_center, radius, table_name, g, &db_graph);
-
-    // Add start segments to graph.
-    EndpointHandler<BasicEdgeEndpointHandler> start_handler{1, 1, 0, 0};
-    auto && start_edges = start_handler.CalculateEndpointEdges(start, table_name, d);
-    for(auto&& edge : start_edges) {
-        auto e = edge;
-        g.AddEdge(move(e));
-    }
-
-    // Add end segments to graph.
-    unsigned_id_type free_node_id_from = start_handler.get_node_id_to();
-    unsigned_id_type free_edge_id_from = start_handler.get_edge_id_to();
-    EndpointHandler<BasicEdgeEndpointHandler> end_handler{free_node_id_from, free_node_id_from + 1, free_edge_id_from, free_edge_id_from + 4};
-    auto && end_edges = end_handler.CalculateEndpointEdges(end, table_name, d);
-    for(auto&& edge : end_edges) {
-        auto e = edge;
-        g.AddEdge(move(e));
-    }
-
-    // Run routing algorithm.
-    Algorithm<Dijkstra<G>> alg{g};
-    alg.Run(0, 1);
-    vector<Dijkstra<G>::Edge> res = alg.GetRoute();
-    // Construct list of geometries.
-    std::string geojson_array = d.GetRouteCoordinates(res, table_name);
-
-    string first_edge_geometry = start_handler.GetEndpointEdgeGeometry(res[res.size() - 1].get_uid());
-    string last_edge_geometry = end_handler.GetEndpointEdgeGeometry(res[0].get_uid());
-
-    string final_array = "[" + first_edge_geometry + geojson_array + "," + last_edge_geometry + "]";
-    return final_array;
-}
 /**/
 /**
  * Function to compute shortest paths that can be called from python.
@@ -102,7 +43,7 @@ static PyObject* CalculateShortestRoute(PyObject* self, PyObject* args) {
 
     string result;
     try {
-        result = CCalculateShortestRoute(table_name, utility::Point{start_lon, start_lat}, utility::Point{end_lon, end_lat});
+        result = CCalculateShortestRoute<DijkstraSetup>(table_name, utility::Point{start_lon, start_lat}, utility::Point{end_lon, end_lat});
         return Py_BuildValue("s", result.c_str());
     } catch (exception & e) {
         result = "ER" + string{e.what()};

@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"  
-#include "routing/graph.h"
+#include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
-#include "routing/dijkstra.h"
+#include "routing/query/dijkstra.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/vertices/contraction_search_vertex.h"
-#include "routing/preprocessing/bidirectional_dijkstra.h"
+#include "routing/query/bidirectional_dijkstra.h"
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
@@ -24,9 +24,10 @@
 using namespace std;
 using namespace routing;
 using namespace database;
+using namespace query;
 using namespace preprocessing;
 // using namespace testing;
-using G = BidirectionalGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>;
+using G = BidirectionalGraph<AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>>;
 
 class BidirectionalDijkstraTests : public testing::Test {
     protected:

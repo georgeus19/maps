@@ -17,7 +17,7 @@ public:
     CsvConvertor(const std::string& file) : f_(), file_(file) {}
 
     template <typename Graph>
-    void SaveEdges(Graph& graph, const std::function<bool(const typename Graph::E&)> condition);
+    void SaveEdges(Graph& graph, const std::function<bool(const typename Graph::Edge&)> condition);
 
     template <typename Graph>
     void SaveVertexOrdering(Graph& graph);
@@ -34,12 +34,12 @@ private:
 };
 
 template <typename Graph>
-void CsvConvertor::SaveEdges(Graph& graph, const std::function<bool(const typename Graph::E&)> condition) {
+void CsvConvertor::SaveEdges(Graph& graph, const std::function<bool(const typename Graph::Edge&)> condition) {
     try {
         f_.open(file_);
-        graph.ForEachEdge([&](const Graph::E& edge) {
+        graph.ForEachEdge([&](const Graph::Edge& edge) {
             if (condition(edge)) {
-                SaveEdge<typename Graph::E>(edge);
+                SaveEdge<typename Graph::Edge>(edge);
             }
 
         });
@@ -56,8 +56,8 @@ template <typename Graph>
 void CsvConvertor::SaveVertexOrdering(Graph& graph) {
     try {
         f_.open(file_);
-        graph.ForEachVertex([&](typename Graph::V& vertex) {
-            SaveOrderingRank<typename Graph::V&>(vertex);
+        graph.ForEachVertex([&](typename Graph::Vertex& vertex) {
+            SaveOrderingRank<typename Graph::Vertex&>(vertex);
         });
     } catch (const std::exception& e) {
         std::cout << e.what();

@@ -12,7 +12,7 @@
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
 #include "routing/exception.h"
-#include "routing/graph.h"
+#include "routing/adjacency_list_graph.h"
 #include <set>
 
 namespace routing {
@@ -23,27 +23,32 @@ namespace routing {
  * @tparam Vertex Type of vertex in the graph.
  * @tparam Edge Type of edge in the graph.
  */
-template <typename Vertex, typename Edge>
+template <typename Graph>
 class BidirectionalGraph {
 public:
-    using vertex_iterator = std::unordered_map<unsigned_id_type, Vertex>::iterator;
-
-    using V = Vertex;
-    using E = Edge;
+    using Vertex = Graph::Vertex;
+    using Edge = Graph::Edge;
 
     inline BidirectionalGraph() : g_() {}
 
     inline void AddEdge(Edge&& edge) {
         Edge reverse_edge = edge;
         g_.AddEdge(std::move(edge));
-        g_.AddReverseEdge(std::move(reverse_edge));
+        AddReverseEdge(std::move(reverse_edge));
     }
 
-    inline void AddUniqueEdge(Edge&& edge) {
-        Edge reverse_edge = edge;
-        g_.AddUniqueEdge(std::move(edge));
-        g_.AddUniqueReverseEdge(std::move(reverse_edge));
-    }
+    inline void AddReverseEdge(Edge && edge) {
+    edge.Reverse();
+    g_.AddEdge(std::move(edge), [](Vertex& v, Edge&& e){
+        v.AddReverseEdge(std::move(e));
+    });
+}
+
+    // inline void AddUniqueEdge(Edge&& edge) {
+    //     Edge reverse_edge = edge;
+    //     g_.AddUniqueEdge(std::move(edge));
+    //     g_.AddUniqueReverseEdge(std::move(reverse_edge));
+    // }
 
     inline Vertex& GetVertex(unsigned_id_type id) {
         return g_.GetVertex(id);
@@ -66,7 +71,7 @@ public:
     }
 
 private:
-    Graph<Vertex, Edge> g_;
+    Graph g_;
 };
 
 

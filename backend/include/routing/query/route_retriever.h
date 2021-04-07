@@ -7,17 +7,17 @@
 #include <vector>
 #include <stack>
 #include "routing/edges/basic_edge.h"
-#include "routing/graph.h"
 
 namespace routing {
+namespace query {
 
-template <typename G>
+template <typename Graph>
 class RouteRetriever {
 public:
-    using Vertex = G::V;
-    using Edge = G::E;
+    using Vertex = Graph::Vertex;
+    using Edge = Graph::Edge;
 
-    RouteRetriever(G& g);
+    RouteRetriever(Graph& g);
 
     class GraphInfo {
     public:
@@ -103,18 +103,18 @@ public:
 
 private:
     
-    G& g_;
+    Graph& g_;
 
     std::vector<Edge> UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut);
 
     Edge& GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id);
 };
   
-template <typename G>
-RouteRetriever<G>::RouteRetriever(G& g) : g_(g) {}
+template <typename Graph>
+RouteRetriever<Graph>::RouteRetriever(Graph& g) : g_(g) {}
 
-template <typename G>
-std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
+template <typename Graph>
+std::vector<typename RouteRetriever<Graph>::Edge> RouteRetriever<Graph>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
     std::vector<Edge> route;
     if (start_node == end_node) {
         return route;
@@ -150,8 +150,8 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::GetRoute(GraphI
     return route; 
 }
 
-template <typename G>
-std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut) {
+template <typename Graph>
+std::vector<typename RouteRetriever<Graph>::Edge> RouteRetriever<Graph>::UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut) {
     assert(shortcut.IsShortcut());
     std::stack<Edge> shortcut_stack{};
     Edge edge = std::move(shortcut);
@@ -178,8 +178,8 @@ std::vector<typename RouteRetriever<G>::Edge> RouteRetriever<G>::UnpackShortcut(
     return underlying_edges;
 }
 
-template <typename G>
-inline RouteRetriever<G>::Edge& RouteRetriever<G>::GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id) {
+template <typename Graph>
+inline RouteRetriever<Graph>::Edge& RouteRetriever<Graph>::GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id) {
     return graph_info->FindEdge(g_.GetVertex(former_vertex_id), [=](const Edge& e) {
         return e.get_to() == latter_vertex_id;
     });
@@ -187,6 +187,7 @@ inline RouteRetriever<G>::Edge& RouteRetriever<G>::GetUnderlyingEdge(GraphInfo* 
 }
     
 
+}
 }
 
 #endif //BACKEND_ROUTE_RETRIEVER_H

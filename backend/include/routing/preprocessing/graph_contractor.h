@@ -15,11 +15,11 @@ namespace preprocessing {
 template <typename Graph>
 class GraphContractor {
     
-    using Edge = Graph::E;
-    using Vertex = Graph::V;
+    using Edge = Graph::Edge;
+    using Vertex = Graph::Vertex;
 public:
     using PriorityQueue = std::priority_queue<std::pair<double, unsigned_id_type>, std::vector<std::pair<double, unsigned_id_type>>,  std::greater<std::pair<double, unsigned_id_type>>>;
-    GraphContractor<Graph>(Graph & g, const ContractionParameters& parameters);
+    GraphContractor<Graph>(Graph& g, const ContractionParameters& parameters);
 
     void ContractGraph();
 

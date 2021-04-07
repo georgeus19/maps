@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"  
-#include "routing/graph.h"
+#include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/edges/ch_search_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
-#include "routing/dijkstra.h"
+#include "routing/query/dijkstra.h"
 #include "routing/vertices/contraction_search_vertex.h"
-#include "routing/preprocessing/bidirectional_dijkstra.h"
+#include "routing/query/bidirectional_dijkstra.h"
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
@@ -24,9 +24,10 @@
 using namespace std;
 using namespace routing;
 using namespace database;
+using namespace query;
 using namespace preprocessing;
 // using namespace testing;
-using G = Graph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>;
+using G = AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>;
 
 struct GraphForEachEdgeTestsParameter;
 
@@ -39,9 +40,9 @@ class GraphForEachEdgeTests : public testing::TestWithParam<GraphForEachEdgeTest
 
 struct GraphForEachEdgeTestsParameter {
     std::function<void(G& g)> function;
-    std::vector<G::E> expected_edges;
+    std::vector<G::Edge> expected_edges;
 
-    GraphForEachEdgeTestsParameter(const std::function<void(G& g)>& f, const std::vector<G::E>& e) 
+    GraphForEachEdgeTestsParameter(const std::function<void(G& g)>& f, const std::vector<G::Edge>& e) 
         : function(f), expected_edges(e) {}
 };
 
@@ -51,7 +52,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         GraphForEachEdgeTestsParameter{
             [](G& g){ TestPathGraph(g); },
-            std::vector<G::E> {
+            std::vector<G::Edge> {
                 CHSearchEdge{0, 1, 2, 1},
                 CHSearchEdge{1, 2, 3, 2},
                 CHSearchEdge{2, 3, 4, 3},
@@ -65,7 +66,7 @@ INSTANTIATE_TEST_CASE_P(
         },
         GraphForEachEdgeTestsParameter{
             [](G& g){ TestBasicReverseGraph(g); },
-            std::vector<G::E> {
+            std::vector<G::Edge> {
                 CHSearchEdge{0, 1, 2, 2},
                 CHSearchEdge{1, 1, 3, 2},
                 CHSearchEdge{2, 2, 6, 8},
@@ -81,7 +82,7 @@ INSTANTIATE_TEST_CASE_P(
         },
         GraphForEachEdgeTestsParameter{
             [](G& g){ TestBasicContractedGraph(g); },
-            std::vector<G::E> {
+            std::vector<G::Edge> {
                 CHSearchEdge{0, 1, 2, 2},
                 CHSearchEdge{1, 1, 3, 2},
                 CHSearchEdge{2, 1, 4, 5, 3},
@@ -104,8 +105,8 @@ INSTANTIATE_TEST_CASE_P(
 TEST_P(GraphForEachEdgeTests, ForEachEdgeTest) {
     auto&& parameters = GetParam();
     parameters.function(g_);
-    std::vector<G::E> actual_edges{};
-    g_.ForEachEdge([&](G::E& edge) {
+    std::vector<G::Edge> actual_edges{};
+    g_.ForEachEdge([&](G::Edge& edge) {
         actual_edges.push_back(edge);
         edge.Print();
     });
@@ -116,13 +117,13 @@ TEST_P(GraphForEachEdgeTests, ForEachEdgeTest) {
 TEST(GraphTests, ForEachVertexBasicGraphTest) {
     G g;
     TestBasicContractedGraph(g);
-    std::vector<G::V> actual_vertices{};
-    g.ForEachVertex([&](G::V& vertex) {
+    std::vector<G::Vertex> actual_vertices{};
+    g.ForEachVertex([&](G::Vertex& vertex) {
         actual_vertices.push_back(vertex);
     });
  
 
-    std::vector<G::V> expected_vertices{
+    std::vector<G::Vertex> expected_vertices{
         ContractionSearchVertex<CHSearchEdge>{1},
         ContractionSearchVertex<CHSearchEdge>{2},
         ContractionSearchVertex<CHSearchEdge>{3},

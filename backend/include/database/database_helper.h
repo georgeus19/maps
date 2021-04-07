@@ -368,7 +368,7 @@ from czedges as e where ST_DWithin('SRID=4326;POINT(13.393348750000001 49.723055
                                     'SRID=4326;POINT(13.3868150 49.7282850)'::geography));
     */
 template <typename Graph>
-void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const std::string & table_name, Graph & graph, DbGraph* db_graph) {
+void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const std::string& table_name, Graph& graph, DbGraph* db_graph) {
     // Select all edges within the `radius` of center.
     std::string load_graph_sql = db_graph->GetEdgeSelect() + 
                         "from " + table_name + " as e " \
@@ -377,7 +377,7 @@ void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const 
 }
 
 template <typename Graph>
-void DatabaseHelper::LoadFullGraph(const std::string & table_name, Graph & graph, DbGraph* db_graph) {
+void DatabaseHelper::LoadFullGraph(const std::string& table_name, Graph& graph, DbGraph* db_graph) {
     std::string load_graph_sql = db_graph->GetEdgeSelect() + " FROM " + table_name + ";";
     LoadGraph(load_graph_sql, graph, db_graph);
 }
@@ -389,7 +389,7 @@ void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
     std::string data_path{current_dir.string() + "/shortcuts.csv"};
     std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV;";
     CsvConvertor convertor{data_path};
-    convertor.SaveEdges(graph, [](const Graph::E& edge) {
+    convertor.SaveEdges(graph, [](const Graph::Edge& edge) {
         return edge.IsShortcut();
     });
 
@@ -418,12 +418,12 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
 
 
 template <typename Graph>
-void DatabaseHelper::LoadGraph(const std::string & sql, Graph & graph, DbGraph* db_graph) {
+void DatabaseHelper::LoadGraph(const std::string& sql, Graph& graph, DbGraph* db_graph) {
     pqxx::nontransaction n{connection_};
     pqxx::result result{n.exec(sql)};
     
     for (std::unique_ptr<DbEdgeIterator> it = db_graph->GetEdgeIterator(result.begin(), result.end()); !(it->IsEnd()); it->Inc()) {
-        graph.AddEdge(typename Graph::E{it.get()});
+        graph.AddEdge(typename Graph::Edge{it.get()});
     }
 }
 

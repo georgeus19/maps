@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"  
-#include "routing/graph.h"
+#include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
-#include "routing/dijkstra.h"
+#include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
@@ -18,11 +18,12 @@
 #include <vector>
 using namespace std;
 using namespace routing;
+using namespace query;
 using namespace preprocessing;
 
 using namespace database;
 // using namespace testing;
-using G = Graph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 
 class CHDijkstraTest : public testing::Test {
     protected:

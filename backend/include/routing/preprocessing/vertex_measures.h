@@ -16,8 +16,8 @@ namespace preprocessing {
 
 template <typename Graph>
 class VertexMeasures {
-    using Vertex = Graph::V;
-    using Edge = Graph::E;
+    using Vertex = Graph::Vertex;
+    using Edge = Graph::Edge;
 public:
 
     VertexMeasures(Graph & g, const ContractionParameters& parameters) : g_(g), shortcut_finder_(g, parameters), parameters_(parameters) {}

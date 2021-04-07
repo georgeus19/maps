@@ -12,20 +12,17 @@
 #include <memory>
 
 namespace routing {
-namespace preprocessing {
+namespace query {
 
 template <typename G>
 class BidirectionalDijkstra {
 public:
-    using Vertex = typename G::V;
-    using Edge = typename G::E;
+    using Vertex = typename G::Vertex;
+    using Edge = typename G::Edge;
     using QueuePair = std::pair<double, Vertex*>;
     using Graph = G;
 
-    friend class RouteRetriever;
-    
-
-    BidirectionalDijkstra(G & g);
+    BidirectionalDijkstra(G& g);
 
     /**
      * Find the best route from `start_node` to `end_node`.

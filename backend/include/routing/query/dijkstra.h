@@ -4,13 +4,13 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
-#include "routing/graph.h"
 #include "routing/exception.h"
 #include <queue>
 #include <algorithm>
 #include "routing/query/route_retriever.h"
 
 namespace routing {
+namespace query {
 
 /**
  * Implementation of dijkstra's routing algorithm.
@@ -18,8 +18,8 @@ namespace routing {
 template <typename G>
 class Dijkstra {
 public:
-    using Vertex = typename G::V;
-    using Edge = typename G::E;
+    using Vertex = typename G::Vertex;
+    using Edge = typename G::Edge;
     using QueuePair = std::pair<double, Vertex*>;
     using Graph = G;
 
@@ -157,5 +157,6 @@ void Dijkstra<G>::InitGraph() {
 
 
 
+}
 }
 #endif //BACKEND_DIJKSTRA_H

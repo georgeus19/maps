@@ -21,8 +21,8 @@ namespace preprocessing {
  */
 template <typename Graph>
 class ShortcutFilter {
-    using Vertex = Graph::V;
-    using Edge = Graph::E;
+    using Vertex = Graph::Vertex;
+    using Edge = Graph::Edge;
 public:
     ShortcutFilter(Graph& g);
 

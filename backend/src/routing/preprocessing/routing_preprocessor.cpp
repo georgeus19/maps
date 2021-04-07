@@ -1,11 +1,10 @@
-#include "routing/graph.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/edges/ch_preprocessing_edge.h"
 #include "routing/algorithm.h"
-#include "routing/dijkstra.h"
+#include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
-#include "routing/graph.h"
+#include "routing/adjacency_list_graph.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
 #include "utility/point.h"
@@ -25,7 +24,7 @@ using namespace database;
 using namespace routing;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
 const string kDbName = "gis";
 const string kUser = "postgres";
 const string kPassword = "wtz2trln";

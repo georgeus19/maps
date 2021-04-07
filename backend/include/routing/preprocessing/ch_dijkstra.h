@@ -12,7 +12,6 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
-#include "routing/graph.h"
 #include "robin_hood/robin_hood.h"
 #include "tsl/robin_map.h"
 #include "tsl/robin_set.h"
@@ -27,8 +26,8 @@ namespace preprocessing {
 template <typename G>
 class CHDijkstra {
 public:
-    using Vertex = typename G::V;
-    using Edge = typename G::E;
+    using Vertex = typename G::Vertex;
+    using Edge = typename G::Edge;
     using Graph = G;
 	using TargetVerticesMap = tsl::robin_map<unsigned_id_type, bool>;
 
