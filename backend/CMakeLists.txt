@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(backend)
 
 set(CMAKE_CXX_STANDARD 20)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 file(GLOB OsmParserGlob src/osm_parser/*.cpp include/osm_parser/*.h)
 file(GLOB DatabaseHelperGlob src/database/*.cpp include/database/*.h)
 file(GLOB TileRenderingGlob src/tile_rendering/*.cpp include/tile_rendering/*.h)

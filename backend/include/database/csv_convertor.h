@@ -37,7 +37,7 @@ template <typename Graph>
 void CsvConvertor::SaveEdges(Graph& graph, const std::function<bool(const typename Graph::Edge&)> condition) {
     try {
         f_.open(file_);
-        graph.ForEachEdge([&](const Graph::Edge& edge) {
+        graph.ForEachEdge([&](const typename Graph::Edge& edge) {
             if (condition(edge)) {
                 SaveEdge<typename Graph::Edge>(edge);
             }
