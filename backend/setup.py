@@ -1,12 +1,14 @@
 import os
 from distutils.core import setup, Extension
 
-os.environ['CC'] = 'g++-9 -std=c++17'
-includeDirs = ['/usr/local/include', './include']
+os.environ['CC'] = 'g++-9 -std=c++2a'
+includeDirs = ['/usr/local/include', './include', './lib']
 
 libs = ['pqxx', 'pq']
 
-src = ['./src/routing/basic_edge_endpoint_handler.cpp', './src/routing/exception.cpp', './src/routing/query/module.cpp', './src/routing/edges/ch_search_edge.cpp', './src/routing/edges/basic_edge.cpp', './src/routing/edges/ch_preprocessing_edge.cpp', './src/routing/preprocessing/routing_preprocessor.cpp', './src/database/database_helper.cpp', './src/utility/point.cpp']
+src = ['./src/routing/basic_edge_endpoint_handler.cpp', './src/routing/exception.cpp', './src/routing/query/module.cpp',
+ './src/routing/edges/ch_search_edge.cpp', './src/routing/edges/basic_edge.cpp', './src/routing/edges/ch_preprocessing_edge.cpp',
+  './src/routing/preprocessing/routing_preprocessor.cpp', './src/database/database_helper.cpp', './src/utility/point.cpp']
 
 module = Extension('routing_module',
                     define_macros = [('MAJOR_VERSION', '1'),

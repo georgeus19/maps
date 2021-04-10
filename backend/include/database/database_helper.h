@@ -152,7 +152,7 @@ public:
      * @param endpoint Endpoint of a route for which segments are found.
      * @return Vector of DbRows each representing one segment. Each segment can be transformed to graph edge.
      */
-    std::vector<DbRow> GetClosestSegments(utility::Point endpoint, const std::string & table_name);
+    std::vector<DbRow> GetClosestSegments(utility::Point endpoint, const std::string & table_name, DbGraph* db_graph);
 
     /**
      * Split an edge into segments by a blade and return
@@ -225,6 +225,9 @@ public:
     void CreateGeographyIndex(const std::string& table_name);
 
     void CreateGraphTable(const std::string& graph_table_name, const std::string& new_table_name, DbGraph* db_graph);
+
+    template <typename Graph>
+    void LoadAdditionalVertexProperties(const std::string& vertices_table, Graph&g);    
     
 private:
     
@@ -416,6 +419,25 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     w.commit();
 }
 
+template <typename Graph>
+void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_table, Graph& g) {
+    std::string select_sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
+    std::string where_condition = " WHERE false = true ";
+    g.ForEachVertex([&](typename Graph::Vertex& v) {
+        where_condition += " or osm_id = ";
+        where_condition += std::to_string(v.get_osm_id());
+    });
+    where_condition += " ";
+    std::string sql = select_sql + where_condition;
+    pqxx::nontransaction n{connection_};
+    pqxx::result result{n.exec(sql)};
+    for (auto&& it = result.begin(); it != result.end(); ++it) {
+        uint64_t vertex_id = it[0].as<uint64_t>();
+        auto&& vertex = g.GetVertex(vertex_id);
+        vertex.set_ordering_rank(it[1].as<uint64_t>());
+        auto&& xx = g.GetVertex(vertex_id);
+    }
+}
 
 template <typename Graph>
 void DatabaseHelper::LoadGraph(const std::string& sql, Graph& graph, DbGraph* db_graph) {

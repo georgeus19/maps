@@ -13,7 +13,6 @@
 #include <utility>
 #include "utility/point.h"
 #include "database/csv_convertor.h"
-#include "database/db_edge_iterator.h"
 
 namespace database {
 

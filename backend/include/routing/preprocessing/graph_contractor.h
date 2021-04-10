@@ -86,13 +86,10 @@ void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
 template <typename Graph>
 void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQueue& q) {
     assert(!q.empty());
-    size_t repeat = 0;
 
     ShortcutContainer<Edge> shortcuts;
     unsigned_id_type vertex_id;
     if (q.size() != 1) {
-        double priority_threshold;
-        double new_priority;
         while(true) {
             vertex_id = q.top().second;
             auto&& vertex = g_.GetVertex(vertex_id);
@@ -104,7 +101,6 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
                 break;
             }
             q.push(std::make_pair(new_priority, vertex_id));
-            ++repeat;
         }
     } else {
         vertex_id = q.top().second;
@@ -112,9 +108,6 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
         shortcuts = shortcut_finder_.FindShortcuts(vertex);
         q.pop();
     }
-    // if (repeat > 10) {
-    //     std::cout << " lazy update repeat is " << repeat << std::endl;
-    // }
 
     AddShortcuts(std::move(shortcuts));
     auto&& contracted_vertex = g_.GetVertex(vertex_id);
@@ -125,14 +118,8 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
 template <typename Graph>
 GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContractionPriority() {
     PriorityQueue q;
-    size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {
-            // ++count;
-            // if (count % 10000 == 0) {
-
-            //     std::cout << count << " CalculateContractionPriority iterations" << std::endl;
-            // }
             double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
             q.push(std::make_pair(attractivity, vertex.get_osm_id()));
         }

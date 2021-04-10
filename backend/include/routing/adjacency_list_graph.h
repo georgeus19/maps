@@ -38,8 +38,6 @@ public:
      */
     void AddEdge(E&& edge);
 
-    void AddReverseEdge(E&& edge);
-
     /**
      * Return point to vertex with `id`.
      * @param id Id of vertex to which Vertex* points.

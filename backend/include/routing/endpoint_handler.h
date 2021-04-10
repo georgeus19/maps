@@ -5,7 +5,6 @@
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 
-
 namespace routing {
 
 /**
@@ -22,8 +21,8 @@ template <typename EndpointHandlerImpl>
 class EndpointHandler {
     EndpointHandlerImpl impl_;
 public:
-    EndpointHandler(unsigned_id_type node_id_from, unsigned_id_type node_id_to,
-            unsigned_id_type edge_id_from, unsigned_id_type edge_id_to) : impl_(EndpointHandlerImpl{node_id_from, node_id_to, edge_id_from, edge_id_to}) {
+    EndpointHandler(database::DbGraph* db_graph, unsigned_id_type node_id_from, unsigned_id_type node_id_to,
+            unsigned_id_type edge_id_from, unsigned_id_type edge_id_to) : impl_(db_graph, node_id_from, node_id_to, edge_id_from, edge_id_to) {
     }
 
     /**

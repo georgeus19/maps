@@ -17,6 +17,7 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include "routing/query/module.h"
+
 #include <string>
 
 using namespace std;
@@ -72,7 +73,7 @@ static struct PyModuleDef routing_module = {
 PyMODINIT_FUNC PyInit_routing_module(void) {
     return PyModule_Create(&routing_module);
 }
-/*/
+/*
 //0: Object { lon: 13.391759236865617, lat: 49.725876733293816 }
 //1: Object { lon: 13.39411338612247, lat: 49.72563051868181 }
 //13.392612138690344, lat: 49.72598770285154 }
@@ -94,4 +95,4 @@ int main() {
 }
 
 
-/**/
+*/

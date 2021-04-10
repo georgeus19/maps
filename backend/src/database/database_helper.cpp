@@ -95,6 +95,7 @@ std::string DatabaseHelper::CalculateRadius(utility::Point start, utility::Point
 WITH closest_candidates AS (
 SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length
 FROM czedges as e
+WHERE shortcut = false
 ORDER BY
 e.geog <-> 'SRID=4326;POINT(13.394182 49.725673)'::geography
 LIMIT 100
@@ -139,7 +140,7 @@ LIMIT 1
 SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(segments.geog), (segments.geog), adjacent.seg_len, max_uid.uid
 FROM segments, closest_edge as e, max_uid,  adjacent
 	*/
-vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string &table_name) {
+vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string &table_name, DbGraph* db_graph) {
 	string point = MakeGeographyPoint(p);
 	/*
 		* First compute closest edge to `point` by fast finding (compare bounding rectangles)
@@ -159,8 +160,9 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 		* segment length, segment geoJSON geometry, previous query segment length and max uid.
 		*/
 	string sql = "WITH closest_candidates AS ( " \
-					"  SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length " \
+					"  SELECT * " \
 					"  FROM " + table_name + " as e " \
+					"  WHERE " + db_graph->GetEndpointEdgeCondition("e") + " " \
 					"  ORDER BY " \
 					"    e.geog <-> " + point + " " \
 					"  LIMIT 100 " \

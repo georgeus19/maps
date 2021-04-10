@@ -98,7 +98,7 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
         return x.first < y.first ||
                (!(y.first < x.first) && x.second < y.second);
     }
-    /**/
+    */
     std::set<QueuePair> q;
     start_node_ = start_node;
     InitGraph();

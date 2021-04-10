@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(backend)
 
 set(CMAKE_CXX_STANDARD 20)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+# set (CMAKE_CXX_FLAGS "-std=c++17 -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -DMAJOR_VERSION=1 -DMINOR_VERSION=0")
 file(GLOB OsmParserGlob src/osm_parser/*.cpp include/osm_parser/*.h)
 file(GLOB DatabaseHelperGlob src/database/*.cpp include/database/*.h)
 file(GLOB TileRenderingGlob src/tile_rendering/*.cpp include/tile_rendering/*.h)
@@ -124,3 +124,4 @@ target_link_libraries(backend_test pq)
 
 # SET(CMAKE_CXX_FLAGS_RELEASE "-g -pg -O2")
 # SET(CMAKE_CXX_FLAGS_BUILD "-g -pg -O2")
+# set (CMAKE_CXX_FLAGS "-std=c++17 -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -DMAJOR_VERSION=1 -DMINOR_VERSION=0")

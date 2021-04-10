@@ -37,19 +37,6 @@ public:
         AddReverseEdge(std::move(reverse_edge));
     }
 
-    inline void AddReverseEdge(Edge && edge) {
-    edge.Reverse();
-    g_.AddEdge(std::move(edge), [](Vertex& v, Edge&& e){
-        v.AddReverseEdge(std::move(e));
-    });
-}
-
-    // inline void AddUniqueEdge(Edge&& edge) {
-    //     Edge reverse_edge = edge;
-    //     g_.AddUniqueEdge(std::move(edge));
-    //     g_.AddUniqueReverseEdge(std::move(reverse_edge));
-    // }
-
     inline Vertex& GetVertex(unsigned_id_type id) {
         return g_.GetVertex(id);
     }
@@ -72,6 +59,14 @@ public:
 
 private:
     Graph g_;
+
+    inline void AddReverseEdge(Edge&& edge) {
+        edge.Reverse();
+        g_.AddEdge(std::move(edge), [](Vertex& v, Edge&& e){
+            v.AddReverseEdge(std::move(e));
+        });
+    }
+
 };
 
 

@@ -28,17 +28,33 @@ namespace database {
 class DbGraph {
 public:
     DbGraph() {}
-    virtual std::string GetEdgeSelect() const = 0;
+    virtual std::string GetEdgeSelect(const std::string& table_alias = "") const = 0;
     virtual std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const = 0;
     virtual std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const = 0;
+    virtual std::string GetEndpointEdgeCondition(const std::string& table_alias = "") const = 0;
+    virtual std::string GetVertexSelect(const std::string& table_alias = "") const = 0;
+ 
+protected:
+    std::string GetAliasExpression(const std::string& alias) const {
+        if (alias.empty()) {
+            return alias;
+        } else {
+            return alias + ".";
+        }
+    }
 };
 
 class UnpreprocessedDbGraph : public DbGraph {
 public:
     UnpreprocessedDbGraph() : DbGraph() {}
 
-    std::string GetEdgeSelect() const override {
-        return " SELECT uid, ST_AsText(geog), from_node, to_node, length ";
+    std::string GetEdgeSelect(const std::string& table_alias = "") const override {
+        std::string alias_expression = GetAliasExpression(table_alias);
+        return " SELECT " + alias_expression + "uid, " \
+            " ST_AsText(" + alias_expression + "geog), "
+            + alias_expression + "from_node, "
+            + alias_expression + "to_node, "
+            + alias_expression + "length ";
     }
 
 
@@ -50,11 +66,30 @@ public:
         return "CREATE TABLE " + new_table + " AS SELECT * FROM " + basic_graph_table + ";";
     }
 
+    std::string GetEndpointEdgeCondition(const std::string& table_alias = "") const override {
+        return " true = true ";
+    }
+
+    std::string GetVertexSelect(const std::string& table_alias = "") const override {
+        return " SELECT * ";
+    }
+
 };
 
 class CHDbGraph : public DbGraph {
 public:
     CHDbGraph() : DbGraph() {}
+
+    std::string GetEdgeSelect(const std::string& table_alias = "") const override {
+        std::string alias_expression = GetAliasExpression(table_alias);
+        return " SELECT " + alias_expression + "uid, " \
+        " ST_AsText(" + alias_expression + "geog), "
+        + alias_expression + "from_node, "
+        + alias_expression + "to_node, "
+        + alias_expression + "length, "
+        + alias_expression + "shortcut, "
+        + alias_expression + "contracted_vertex ";
+    }
 
     std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
         std::string create_table_sql = "CREATE TABLE " + new_table + " ( " \
@@ -77,8 +112,16 @@ public:
         return std::make_unique<CHDbEdgeIterator>(begin, end);
     }
 
-    std::string GetEdgeSelect() const override {
-        return " SELECT uid, ST_AsText(geog), from_node, to_node, length, shortcut, contracted_vertex ";
+    std::string GetEndpointEdgeCondition(const std::string& table_alias = "") const override {
+        std::string alias_expression = GetAliasExpression(table_alias);
+        return " " + alias_expression + "shortcut = false ";
+    }
+
+    std::string GetVertexSelect(const std::string& table_alias = "") const override {
+        std::string alias_expression = GetAliasExpression(table_alias);
+        return " SELECT "
+            + alias_expression + "osm_id, "
+            + alias_expression + "ordering_rank ";
     }
 };
 

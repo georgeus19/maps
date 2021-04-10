@@ -14,15 +14,15 @@ namespace utility {
 
         Point(double lon, double lat);
 
-        Point(const Point & other);
+        Point(const Point & other) = default;
 
-        Point(Point && other);
+        Point(Point && other) = default;;
 
-        Point& operator=(const Point & other);
+        Point& operator=(const Point & other) = default;;
 
-        Point& operator=(Point && other);
+        Point& operator=(Point && other) = default;
 
-        ~Point();
+        ~Point() = default;
 
         void Swap(Point & other);
     };

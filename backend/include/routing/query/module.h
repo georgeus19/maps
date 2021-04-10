@@ -32,15 +32,23 @@ const std::string kHostAddress = "127.0.0.1";
 const std::string kPort = "5432";
 
 struct DijkstraSetup {
-    using Graph = AdjacencyListGraph<BasicVertex<BasicEdge>, BasicEdge>;
+    using Edge = BasicEdge;
+    using Vertex = BasicVertex<Edge>;
+    using Graph = AdjacencyListGraph<Vertex, Edge>;
     using DbGraph = database::UnpreprocessedDbGraph;
     using Algorithm = Dijkstra<Graph>;
+    void f(database::DatabaseHelper& d, const std::string& s, Graph g) {}
 };
 
 struct CHSetup {
-    using Graph = BidirectionalGraph<AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>>;
+    using Edge = CHSearchEdge;
+    using Vertex = ContractionSearchVertex<Edge>;
+    using Graph = BidirectionalGraph<AdjacencyListGraph<Vertex, Edge>>;
     using DbGraph = database::CHDbGraph;
     using Algorithm = BidirectionalDijkstra<Graph>;
+    void f(database::DatabaseHelper& d, const std::string& s, Graph& g) {
+        d.LoadAdditionalVertexProperties(s, g);
+    }
 };
 /**
  * Calculate shortest path between `start` and `end` points.
@@ -62,23 +70,26 @@ std::string CCalculateShortestRoute(const std::string & table_name, utility::Poi
     std::string radius = d.CalculateRadius(start, end, 0.7);
     typename Setup::DbGraph db_graph{};
     d.LoadGraph<typename Setup::Graph>(graph_center, radius, table_name, g, &db_graph);
+    Setup s;
+    s.f(d, table_name + "_vertex_ordering", g);
+    // d.LoadAdditionalVertexProperties(table_name + "LoadAdditionalVertexProperties", g);
 
     // Add start segments to graph.
-    EndpointHandler<BasicEdgeEndpointHandler> start_handler{1, 1, 0, 0};
-    auto && start_edges = start_handler.CalculateEndpointEdges(start, table_name, d);
+    BasicEdgeEndpointHandler<typename Setup::Edge> start_handler{&db_graph, 1, 1, 0, 0};
+    auto&& start_edges = start_handler.CalculateEndpointEdges(start, table_name, d);
     for(auto&& edge : start_edges) {
         auto e = edge;
-        g.AddEdge(std::move(e));
+        g.AddEdge(std::move(edge));
     }
 
     // Add end segments to graph.
     unsigned_id_type free_node_id_from = start_handler.get_node_id_to();
     unsigned_id_type free_edge_id_from = start_handler.get_edge_id_to();
-    EndpointHandler<BasicEdgeEndpointHandler> end_handler{free_node_id_from, free_node_id_from + 1, free_edge_id_from, free_edge_id_from + 4};
-    auto && end_edges = end_handler.CalculateEndpointEdges(end, table_name, d);
+    BasicEdgeEndpointHandler<typename Setup::Edge> end_handler{&db_graph, free_node_id_from, free_node_id_from + 1, free_edge_id_from, free_edge_id_from + 4};
+    auto&& end_edges = end_handler.CalculateEndpointEdges(end, table_name, d);
     for(auto&& edge : end_edges) {
         auto e = edge;
-        g.AddEdge(std::move(e));
+        g.AddEdge(std::move(edge));
     }
 
     // Run routing algorithm.
@@ -88,8 +99,8 @@ std::string CCalculateShortestRoute(const std::string & table_name, utility::Poi
     // Construct list of geometries.
     std::string geojson_array = d.GetRouteCoordinates(res, table_name);
 
-    std::string first_edge_geometry = start_handler.GetEndpointEdgeGeometry(res[res.size() - 1].get_uid());
-    std::string last_edge_geometry = end_handler.GetEndpointEdgeGeometry(res[0].get_uid());
+    std::string first_edge_geometry = start_handler.GetEndpointEdgeGeometry(res[0].get_uid());
+    std::string last_edge_geometry = end_handler.GetEndpointEdgeGeometry(res[res.size() - 1].get_uid());
 
     std::string final_array = "[" + first_edge_geometry + geojson_array + "," + last_edge_geometry + "]";
     return final_array;
