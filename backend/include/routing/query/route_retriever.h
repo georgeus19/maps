@@ -7,11 +7,12 @@
 #include <vector>
 #include <stack>
 #include "routing/edges/basic_edge.h"
+#include "tsl/robin_map.h"
 
 namespace routing {
 namespace query {
 
-template <typename Graph>
+template <typename Graph, typename VertexRoutingProperties>
 class RouteRetriever {
 public:
     using Vertex = Graph::Vertex;
@@ -21,25 +22,24 @@ public:
 
     class GraphInfo {
     public:
-        GraphInfo(RouteRetriever& retriever) : retriever_(retriever) {}
+        GraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : retriever_(retriever), touched_vertices_(tv) {}
 
-        virtual unsigned_id_type GetPrevious(const Vertex& vertex) = 0;
+        unsigned_id_type GetPrevious(const Vertex& vertex) const {
+            return touched_vertices_[vertex.get_osm_id()].previous;
+        }
 
         virtual Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
 
         virtual void AddEdge(std::vector<Edge>& route, Edge&& edge) = 0;
     protected:
         RouteRetriever& retriever_;
+        VertexRoutingProperties& touched_vertices_;
     };
 
     class BiDijkstraForwardGraphInfo : public GraphInfo {
         using GraphInfo::retriever_;
     public:
-        BiDijkstraForwardGraphInfo(RouteRetriever& retriever) : GraphInfo(retriever) {}
-
-        unsigned_id_type GetPrevious(const Vertex& vertex) override {
-            return vertex.get_forward_previous();
-        }
+        BiDijkstraForwardGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
         Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindEdge(f);
@@ -58,11 +58,7 @@ public:
     class BiDijkstraBackwardGraphInfo : public GraphInfo {
         using GraphInfo::retriever_;
     public:
-        BiDijkstraBackwardGraphInfo(RouteRetriever& retriever) : GraphInfo(retriever) {}
-
-        unsigned_id_type GetPrevious(const Vertex& vertex) override {
-            return vertex.get_backward_previous();
-        }
+        BiDijkstraBackwardGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
         Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindReverseEdge(f);
@@ -84,11 +80,7 @@ public:
 
     class DijkstraGraphInfo : public GraphInfo {
     public:
-        DijkstraGraphInfo(RouteRetriever& retriever) : GraphInfo(retriever) {}
-
-        unsigned_id_type GetPrevious(const Vertex& vertex) override {
-            return vertex.get_previous();
-        }
+        DijkstraGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
         Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindEdge(f);
@@ -110,11 +102,11 @@ private:
     Edge& GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id);
 };
   
-template <typename Graph>
-RouteRetriever<Graph>::RouteRetriever(Graph& g) : g_(g) {}
+template <typename Graph, typename VertexRoutingProperties>
+RouteRetriever<Graph, VertexRoutingProperties>::RouteRetriever(Graph& g) : g_(g) {}
 
-template <typename Graph>
-std::vector<typename RouteRetriever<Graph>::Edge> RouteRetriever<Graph>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
+template <typename Graph, typename VertexRoutingProperties>
+std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> RouteRetriever<Graph, VertexRoutingProperties>::GetRoute(GraphInfo* graph_info, unsigned_id_type start_node, unsigned_id_type end_node) {
     std::vector<Edge> route;
     if (start_node == end_node) {
         return route;
@@ -150,8 +142,8 @@ std::vector<typename RouteRetriever<Graph>::Edge> RouteRetriever<Graph>::GetRout
     return route; 
 }
 
-template <typename Graph>
-std::vector<typename RouteRetriever<Graph>::Edge> RouteRetriever<Graph>::UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut) {
+template <typename Graph, typename VertexRoutingProperties>
+std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> RouteRetriever<Graph, VertexRoutingProperties>::UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut) {
     assert(shortcut.IsShortcut());
     std::stack<Edge> shortcut_stack{};
     Edge edge = std::move(shortcut);
@@ -178,8 +170,8 @@ std::vector<typename RouteRetriever<Graph>::Edge> RouteRetriever<Graph>::UnpackS
     return underlying_edges;
 }
 
-template <typename Graph>
-inline RouteRetriever<Graph>::Edge& RouteRetriever<Graph>::GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id) {
+template <typename Graph, typename VertexRoutingProperties>
+inline RouteRetriever<Graph, VertexRoutingProperties>::Edge& RouteRetriever<Graph, VertexRoutingProperties>::GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id) {
     return graph_info->FindEdge(g_.GetVertex(former_vertex_id), [=](const Edge& e) {
         return e.get_to() == latter_vertex_id;
     });
