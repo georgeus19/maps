@@ -435,7 +435,6 @@ void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_
         uint64_t vertex_id = it[0].as<uint64_t>();
         auto&& vertex = g.GetVertex(vertex_id);
         vertex.set_ordering_rank(it[1].as<uint64_t>());
-        auto&& xx = g.GetVertex(vertex_id);
     }
 }
 

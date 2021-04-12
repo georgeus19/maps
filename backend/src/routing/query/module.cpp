@@ -44,7 +44,7 @@ static PyObject* CalculateShortestRoute(PyObject* self, PyObject* args) {
 
     string result;
     try {
-        result = CCalculateShortestRoute<DijkstraSetup>(table_name, utility::Point{start_lon, start_lat}, utility::Point{end_lon, end_lat});
+        result = CCalculateShortestRoute<CHSetup>(table_name, utility::Point{start_lon, start_lat}, utility::Point{end_lon, end_lat});
         return Py_BuildValue("s", result.c_str());
     } catch (exception & e) {
         result = "ER" + string{e.what()};

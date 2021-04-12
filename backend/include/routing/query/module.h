@@ -63,16 +63,23 @@ std::string CCalculateShortestRoute(const std::string & table_name, utility::Poi
     if (start.lat_ == end.lat_ && start.lon_ == end.lon_) {
         throw RouteNotFoundException("Start and end point are the same.");
     }
+
+    
     // Load graph.
     utility::Point graph_center{(start.lon_ + end.lon_) / 2, (start.lat_ + end.lat_) / 2};
     typename Setup::Graph g{};
     database::DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
     std::string radius = d.CalculateRadius(start, end, 0.7);
     typename Setup::DbGraph db_graph{};
+
+        auto start_load = std::chrono::high_resolution_clock::now();
     d.LoadGraph<typename Setup::Graph>(graph_center, radius, table_name, g, &db_graph);
     Setup s;
-    s.f(d, table_name + "_vertex_ordering", g);
+        auto finish_load = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_load = finish_load - start_load;
+        std::cout << "Elapsed time - load graph: " << elapsed_load.count() << " s\n";
     // d.LoadAdditionalVertexProperties(table_name + "LoadAdditionalVertexProperties", g);
+    s.f(d, table_name + "_vertex_ordering", g);
 
     // Add start segments to graph.
     BasicEdgeEndpointHandler<typename Setup::Edge> start_handler{&db_graph, 1, 1, 0, 0};
@@ -93,8 +100,13 @@ std::string CCalculateShortestRoute(const std::string & table_name, utility::Poi
     }
 
     // Run routing algorithm.
+        auto start_run = std::chrono::high_resolution_clock::now();
     Algorithm<typename Setup::Algorithm> alg{g};
     alg.Run(0, 1);
+        auto finish_run = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_run = finish_run - start_run;
+        std::cout << "Elapsed time - run alg: " << elapsed_run.count() << " s\n";
+
     std::vector<typename Setup::Algorithm::Edge> res = alg.GetRoute();
     // Construct list of geometries.
     std::string geojson_array = d.GetRouteCoordinates(res, table_name);

@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <chrono>
 
 using namespace std;
 using namespace routing;
@@ -31,14 +32,26 @@ using namespace preprocessing;
 
 TEST(QueryModuleTests, QueryModuleTest) {
     std::string table_name = "cznoloops";
-    utility::Point start{15.568861848533453, 50.66747073900733};
-    utility::Point end{15.581821585773252,  50.67989977147217};
-
-
-    auto&& result = CCalculateShortestRoute<DijkstraSetup>(table_name, start, end);
-    auto&& CHresult = CCalculateShortestRoute<CHSetup>("CH" + table_name, start, end);
-    std::cout << result << std::endl;
-    std::cout << CHresult << std::endl;
+    utility::Point source{15.568861848533453, 50.66747073900733};
+    utility::Point target{15.581821585773252,  50.67989977147217};
+    // lon lat
+    // utility::Point source{13.376990, 49.746841}; // plzen
+    // utility::Point target{15.608720, 50.627522}; // vrchlabi
+    // utility::Point target{13.391600, 49.934470}; // plasy
+    std::cout << "Dijkstra query:" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    auto&& result = CCalculateShortestRoute<DijkstraSetup>(table_name, source, target);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+    std::cout << "Contraction hierarchies query:" << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+    auto&& CHresult = CCalculateShortestRoute<CHSetup>("CH" + table_name, source, target);
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish - start;
+    std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+    // std::cout << result << std::endl;
+    // std::cout << CHresult << std::endl;
     EXPECT_EQ(result, CHresult);
     ;
 }

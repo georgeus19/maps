@@ -8,6 +8,16 @@
 #include <set>
 #include <queue>
 #include <cassert>
+#include <cstdlib>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <random>
+#include <cmath>
+#include <iostream>
+#include <ctime>
 #include "routing/preprocessing/contraction_parameters.h"
 #include "tsl/robin_set.h"
 #include "tsl/robin_map.h"
@@ -63,6 +73,11 @@ ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::F
 template <typename Graph>
 std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& contracted_vertex, const Edge& reversed_first_edge) {
     std::vector<Edge> shortcuts{};
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> distrib(1, 11);
+    const size_t random_half = 6;
+
     unsigned_id_type source_vertex_id = reversed_first_edge.get_to();
     Vertex& source_vertex = g_.GetVertex(source_vertex_id);
 
@@ -89,7 +104,11 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
-            shortcuts.push_back(Edge{parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), reversed_first_edge.get_geography()});
+            int random = distrib(gen);
+            // std::cout << "random: " << random << std::endl;
+            auto&& geog = ((random < random_half) ?  reversed_first_edge.get_geography() :  second_edge.get_geography());
+
+            shortcuts.emplace_back(parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id(), geog);
         }
     }
     return shortcuts;
