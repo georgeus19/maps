@@ -67,7 +67,7 @@ public:
 		return settled_vertices_;
 	}
 private:
-    struct VertexRoutingInfo;
+    struct VertexRoutingProperties;
 	struct PriorityQueueMember;
 	struct PriorityQueueMemberMinComparator;
     using PriorityQueue = std::priority_queue<PriorityQueueMember, std::vector<PriorityQueueMember>, PriorityQueueMemberMinComparator>;
@@ -77,9 +77,9 @@ private:
 	 * Stores all reached vertices from Run function. STL unordered map is not used,
 	 * since slows the entire preprocessing wrt performance and memory usage.
 	 */
-	// using UnorderedMap = std::unordered_map<unsigned_id_type, VertexRoutingInfo>;
-	// using UnorderedMap = robin_hood::unordered_map<unsigned_id_type, VertexRoutingInfo>;
-	using UnorderedMap = tsl::robin_map<unsigned_id_type, VertexRoutingInfo>;
+	// using UnorderedMap = std::unordered_map<unsigned_id_type, VertexRoutingProperties>;
+	// using UnorderedMap = robin_hood::unordered_map<unsigned_id_type, VertexRoutingProperties>;
+	using UnorderedMap = tsl::robin_map<unsigned_id_type, VertexRoutingProperties>;
     UnorderedMap touched_vertices_;
 
     unsigned_id_type source_vertex_;
@@ -94,19 +94,19 @@ private:
 	 * Stores information from the search. It is memory & performance inefficient to store it in vertices
 	 * since a small portion of graph is searched.
 	 */
-    struct VertexRoutingInfo {
+    struct VertexRoutingProperties {
         double cost;
         unsigned_id_type previous;
 
-		VertexRoutingInfo() : cost(std::numeric_limits<double>::max()), previous(0) {}
+		VertexRoutingProperties() : cost(std::numeric_limits<double>::max()), previous(0) {}
 
-        VertexRoutingInfo(double c, unsigned_id_type p) : cost(c), previous(p) {}
+        VertexRoutingProperties(double c, unsigned_id_type p) : cost(c), previous(p) {}
 
-        VertexRoutingInfo(const VertexRoutingInfo& other) = default;
-        VertexRoutingInfo(VertexRoutingInfo&& other) = default;
-        VertexRoutingInfo& operator= (const VertexRoutingInfo& other) = default;
-        VertexRoutingInfo& operator= (VertexRoutingInfo&& other) = default;
-        ~VertexRoutingInfo() = default;
+        VertexRoutingProperties(const VertexRoutingProperties& other) = default;
+        VertexRoutingProperties(VertexRoutingProperties&& other) = default;
+        VertexRoutingProperties& operator= (const VertexRoutingProperties& other) = default;
+        VertexRoutingProperties& operator= (VertexRoutingProperties&& other) = default;
+        ~VertexRoutingProperties() = default;
     };
 
 	/**
@@ -160,7 +160,7 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 	source_vertex_ = source_vertex;
 	settled_vertices_ = 0;
 	contracted_vertex_ = contracted_vertex;
-	touched_vertices_.insert_or_assign(source_vertex, VertexRoutingInfo{0, 0});
+	touched_vertices_.insert_or_assign(source_vertex, VertexRoutingProperties{0, 0});
 	PriorityQueue q{};
 	q.emplace(0, source_vertex, 0);
 	size_t dead_members = 0;
@@ -172,22 +172,22 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		assert(touched_vertices_.contains(min_member.vertex_id));
 		assert(min_member.hop_count < limits.max_hop_count);
 		auto&& vertex = g_.GetVertex(min_member.vertex_id);
-		auto&& vertex_info = touched_vertices_[min_member.vertex_id];
+		auto&& vertex_routing_properties = touched_vertices_[min_member.vertex_id];
 		
 		// There might be more members in the `q` for one vertex - always use only the minimal one.
-		bool queue_member_is_dead = vertex_info.cost < min_member.cost;
+		bool queue_member_is_dead = vertex_routing_properties.cost < min_member.cost;
 		if (queue_member_is_dead) {
 			++dead_members;
 			continue;
 		}
-		assert(vertex_info.cost == min_member.cost);
+		assert(vertex_routing_properties.cost == min_member.cost);
 		auto&& it = target_vertices.find(min_member.vertex_id);
 		if (it != target_vertices.end() && it->second == false) {
 			target_vertices.insert_or_assign(min_member.vertex_id, true);
 			++target_vertices_found; 
 		}
 		bool all_target_vertices_found = target_vertices_found == target_vertices.size();
-		bool max_cost_surpassed = vertex_info.cost > limits.max_cost;
+		bool max_cost_surpassed = vertex_routing_properties.cost > limits.max_cost;
 		if (all_target_vertices_found || max_cost_surpassed) {
 			return true;
 		}
@@ -226,14 +226,14 @@ inline bool CHDijkstra<G>::IgnoreNeighbour(const Vertex& neighbour) {
 template <typename G>
 void CHDijkstra<G>::UpdateNeighbour(const PriorityQueueMember& min_member, const Edge& edge, PriorityQueue& q, const SearchRangeLimits& limits) {
 	unsigned_id_type neighbour_id = edge.get_to();
-	auto&& neighbour_info = touched_vertices_[neighbour_id];
+	auto&& neighbour_routing_properties = touched_vertices_[neighbour_id];
 	double update_cost = min_member.cost + edge.get_length();
-	if (update_cost < neighbour_info.cost && !IgnoreNeighbour(g_.GetVertex(neighbour_id)) ) {
-		neighbour_info.cost = update_cost;
-		neighbour_info.previous = min_member.vertex_id;
+	if (update_cost < neighbour_routing_properties.cost && !IgnoreNeighbour(g_.GetVertex(neighbour_id)) ) {
+		neighbour_routing_properties.cost = update_cost;
+		neighbour_routing_properties.previous = min_member.vertex_id;
 		size_t update_hop_count = min_member.hop_count + 1;
 		if (update_hop_count < limits.max_hop_count) {
-			q.emplace(neighbour_info.cost, neighbour_id, update_hop_count);
+			q.emplace(neighbour_routing_properties.cost, neighbour_id, update_hop_count);
 		}
 	}
 }
