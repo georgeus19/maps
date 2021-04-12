@@ -13,8 +13,6 @@ template <typename Edge>
 class ContractionVertex : public BasicVertex<Edge> {
     using BasicVertex<Edge>::osm_id_;
     using BasicVertex<Edge>::outgoing_edges_;
-    using BasicVertex<Edge>::cost_;
-    using BasicVertex<Edge>::previous_;
 public:
 
     using BasicVertex<Edge>::FindEdge;
@@ -62,7 +60,7 @@ private:
 
 template <typename Edge>
 ContractionVertex<Edge>::ContractionVertex(unsigned_id_type osm_id)
-        : BasicVertex<Edge>(osm_id), ordering_rank_(0), contracted_(false), reverse_edges_(std::vector<Edge>{}) {}
+        : BasicVertex<Edge>(osm_id), ordering_rank_(0), contracted_(false), reverse_edges_() {}
 
 template <typename Edge>
 inline void ContractionVertex<Edge>::AddReverseEdge(Edge&& edge) {

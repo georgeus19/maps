@@ -81,8 +81,6 @@ private:
     };
 
     void UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_properties, std::set<QueuePair> & q, const std::function<bool(Vertex*)>& ignore);
-
-    void InitGraph();
 };
 
 template <typename G>
@@ -125,7 +123,6 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
     std::set<QueuePair> q;
     start_node_ = start_node;
     touched_vertices_.clear();
-    InitGraph();
 
     Vertex& start_vertex = g_.GetVertex(start_node);
     touched_vertices_.insert_or_assign(start_node, VertexRoutingProperties{0, 0});
@@ -175,13 +172,7 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
     });
 }
 
-template <typename G>
-void Dijkstra<G>::InitGraph() {
-    
-    g_.ForEachVertex([](Vertex&  v) {
-        v.ResetRoutingProperties();
-    }); 
-}
+
     
 
 
