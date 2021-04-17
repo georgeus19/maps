@@ -65,6 +65,7 @@
         "bit": "cpp",
         "typeindex": "cpp",
         "queue": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "cursor": "cpp"
     }
 }

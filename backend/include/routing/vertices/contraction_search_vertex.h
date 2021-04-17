@@ -16,14 +16,8 @@ class ContractionSearchVertex : public BasicVertex<Edge> {
 private:
     using BasicVertex<Edge>::osm_id_;
     using BasicVertex<Edge>::outgoing_edges_;
-
-    unsigned_id_type ordering_rank_;
-
-    std::vector<Edge> reverse_edges_;
 public:
-
     using BasicVertex<Edge>::FindEdge;
-
     inline void set_ordering_rank(unsigned_id_type ordering_rank) {
         ordering_rank_ = ordering_rank;
     }
@@ -45,7 +39,10 @@ public:
     void ForEachReverseEdge(const std::function<void(Edge&)>& f);
 
     Edge& FindReverseEdge(const std::function<bool(const Edge&)>& f);
+private:
+    unsigned_id_type ordering_rank_;
 
+    std::vector<Edge> reverse_edges_;
 };
 
 template <typename Edge>

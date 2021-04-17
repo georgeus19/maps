@@ -13,6 +13,7 @@
 #include "routing/vertices/contraction_vertex.h"
 #include "routing/exception.h"
 #include <set>
+#include "tsl/robin_map.h"
 
 namespace routing {
 
@@ -25,7 +26,9 @@ namespace routing {
 template <typename V, typename E>
 class AdjacencyListGraph {
 public:
-    using vertex_iterator = std::unordered_map<unsigned_id_type, V>::iterator;
+    template <typename Key, typename Value>
+    using UnorderedMap = std::unordered_map<Key, Value>;
+    using vertex_iterator = UnorderedMap<unsigned_id_type, V>::iterator;
 
     using Vertex = V;
     using Edge = E;
@@ -60,12 +63,12 @@ private:
      * Internal graph representaions. Unfortunately, even though the ids
      * are number they are too high to index using std::vector.
      */
-    std::unordered_map<unsigned_id_type, V> g_;
+    UnorderedMap<unsigned_id_type, V> g_;
 
 };
 
 template <typename V, typename E>
-AdjacencyListGraph<V, E>::AdjacencyListGraph() : g_(std::unordered_map<unsigned_id_type, V>{}) {}
+AdjacencyListGraph<V, E>::AdjacencyListGraph() : g_(UnorderedMap<unsigned_id_type, V>{}) {}
 
 template <typename V, typename E>
 inline void AdjacencyListGraph<V, E>::AddEdge(E && edge) {
@@ -80,12 +83,16 @@ inline V& AdjacencyListGraph<V, E>::GetVertex(unsigned_id_type id) {
     if (it == g_.end()) {
         throw VertexNotFoundException("Vertex " + std::to_string(id) + " not found in graph.");
     } else {
+        // return it.value();
         return it->second;
     }
 }
 
 template <typename V, typename E>
 void AdjacencyListGraph<V, E>::ForEachVertex(const std::function<void(V&)>& f) {
+    // for(auto it = g_.begin(); it != g_.end(); ++it) {
+    //     f(it.value());
+    // }
     for (auto&& pair : g_) {
         f(pair.second);
     }
@@ -112,6 +119,7 @@ void AdjacencyListGraph<V, E>::AddEdge(E && e, const std::function<void(V &, E &
     } else {
         // Vertex exists. Add edge.
         add_edge(from_it->second, std::move(e));
+        // add_edge(from_it.value(), std::move(e));
     }
 
     // e.to_ might not be added to the graph.

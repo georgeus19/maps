@@ -419,16 +419,28 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     w.commit();
 }
 
+// template <typename Graph>
+// void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_table, Graph& g) {
+//     std::string select_sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
+//     std::string where_condition = " WHERE false = true ";
+//     g.ForEachVertex([&](typename Graph::Vertex& v) {
+//         where_condition += " or osm_id = ";
+//         where_condition += std::to_string(v.get_osm_id());
+//     });
+//     where_condition += " ";
+//     std::string sql = select_sql + where_condition;
+//     pqxx::nontransaction n{connection_};
+//     pqxx::result result{n.exec(sql)};
+//     for (auto&& it = result.begin(); it != result.end(); ++it) {
+//         uint64_t vertex_id = it[0].as<uint64_t>();
+//         auto&& vertex = g.GetVertex(vertex_id);
+//         vertex.set_ordering_rank(it[1].as<uint64_t>());
+//     }
+// }
+
 template <typename Graph>
 void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_table, Graph& g) {
-    std::string select_sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
-    std::string where_condition = " WHERE false = true ";
-    g.ForEachVertex([&](typename Graph::Vertex& v) {
-        where_condition += " or osm_id = ";
-        where_condition += std::to_string(v.get_osm_id());
-    });
-    where_condition += " ";
-    std::string sql = select_sql + where_condition;
+    std::string sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
     pqxx::nontransaction n{connection_};
     pqxx::result result{n.exec(sql)};
     for (auto&& it = result.begin(); it != result.end(); ++it) {

@@ -29,7 +29,14 @@ public:
     using Vertex = Graph::Vertex;
     using Edge = Graph::Edge;
 
-    inline BidirectionalGraph() : g_() {}
+    inline BidirectionalGraph() : g_() {
+        size_t edge_count = 10914384;
+
+        // for(uint64_t i = 0; i < edge_count; ++i) {
+        //     AddEdge(Edge{3, 42, 3, 2});
+        //     // unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex
+        // }
+    }
 
     inline void AddEdge(Edge&& edge) {
         Edge reverse_edge = edge;

@@ -113,12 +113,12 @@ void TestPathGraph(G& g) {
     g.GetVertex(2).set_ordering_rank(2);
     g.GetVertex(3).set_ordering_rank(3);
     g.GetVertex(4).set_ordering_rank(4);
-    g.GetVertex(5).set_ordering_rank(10);
-    g.GetVertex(6).set_ordering_rank(9);
-    g.GetVertex(7).set_ordering_rank(8);
-    g.GetVertex(8).set_ordering_rank(7);
-    g.GetVertex(9).set_ordering_rank(6);
-    g.GetVertex(10).set_ordering_rank(5);
+    g.GetVertex(5).set_ordering_rank(5);
+    g.GetVertex(6).set_ordering_rank(6);
+    g.GetVertex(7).set_ordering_rank(7);
+    g.GetVertex(8).set_ordering_rank(8);
+    g.GetVertex(9).set_ordering_rank(9);
+    g.GetVertex(10).set_ordering_rank(10);
 }
 
 template <typename G>
@@ -135,6 +135,17 @@ void TestPathShortcutGraph(G& g) {
     g.AddEdge(std::move(typename G::Edge{13, 7, 10, 6, 8}));
 
     g.AddEdge(std::move(typename G::Edge{14, 8, 10, 3, 9}));
+
+	g.GetVertex(1).set_ordering_rank(9);
+    g.GetVertex(2).set_ordering_rank(1);
+    g.GetVertex(3).set_ordering_rank(2);
+    g.GetVertex(4).set_ordering_rank(3);
+    g.GetVertex(5).set_ordering_rank(10);
+    g.GetVertex(6).set_ordering_rank(7);
+    g.GetVertex(7).set_ordering_rank(6);
+    g.GetVertex(8).set_ordering_rank(5);
+    g.GetVertex(9).set_ordering_rank(4);
+    g.GetVertex(10).set_ordering_rank(8);
 }
 
 

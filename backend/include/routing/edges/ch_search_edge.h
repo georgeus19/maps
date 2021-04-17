@@ -3,6 +3,7 @@
 #include <string>
 #include "database/db_edge_iterator.h"
 #include "routing/edges/basic_edge.h"
+#include "routing/edges/min_edge.h"
 #include <iostream>
 
 namespace routing {
@@ -11,7 +12,7 @@ namespace routing {
 class CHSearchEdge : public BasicEdge {
 public:
     inline bool IsShortcut() const {
-        return shortcut_;
+        return contracted_vertex_ != 0;
     }
 
     inline unsigned_id_type get_contracted_vertex() const {
@@ -29,7 +30,6 @@ public:
     ~CHSearchEdge() = default;
 
 private:
-    bool shortcut_;
     unsigned_id_type contracted_vertex_;
 };
 

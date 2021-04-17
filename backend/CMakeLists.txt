@@ -12,6 +12,7 @@ file(GLOB UtilityGlob src/utility/*.cpp include/utility/*.h)
 file(GLOB RoutingPreprocessingGlob src/routing/preprocessing/*.cpp include/routing/preprocessing/*.h src/routing/edges/*.cpp include/routing/edges/*.h)
 file(GLOB RoutingQueryGlob src/routing/query/*.cpp include/routing/query/*.h)
 file(GLOB RoutingTestsGlob src/tests/*.cpp include/tests/*.h)
+file(GLOB RoutingMeasurementsGlob src/routing/measurements/*.cpp include/routing/measurements/*.h)
 
 
 
@@ -22,6 +23,7 @@ add_library(routing ${RoutingGLob} ${RoutingPreprocessingGlob} ${RoutingQueryGlo
 # add_executable(routing_preprocessing ${RoutingGLob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_library(routing_preprocessing ${RoutingGLob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_executable(routing_preprocessor ${RoutingGLob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
+add_executable(routing_measurements ${RoutingMeasurementsGlob}) 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(Osmium REQUIRED)
@@ -104,6 +106,9 @@ link_directories(backend_test /usr/local/lib)
 
 target_link_libraries(tests routing)
 target_link_libraries(tests routing_preprocessing)
+
+target_link_libraries(routing_measurements routing)
+target_link_libraries(routing_measurements routing_preprocessing)
 
 target_link_libraries(routing pqxx)
 target_link_libraries(routing pq)

@@ -30,6 +30,8 @@ public:
 
         virtual Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
 
+        virtual Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
+
         virtual void AddEdge(std::vector<Edge>& route, Edge&& edge) = 0;
     protected:
         RouteRetriever& retriever_;
@@ -43,6 +45,10 @@ public:
 
         Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindEdge(f);
+        }
+
+        Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
+            return vertex.FindReverseEdge(f);
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
@@ -62,6 +68,10 @@ public:
 
         Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
             return vertex.FindReverseEdge(f);
+        }
+
+        Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
+            return vertex.FindEdge(f);
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
@@ -86,6 +96,10 @@ public:
             return vertex.FindEdge(f);
         }
 
+        Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
+            throw NotImplementedException{"DijkstraGraphInfo FindReverseEdge not implemented - no other reverse edges!"};
+        }
+
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
             route.push_back(std::move(edge));
         }
@@ -99,7 +113,9 @@ private:
 
     std::vector<Edge> UnpackShortcut(GraphInfo* graph_info, Edge&& shortcut);
 
-    Edge& GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id);
+    Edge& GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type source_vertex_id, unsigned_id_type target_vertex_id, bool normal_edge);
+
+    unsigned_id_type GetPreviousDefaultValue() const;
 };
   
 template <typename Graph, typename VertexRoutingProperties>
@@ -117,7 +133,7 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     Vertex& curv = g_.GetVertex(cur);
 
 
-    if (end_vertex.GetPreviousDefaultValue() == graph_info->GetPrevious(end_vertex) ) {
+    if (GetPreviousDefaultValue() == graph_info->GetPrevious(end_vertex) ) {
         return route;
     }
 
@@ -152,7 +168,7 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     while (!shortcut_stack.empty() || edge.IsShortcut()) {
         if (edge.IsShortcut()) {
             shortcut_stack.push(edge);
-            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), edge.get_to());
+            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), edge.get_to(), true);
         } else {
             // Add the non-shortcut edges to route.
             underlying_edges.push_back(std::move(edge));
@@ -160,7 +176,12 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
             shortcut_stack.pop();
 
             // The shortcut itself is useless - nothing is done with it.
-            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex());
+            
+            // The former edge belongs to the downward graph if for forward dijkstra search
+            // resp to the upward graph in case of backward dijkstra search.
+            // So the edge needs to be reverse so that its direction is correct.
+            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex(), false);
+            edge.Reverse();
         }
     }
     // Last non-shortcut edge was not added due to empty stack and not being a shortcut.
@@ -171,11 +192,22 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
 }
 
 template <typename Graph, typename VertexRoutingProperties>
-inline RouteRetriever<Graph, VertexRoutingProperties>::Edge& RouteRetriever<Graph, VertexRoutingProperties>::GetUnderlyingEdge(GraphInfo* graph_info, unsigned_id_type former_vertex_id, unsigned_id_type latter_vertex_id) {
-    return graph_info->FindEdge(g_.GetVertex(former_vertex_id), [=](const Edge& e) {
-        return e.get_to() == latter_vertex_id;
-    });
+inline RouteRetriever<Graph, VertexRoutingProperties>::Edge& RouteRetriever<Graph, VertexRoutingProperties>::GetUnderlyingEdge(
+    GraphInfo* graph_info, unsigned_id_type source_vertex_id, unsigned_id_type target_vertex_id, bool normal_edge) {
+    if (normal_edge) {
+        return graph_info->FindEdge(g_.GetVertex(source_vertex_id), [=](const Edge& e) {
+            return e.get_to() == target_vertex_id;
+        });
+    } else {
+        return graph_info->FindReverseEdge(g_.GetVertex(target_vertex_id), [=](const Edge& e) {
+            return e.get_to() == source_vertex_id;
+        });
+    }
+}
 
+template <typename Graph, typename VertexRoutingProperties>
+inline unsigned_id_type RouteRetriever<Graph, VertexRoutingProperties>::GetPreviousDefaultValue() const {
+    return 0;
 }
     
 

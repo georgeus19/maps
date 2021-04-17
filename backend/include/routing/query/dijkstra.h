@@ -144,9 +144,6 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
 
 template <typename G>
 double Dijkstra<G>::GetPathLength(unsigned_id_type to) {
-    for(auto&& xx : touched_vertices_) {
-        std::cout << xx.first << " " << xx.second.cost << std::endl;
-    }
     return touched_vertices_[to].cost;
 }
 
@@ -155,9 +152,7 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
     v.ForEachEdge([&](Edge & edge) {
         unsigned_id_type neighbour_id = edge.get_to();
         Vertex& neighbour = g_.GetVertex(neighbour_id);
-        std::cout << touched_vertices_.size() << std::endl;
         auto&& neighbour_properties = touched_vertices_[neighbour_id];
-        std::cout << touched_vertices_.size() << std::endl;
         double new_cost = vertex_properties.cost + edge.get_length();
         if (!ignore(&neighbour) && neighbour_properties.cost > new_cost) {
 
