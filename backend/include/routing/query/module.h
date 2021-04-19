@@ -108,6 +108,7 @@ std::string CCalculateShortestRoute(const std::string & table_name, utility::Poi
         std::cout << "Elapsed time - run alg: " << elapsed_run.count() << " s\n";
 
     std::vector<typename Setup::Algorithm::Edge> res = alg.GetRoute();
+    std::cout << "Get route done." << std::endl;
     // Construct list of geometries.
     std::string geojson_array = d.GetRouteCoordinates(res, table_name);
 
@@ -115,6 +116,7 @@ std::string CCalculateShortestRoute(const std::string & table_name, utility::Poi
     std::string last_edge_geometry = end_handler.GetEndpointEdgeGeometry(res[res.size() - 1].get_uid());
 
     std::string final_array = "[" + first_edge_geometry + geojson_array + "," + last_edge_geometry + "]";
+    std::cout << "Routing done." << std::endl;
     return final_array;
 }
 

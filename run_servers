@@ -8,3 +8,7 @@ run renderd in background : sudo /etc/init.d/renderd start
 run yarn start
 
 run yarn start api
+
+
+\copy (select uid, from_node, to_node, length, contracted_vertex from abc) to '/home/hrubyk/projects/maps/backend/build/graph.csv' with csv
+

@@ -1,9 +1,9 @@
 {
     "files.associations": {
-        "string": "cpp",
         "any": "cpp",
         "array": "cpp",
         "atomic": "cpp",
+        "strstream": "cpp",
         "*.tcc": "cpp",
         "bitset": "cpp",
         "cctype": "cpp",
@@ -11,7 +11,10 @@
         "cinttypes": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
         "condition_variable": "cpp",
+        "csignal": "cpp",
         "cstdarg": "cpp",
         "cstddef": "cpp",
         "cstdint": "cpp",
@@ -39,6 +42,7 @@
         "random": "cpp",
         "ratio": "cpp",
         "set": "cpp",
+        "string": "cpp",
         "string_view": "cpp",
         "system_error": "cpp",
         "tuple": "cpp",
@@ -59,17 +63,11 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "thread": "cpp",
+        "cfenv": "cpp",
+        "typeindex": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "bit": "cpp",
-        "typeindex": "cpp",
-        "queue": "cpp",
-        "codecvt": "cpp",
-        "cursor": "cpp",
-        "strstream": "cpp",
-        "complex": "cpp",
-        "csignal": "cpp",
-        "cfenv": "cpp"
+        "bit": "cpp"
     }
 }

@@ -3,11 +3,12 @@ from flask_restplus import Api, Resource
 import renderModule
 import routing_module
 from werkzeug.routing import BaseConverter
-from flask import send_file
+from flask import render_template
+from flask import send_file, send_from_directory
 import os.path
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../build/', static_url_path='/')
 api = Api(app)
 
 @api.route('/route')
@@ -23,9 +24,18 @@ class Test(Resource):
                 if s[0] == 'E' and s[1] == 'R':
                     return []
                 route.extend(json.loads(s))
+        print(route)
         return route
 
 
+# @app.route('/main')
+# def index():
+    # return app.send_static_file('index.html')
+@api.route('/main')
+class Main(Resource):
+    def get(self):
+        return send_file("/home/hrubyk/projects/maps/build/index.html")
+        # return app.send_static_file("index.html")
 
 @api.route('/maps/<int:z>/<int:x>/<int:y>.png')
 class MapFeeder(Resource):
