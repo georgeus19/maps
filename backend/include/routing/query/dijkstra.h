@@ -132,9 +132,6 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
         auto&& it = q.begin();
         Vertex& v = g_.GetVertex(it->second);
         q.erase(it);
-        if (v.get_osm_id() == 3305992707 || v.get_osm_id() == 3305992710) {
-            std::cout << "krtek";
-        }
 
         if (end_condition(&v)) {
             return true;
@@ -162,9 +159,6 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
             // Only vertices with updated values are in priority queue.
             if (neighbour_properties.cost != std::numeric_limits<double>::max()) {
                 q.erase(std::make_pair(neighbour_properties.cost, neighbour_id));
-            }
-            if (neighbour_id == 3305992707 || neighbour_id == 3305992710) {
-                std::cout << "krtek";
             }
             neighbour_properties.cost = new_cost;
             neighbour_properties.previous = v.get_osm_id();
