@@ -91,11 +91,12 @@ function PointContainer(props) {
      * @param {Array of pairs} points [[lon, lat], ...] 
      */
     function findRoute(points) {
-        // fetch('/route', {
+        // Promise.all(points.map((p, index) => {
+            
+        //     return 
+        // }))
         fetch('/route?coordinates=' + JSON.stringify(points), {
             method: 'GET',
-            // method: 'POST',
-            // body: JSON.stringify(points),
             headers: {
                 'Content-type': 'application/json; charset=UTF-8'
             }
@@ -106,14 +107,17 @@ function PointContainer(props) {
             }
             return Promise.reject(response);
         })
-        .then((route) => {
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBB", route)
-            const r = JSON.parse(route["route"]);
-            if (r.length == 0) {
+        .then((data) => {
+            if (data["ok"] != true) {
+                Promise.reject(data["error"]);
+            }
+            const route = JSON.parse(data["route"]);
+            
+            if (route.length === 0) {
                 console.log("invalid path.");
             } else {
-                props.setRoute({data:r, key:props.route.key < 0 ? 1 : -1});
-                console.log("fetched route: ", r);
+                props.setRoute({data:route, key:props.route.key < 0 ? 1 : -1});
+                console.log("fetched route: ", route);
             }
         })
         .catch((error) => {

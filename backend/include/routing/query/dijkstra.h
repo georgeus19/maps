@@ -21,7 +21,7 @@ class Dijkstra {
 public:
     using Vertex = typename G::Vertex;
     using Edge = typename G::Edge;
-    using QueuePair = std::pair<double, Vertex*>;
+    using QueuePair = std::pair<double, unsigned_id_type>;
     using Graph = G;
 
     Dijkstra(G & g);
@@ -126,18 +126,21 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
 
     Vertex& start_vertex = g_.GetVertex(start_node);
     touched_vertices_.insert_or_assign(start_node, VertexRoutingProperties{0, 0});
-    q.insert(std::make_pair(0, &start_vertex));
+    q.insert(std::make_pair(0, start_node));
 
     while (q.empty() == false) {
         auto&& it = q.begin();
-        Vertex& v = *(it->second);
+        Vertex& v = g_.GetVertex(it->second);
         q.erase(it);
+        if (v.get_osm_id() == 3305992707 || v.get_osm_id() == 3305992710) {
+            std::cout << "krtek";
+        }
 
         if (end_condition(&v)) {
             return true;
         }
-
-        UpdateNeighbours(v, touched_vertices_[v.get_osm_id()], q, ignore);
+        VertexRoutingProperties vertex_properties = touched_vertices_[v.get_osm_id()];
+        UpdateNeighbours(v, vertex_properties, q, ignore);
     }
     return false;
 }
@@ -152,17 +155,20 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
     v.ForEachEdge([&](Edge & edge) {
         unsigned_id_type neighbour_id = edge.get_to();
         Vertex& neighbour = g_.GetVertex(neighbour_id);
-        auto&& neighbour_properties = touched_vertices_[neighbour_id];
+        VertexRoutingProperties& neighbour_properties = touched_vertices_[neighbour_id];
         double new_cost = vertex_properties.cost + edge.get_length();
         if (!ignore(&neighbour) && neighbour_properties.cost > new_cost) {
 
             // Only vertices with updated values are in priority queue.
             if (neighbour_properties.cost != std::numeric_limits<double>::max()) {
-                q.erase(std::make_pair(neighbour_properties.cost, &neighbour));
+                q.erase(std::make_pair(neighbour_properties.cost, neighbour_id));
+            }
+            if (neighbour_id == 3305992707 || neighbour_id == 3305992710) {
+                std::cout << "krtek";
             }
             neighbour_properties.cost = new_cost;
             neighbour_properties.previous = v.get_osm_id();
-            q.insert(std::make_pair(neighbour_properties.cost, &neighbour));
+            q.insert(std::make_pair(neighbour_properties.cost, neighbour_id));
         }
     });
 }

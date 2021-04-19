@@ -127,30 +127,27 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     if (start_node == end_node) {
         return route;
     }
-    unsigned_id_type prev = end_node;
+    unsigned_id_type previous_vertex_id = end_node;
     Vertex& end_vertex = g_.GetVertex(end_node);
-    unsigned_id_type cur = graph_info->GetPrevious(end_vertex);
-    Vertex& curv = g_.GetVertex(cur);
+    unsigned_id_type current_vertex_id = graph_info->GetPrevious(end_vertex);
 
 
     if (GetPreviousDefaultValue() == graph_info->GetPrevious(end_vertex) ) {
         return route;
     }
-
-    while (cur != start_node) {
-        Edge edge = graph_info->FindEdge(curv, [=](const Edge& e) {
-            return e.get_to() == prev;
+    while (current_vertex_id != start_node) {
+        Vertex& current_vertex = g_.GetVertex(current_vertex_id);
+        Edge edge = graph_info->FindEdge(current_vertex, [=](const Edge& e) {
+            return e.get_to() == previous_vertex_id;
         });
         graph_info->AddEdge(route, std::move(edge));
-
-        prev = cur;
-        cur = graph_info->GetPrevious(curv);
-        curv = g_.GetVertex(cur);
+        previous_vertex_id = current_vertex_id;
+        current_vertex_id = graph_info->GetPrevious(current_vertex);
     }
 
     // Find the correct edge of the route's first vertex == start_node.
-    Edge edge = graph_info->FindEdge(curv, [=](const Edge& e) {
-        return e.get_to() == prev;
+    Edge edge = graph_info->FindEdge(g_.GetVertex(current_vertex_id), [=](const Edge& e) {
+        return e.get_to() == previous_vertex_id;
     });
     graph_info->AddEdge(route, std::move(edge));
 

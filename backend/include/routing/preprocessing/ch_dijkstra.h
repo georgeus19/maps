@@ -172,7 +172,7 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		assert(touched_vertices_.contains(min_member.vertex_id));
 		assert(min_member.hop_count < limits.max_hop_count);
 		auto&& vertex = g_.GetVertex(min_member.vertex_id);
-		auto&& vertex_routing_properties = touched_vertices_[min_member.vertex_id];
+		VertexRoutingProperties vertex_routing_properties = touched_vertices_[min_member.vertex_id];
 		
 		// There might be more members in the `q` for one vertex - always use only the minimal one.
 		bool queue_member_is_dead = vertex_routing_properties.cost < min_member.cost;
@@ -242,7 +242,6 @@ template <typename G>
 double CHDijkstra<G>::GetPathLength(unsigned_id_type to) const {
 	auto&& it = touched_vertices_.find(to);
 	if (it != touched_vertices_.end()) {
-		auto xx = it->second;
 		return it->second.cost;
 	}
 	return std::numeric_limits<double>::max();

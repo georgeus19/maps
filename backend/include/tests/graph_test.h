@@ -136,7 +136,7 @@ void TestPathShortcutGraph(G& g) {
 
     g.AddEdge(std::move(typename G::Edge{14, 8, 10, 3, 9}));
 
-	g.GetVertex(1).set_ordering_rank(9);
+	g.GetVertex(1).set_ordering_rank(9);    
     g.GetVertex(2).set_ordering_rank(1);
     g.GetVertex(3).set_ordering_rank(2);
     g.GetVertex(4).set_ordering_rank(3);

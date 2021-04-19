@@ -187,7 +187,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         PriorityQueueMember min_member = GetMin(forward_queue, backward_queue);
         Vertex& vertex = g_.GetVertex(min_member.vertex_id);
         Direction* direction = min_member.direction;
-        const VertexRoutingProperties& vertex_routing_properties = direction->GetRoutingProperties(vertex.get_osm_id());
+        VertexRoutingProperties vertex_routing_properties = direction->GetRoutingProperties(vertex.get_osm_id());
         bool queue_member_is_dead = vertex_routing_properties.cost < min_member.cost_priority;
         if (queue_member_is_dead) {
             continue; // The element already has lower cost - dead element in queue (was added multiple time with diff costs).

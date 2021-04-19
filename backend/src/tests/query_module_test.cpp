@@ -37,15 +37,15 @@ using namespace preprocessing;
 
 TEST(QueryModuleTests, QueryModuleTest) {
     std::string table_name = "cznoloops";
-    utility::Point source{15.568861848533453, 50.66747073900733};
-    utility::Point target{15.581821585773252,  50.67989977147217};
+    utility::Point source{13.393973958925121, 49.73380001564838};
+    utility::Point target{13.399605229319672,  49.72901499324271};
     // lon lat
     // utility::Point source{13.376990, 49.746841}; // plzen
     // utility::Point target{15.608720, 50.627522}; // vrchlabi
     // utility::Point target{13.391600, 49.934470}; // plasy
     // std::cout << "Dijkstra query:" << std::endl;
     // auto start = std::chrono::high_resolution_clock::now();
-    // auto&& result = CCalculateShortestRoute<DijkstraSetup>(table_name, source, target);
+    auto&& result = CCalculateShortestRoute<DijkstraSetup>(table_name, source, target);
     // auto finish = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> elapsed = finish - start;
     // std::cout << "Elapsed time: " << elapsed.count() << " s\n";
