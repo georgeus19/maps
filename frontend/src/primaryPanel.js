@@ -90,41 +90,49 @@ function PointContainer(props) {
      * Sends a request to server to calculate the best route based on `points`.
      * @param {Array of pairs} points [[lon, lat], ...] 
      */
-    function findRoute(points) {
-        // Promise.all(points.map((p, index) => {
-            
-        //     return 
-        // }))
-        fetch('/route?coordinates=' + JSON.stringify(points), {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8'
-            }
-        })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return Promise.reject(response);
-        })
-        .then((data) => {
-            console.log(data);
-            if (data.ok) {
-                const route = JSON.parse(data.route);
-                if (route.length === 0) {
-                    alert("Invalid path");
-                } else {
-                    props.setRoute({data:route, key:props.route.key < 0 ? 1 : -1});
-                    console.log("fetched route: ", route);
-                }
-            } else {
-                return Promise.reject(data.error);
-            }
+    function findRoute(coordinates) {
+        let coordinatesPairs = [];
+        for (let i = 0; i < coordinates.length - 1; i++) {
+            coordinatesPairs.push([coordinates[i], coordinates[i + 1]]);
+        }
+        Promise.all(coordinatesPairs.map((pair) => {
+            return fetch('/route?coordinates=' + JSON.stringify(pair), {
+                    method: 'GET',
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8'
+                    }
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    return Promise.reject(response);
+                })
+                .then((data) => {
+                    // console.log(data);
+                    if (data.ok) {
+                        const route = JSON.parse(data.route);
+                        if (route.length === 0) {
+                            return Promise.reject("No route found");
+                        } else {
+                            console.log("Fetched route: ", route);
+                            return route;
+                        }
+                    } else {
+                        return Promise.reject(data.error);
+                    }
+                });
+        }))
+        .then((routes) => {
+            const joinedRoute = routes.flat(1);
+            props.setRoute({data:joinedRoute, key:props.route.key < 0 ? 1 : -1});
+            console.log("routes ", routes);
+            console.log("joinedRoute ", joinedRoute);
         })
         .catch((error) => {
+            alert("Invalid path.");
             console.warn('Error occured with respect to routing.', error);
         });
-
     }
 
     /**
