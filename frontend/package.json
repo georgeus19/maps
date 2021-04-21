@@ -2,6 +2,7 @@
   "name": "maps",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -23,7 +24,8 @@
     "react-leaflet": "^2.7.0",
     "react-scripts": "3.4.1",
     "react-select": "^3.1.0",
-    "react-select-input": "^1.0.5"
+    "react-select-input": "^1.0.5",
+    "serve": "^11.3.2"
   },
   "scripts": {
     "start": "react-scripts start",

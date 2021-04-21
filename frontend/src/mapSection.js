@@ -233,7 +233,7 @@ function MapContainer(props) {
             method: 'GET'
         };
         // https://nominatim.openstreetmap.org/reverse?lat - nominatim free test api server
-        fetch('http://127.0.0.1/nominatim/reverse?lat=' + lat + '&lon=' + lon + '&format=json', options)
+        fetch('/nominatim/reverse?lat=' + lat + '&lon=' + lon + '&format=json', options)
                 .then((response) => { console.log("DATA FETCHED"); return response.json();})
                 .then((data) => {
                     console.log("fetched reverse geocoding data ", data); 
@@ -266,7 +266,16 @@ function MapContainer(props) {
         setPoint(e.latlng.lng, e.latlng.lat);
     }
 
-    return (
+    return <Map className="Map" bounds={bounds} onViewportChanged={(v) => {setViewport(v)}} viewport={viewport} onclick={(e) => handleClick(e)}>
+        <TileLayer
+            url="/hot/{z}/{x}/{y}.png" // Address of tiles on our local server.
+            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+        /> 
+        {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1, false)}
+        {props.currentTab === TabEnum.routeTab && routeMarkers}
+        {props.currentTab === TabEnum.routeTab && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
+    </Map>;
+    // (
        /*/  Map using tiles from osm server.
         <Map className="Map" center={[49.7315809334801,13.384550088168409]} zoom={13} onclick={(e) => handleClick(e)}>
             <TileLayer
@@ -275,16 +284,8 @@ function MapContainer(props) {
             />
         </Map>
         /*/
-        <Map className="Map" bounds={bounds}  onViewportChanged={(v) => {setViewport(v)}} viewport={viewport} onclick={(e) => handleClick(e)}>
-            <TileLayer
-                url="http://127.0.0.1/hot/{z}/{x}/{y}.png" // Address of tiles on our local server.
-                attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-            /> 
-            {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1, false)}
-            {props.currentTab === TabEnum.routeTab && routeMarkers}
-            {props.currentTab === TabEnum.routeTab && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
-        </Map>
-    );  
+        
+    // );  
   }
 
   export default MapSection;

@@ -9,6 +9,23 @@ run yarn start
 
 run yarn start api
 
+create configuration in /etc/apache2/sites-available and set DocumentRoot to the folder with deployed react app.
+The configuration also needs to have mod_tile and renderd information for some reason.
+activate new configuration: sudo a2ensite maps.conf
+disable configuration: sudo a2dissite 000-default.conf 
+Put this to the configuration:
+	<Directory /home/hrubyk/projects/maps/frontend/build>
+                Options Indexes FollowSymLinks
+                AllowOverride None
+                Require all granted
+        </Directory>
+
+Set up proxy for backend routing server:
+        ProxyPreserveHost On
+        ProxyPass /route http://127.0.0.1:18080/route
+        ProxyPassReverse /route http://127.0.0.1:18080/route
+
+
 
 \copy (select uid, from_node, to_node, length, contracted_vertex from abc) to '/home/hrubyk/projects/maps/backend/build/graph.csv' with csv
 

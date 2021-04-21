@@ -26,10 +26,8 @@ int main(int argc, const char ** argv) {
             auto&& result = CCalculateShortestRoute<DijkstraSetup>("cznoloops", source, target);
             std::cout << result << std::endl;
             response["route"] = result; //"[{\"lon\":13.395043407996823,\"lat\":49.731248062403814},{\"lon\":13.399688415374477,\"lat\":49.72567213250674}]";
+            response["ok"] = "true";
             return response;
-            // res.set_static_file_info("/home/hrubyk/projects/webovky/html_forms/index.html");
-            // res.set_static_file_info("/home/hrubyk/projects/maps/build/index.html");
-            
     });
 
     app.port(18080).multithreaded().run();

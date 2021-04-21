@@ -108,7 +108,7 @@ function PointContainer(props) {
             return Promise.reject(response);
         })
         .then((data) => {
-            if (data["ok"] != true) {
+            if (data["ok"] !== true) {
                 Promise.reject(data["error"]);
             }
             const route = JSON.parse(data["route"]);
@@ -152,7 +152,7 @@ function PointContainer(props) {
             props.setRoute({data:[], key:props.route.key < 0 ? 1 : -1});
         }
 
-    }, [props.pathPoints])
+    }, [props.pathPoints]);
 
     // Create an array of `PathPoint` where between all adjacent ones is placed AddPoint.
     // -> `PathPoint`,`AddPoint`,`PathPoint`, ...
@@ -214,7 +214,7 @@ function PathPoint(props) {
      */
     useEffect(() => {
         setText(props.pointName);
-    }, [props.pointName])
+    }, [props.pointName]);
 
     return(
         <div className="PathPoint">
@@ -315,7 +315,7 @@ function SearchContainer(props) {
      */
     useEffect(() => {
         setText(props.searchPoint.address);
-    }, [props.searchPoint.address])
+    }, [props.searchPoint.address]);
 
     /**
      * Trigger `MapSection` to render a marker for this place.
