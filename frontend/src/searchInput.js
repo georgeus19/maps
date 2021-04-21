@@ -5,6 +5,7 @@ import Select from "react-select";
 import AsyncSelect from "react-select/async"
 import Dropdown from 'react-bootstrap/Dropdown'
 import { Camera, Search, PlusSquare, PlusCircle, Trash2, RefreshCcw } from 'react-feather';
+import { findPossiblePlaces } from './nominatim.js'
 
 /**
  * Component `SearchInput` contains a select that user can type in and a search button.
@@ -33,45 +34,6 @@ function SearchInput(props) {
      * Fetch possible location that match user input if `search` is true.
      */
     useEffect(() => {
-        const fetchPlaces = async () => {
-            const options = {
-                method: 'GET'
-            };//https://nominatim.openstreetmap.org - nominatim free test api server
-            await fetch('http://127.0.0.1/nominatim/search?q=' + props.text + '&format=json&addressdetails=1', options)
-                .then((response) => { console.log("DATA FETCHED"); return response.json();})
-                .then((data) => {
-                    console.log(data); 
-                    const res = data.map((obj) => { 
-                        const adr = obj.address;
-                        let displayName = '';
-                        if (adr.road) {
-                            displayName += adr.road + ', ';
-                        }
-                        if (adr.house_number) {
-                            displayName += adr.house_number + ', ';
-                        }
-                        if (adr.city) {
-                            displayName += adr.city + ', ';
-                        } else if (adr.village) {
-                            displayName += adr.village + ', ';
-                        } else if (adr.town) {
-                            displayName += adr.town + ', ';
-                        }
-                        if (adr.neighbourhood) {
-                            displayName += adr.neighbourhood + ', ';
-                        }
-                        if (adr.country) {
-                            displayName += adr.country + ', ';
-                        }
-                        return { value:obj, label:obj.display_name };
-                     });
-                    setPlaceOptions(res);
-                    setMenuOpen(true);
-                })
-                .catch((error) => {
-                    console.warn('Error occured with respect to searching.', error);
-                });
-        }
         //if (search === false) {
         //    console.log("NO fetch.");
         //    return;
@@ -80,8 +42,14 @@ function SearchInput(props) {
         if (props.text === '') {
             return;
         }
-        fetchPlaces();
-        setMenuOpen(true);
+        findPossiblePlaces(props.text)
+            .then((places) => {
+                setPlaceOptions(places);
+                setMenuOpen(true);
+            })
+            .catch((error) => {
+                console.warn('Error occured with respect to searching possible places.', error);
+            });
     }, [search]);
 
     /**

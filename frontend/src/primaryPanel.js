@@ -108,16 +108,17 @@ function PointContainer(props) {
             return Promise.reject(response);
         })
         .then((data) => {
-            if (data["ok"] !== true) {
-                Promise.reject(data["error"]);
-            }
-            const route = JSON.parse(data["route"]);
-            
-            if (route.length === 0) {
-                console.log("invalid path.");
+            console.log(data);
+            if (data.ok) {
+                const route = JSON.parse(data.route);
+                if (route.length === 0) {
+                    alert("Invalid path");
+                } else {
+                    props.setRoute({data:route, key:props.route.key < 0 ? 1 : -1});
+                    console.log("fetched route: ", route);
+                }
             } else {
-                props.setRoute({data:route, key:props.route.key < 0 ? 1 : -1});
-                console.log("fetched route: ", route);
+                return Promise.reject(data.error);
             }
         })
         .catch((error) => {

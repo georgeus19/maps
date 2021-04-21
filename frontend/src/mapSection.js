@@ -3,6 +3,7 @@ import './mapSection.css';
 import { Map, Marker, Popup, TileLayer, GeoJSON, GeoJSONProps } from 'react-leaflet' 
 import L from 'leaflet'   
 import 'leaflet/dist/leaflet.css';
+import { findPlaceInformation } from './nominatim.js'
 import marker from './marker.svg'
 const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
 
@@ -227,35 +228,21 @@ function MapContainer(props) {
         if (props.currentPoint === -1 && index === -1) {
             return;
         }
-
         console.log("setPoint: ", props.currentPoint);
-        const options = {
-            method: 'GET'
-        };
-        // https://nominatim.openstreetmap.org/reverse?lat - nominatim free test api server
-        fetch('/nominatim/reverse?lat=' + lat + '&lon=' + lon + '&format=json', options)
-                .then((response) => { console.log("DATA FETCHED"); return response.json();})
-                .then((data) => {
-                    console.log("fetched reverse geocoding data ", data); 
-                    let adr;
-                    if (data.display_name) {
-                        adr = data.display_name;
-                    } else if (data.length > 0) {
-                        adr = data[0].display_name;
-                    } else {
-                        adr = lat + 'N, ' + lon + 'E';
-                    }
-                    if (index === -1) {
-                        props.dispatchPoints({type:'update', value:{name:adr, latLon:[lat, lon]}, index:props.currentPoint})
-                    } else {
-                        props.dispatchPoints({type:'update', value:{name:adr, latLon:[lat, lon]}, index:index})
-                    }
-                    
-                    props.setCurrentPoint(-1);
-                })
-                .catch((error) => {
-                    console.warn('Error occured with respect to searching for address based on latlng.', error);
-                });
+        findPlaceInformation(lat, lon)
+            .then((placeInfo) => {
+                console.log("place info ", placeInfo);
+                if (index === -1) {
+                    props.dispatchPoints({type:'update', value:placeInfo, index:props.currentPoint});
+                } else {
+                    props.dispatchPoints({type:'update', value:placeInfo, index:index});
+                }
+                
+                props.setCurrentPoint(-1);
+            })
+            .catch((error) => {
+                console.warn('Error occured with respect to searching for address based on latlng.', error);
+            });
     }
 
     /**
