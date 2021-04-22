@@ -29,7 +29,7 @@ namespace osm_parser {
          * Write any sql script initialization before edges are written to a file.
          * @param table_name Table name that will hold the data in db.
          */
-        virtual void WriteInitSql(const std::string &table_name) = 0;
+        virtual void WriteInitSql(const std::string& table_name) = 0;
 
         /**
          * Save edge to a file in such a form that it can be loaded to db later
@@ -37,63 +37,21 @@ namespace osm_parser {
          * @param table_name Table name that will hold the data in db.
          * @param edge Edge to be saved to file.
          */
-        virtual void WriteEdge(const std::string &table_name, const Edge &edge) = 0;
+        virtual void WriteEdge(const std::string& table_name, const Edge& edge) = 0;
 
         /**
          * Write any necessary finish for sql script.
          * @param table_name Table name that will hold the data in db.
          */
-        virtual void WriteFinishSql(const std::string &table_name) = 0;
+        virtual void WriteFinishSql(const std::string& table_name) = 0;
 
         virtual ~IWriter() {}
-    };
-
-    /**
-     * InsertWriter generates a sql script that uses sql command INSERT to load
-     * each edge to database.
-     *
-     * The advantage is that the sql script and data can be in one file
-     * but it takes a lot of time to run when there are lots of edges.
-     */
-    class InsertWriter : public IWriter {
-        /**
-         * Ofstream used for writing sql script to a destination file.
-         */
-        std::ofstream f_;
-    public:
-        /**
-         * @param file_name Path and name of the file where sql script is saved.
-         */
-        InsertWriter(const std::string &file_name);
-
-        ~InsertWriter() override;
-
-        /**
-         * Sql table initialization - table_creation.
-         * @param table_name Table name that will hold the data in db.
-         */
-        void WriteInitSql(const std::string &table_name) override;
-
-        /**
-         * Write INSERT sql for given edge.
-         * @param table_name Table name that will hold the data in db.
-         * @param edge Edge to be saved to file.
-         */
-        void WriteEdge(const std::string &table_name, const Edge &edge) override;
-
-        /**
-         * Creates geo index and adds length column and computes lengths.
-         * @param table_name Table name that will hold the data in db.
-         */
-        void WriteFinishSql(const std::string &table_name) override;
     };
 
     /**
      * CopyWriter generates a sql script that uses
      * COPY to load edge data to db.
      *
-     * It is much faster than InsertWriter but
-     * it is necessary to have a sql and data file.
      */
     class CopyWriter : public IWriter {
         /**
@@ -116,7 +74,7 @@ namespace osm_parser {
          * @param sql_path Path and name of the file where sql script is saved.
          * @param data_path Path and name of the file where edge data is saved.
          */
-        CopyWriter(const std::string &sql_path, const std::string &data_path);
+        CopyWriter(const std::string& sql_path, const std::string& data_path);
 
         ~CopyWriter() override;
 
@@ -125,20 +83,29 @@ namespace osm_parser {
          * generation, length computation, geo index creation.
          * @param table_name Table name that will hold the data in db.
          */
-        void WriteInitSql(const std::string &table_name) override;
+        void WriteInitSql(const std::string& table_name) override;
 
         /**
          * Write edge to a edge data file.
          * @param table_name Table name that will hold the data in db.
          * @param edge Edge to be saved to file.
          */
-        void WriteEdge(const std::string &table_name, const Edge &edge) override;
+        void WriteEdge(const std::string& table_name, const Edge& edge) override;
 
         /**
          * No need to do anything since everyting can be doone in WriteInitSql.
          * @param table_name Table name that will hold the data in db.
          */
-        void WriteFinishSql(const std::string &table_name) override;
+        void WriteFinishSql(const std::string& table_name) override;
+
+    private:
+        std::string GetCreateEdgesTable(const std::string& table_name) const;
+
+        std::string GetCreateVertexIdMappingTable(const std::string& edges_table, const std::string& mapping_table) const;
+
+        std::string GetInsertToFinalTable(const std::string& final_table, const std::string& edges_table, const std::string& mapping_table) const;
+
+        std::string GetDropTable(const std::string& table_name) const;
     };
 }
 #endif //BACKEND_WRITER_H

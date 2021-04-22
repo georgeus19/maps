@@ -59,7 +59,7 @@ struct CHSetup {
  * @return geoJson list of geometries of edges that are part of the shortest route all in string.
  */
 template <typename Setup>
-std::string CCalculateShortestRoute(const std::string & table_name, utility::Point start, utility::Point end) {
+std::string CCalculateShortestRoute(const std::string & table_name/*, typename Setup::Graph& g*/, utility::Point start, utility::Point end) {
     if (start.lat_ == end.lat_ && start.lon_ == end.lon_) {
         throw RouteNotFoundException("Start and end point are the same.");
     }

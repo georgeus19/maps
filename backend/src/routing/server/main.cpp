@@ -23,7 +23,7 @@ int main(int argc, const char ** argv) {
             utility::Point source{coordinates[0]["lon"].d(), coordinates[0]["lat"].d()};
             utility::Point target{coordinates[1]["lon"].d(), coordinates[1]["lat"].d()};
             std::cout << req.url_params << std::endl;
-            auto&& result = CCalculateShortestRoute<DijkstraSetup>("cznoloops", source, target);
+            auto&& result = CCalculateShortestRoute<DijkstraSetup>("czedges", source, target);
             std::cout << result << std::endl;
             response["route"] = result; //"[{\"lon\":13.395043407996823,\"lat\":49.731248062403814},{\"lon\":13.399688415374477,\"lat\":49.72567213250674}]";
             response["ok"] = "true";

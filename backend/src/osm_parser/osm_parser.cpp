@@ -83,7 +83,6 @@ namespace osm_parser {
         //osmium::geom::WKBFactory<> factoryWKB{osmium::geom::wkb_type::ewkb, osmium::geom::out_type::hex};
         // Geometries in output files will be of WKT format.
         osmium::geom::WKTFactory<> factoryWKT{};
-        // InsertWriter writer{output_sql_path};
         // Use CopyWriter for writing to ouput files -> faster.
         CopyWriter writer{output_sql_path, output_data_path};
         writer.WriteInitSql(table_name);
