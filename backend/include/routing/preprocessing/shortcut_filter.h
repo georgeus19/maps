@@ -83,7 +83,7 @@ ShortcutContainer<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::C
         auto&& source_vertex = g_.GetVertex(shortcut.get_from());
         bool new_edge = true;
         bool improve = false;
-        for(auto&& edge : source_vertex.get_edges()) {
+        source_vertex.ForEachEdge([&](Edge& edge) {
             bool same_target = shortcut.get_to() == edge.get_to();
             if (same_target) {
                 if (shortcut.get_length() < edge.get_length()) {
@@ -91,7 +91,7 @@ ShortcutContainer<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::C
                 } 
                 new_edge = false;
             }
-        }
+        });
         if (new_edge) {
             new_edges.push_back(std::move(shortcut));
         }

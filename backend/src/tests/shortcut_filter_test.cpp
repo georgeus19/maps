@@ -21,6 +21,8 @@
 #include "routing/preprocessing/shortcut_finder.h"
 #include "routing/preprocessing/shortcut_filter.h"
 #include "routing/preprocessing/shortcut_container.h"
+#include "routing/vertices/ch_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
 
 #include <string>
 #include <vector>
@@ -33,7 +35,8 @@ using namespace query;
 using namespace database;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+// using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
 void Print(const std::vector<CHPreprocessingEdge>& edges, const std::string& name);
 
 struct ClassifyShortcutsParameter {

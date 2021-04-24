@@ -43,11 +43,11 @@ private:
 
 template <typename Graph>
 GraphContractor<Graph>::GraphContractor(Graph &g, const ContractionParameters& parameters)
-    : g_(g), shortcut_finder_(g, parameters), vertex_measures_(g, parameters), free_ordering_rank_(0) {}
+    : g_(g), shortcut_finder_(g, parameters), vertex_measures_(g, parameters), free_ordering_rank_(1) {}
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractGraph() {
-    free_ordering_rank_ = 0;
+    free_ordering_rank_ = 1;
     PriorityQueue q = CalculateContractionPriority();
     std::cout << "Contraction starting - queue completed." << std::endl;
     size_t count = 0;
@@ -77,7 +77,7 @@ template <typename Graph>
 void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
     ShortcutContainer<Edge> shortcuts = shortcut_finder_.FindShortcuts(vertex);
     AddShortcuts(std::move(shortcuts));
-    vertex.SetContracted();
+    // vertex.SetContracted();
     vertex.set_ordering_rank(++free_ordering_rank_);
 }
 
@@ -111,7 +111,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
 
     AddShortcuts(std::move(shortcuts));
     auto&& contracted_vertex = g_.GetVertex(vertex_id);
-    contracted_vertex.SetContracted();
+    // contracted_vertex.SetContracted();
     contracted_vertex.set_ordering_rank(++free_ordering_rank_);
 }
 
@@ -136,19 +136,19 @@ void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
     }
 
     for(auto&& shortcut : shortcuts.improving_edges) {
-        Edge rshortcut = shortcut;
-        rshortcut.Reverse();
+        Edge backward_shortcut = shortcut;
+
         auto&& source_vertex = g_.GetVertex(shortcut.get_from());
         Edge& edge = source_vertex.FindEdge([&](const Edge& e) {
             return e.get_to() == shortcut.get_to();
         });
         edge.Swap(shortcut);
 
-        auto&& target_vertex = g_.GetVertex(rshortcut.get_from());
-        Edge& redge = target_vertex.FindReverseEdge([&](const Edge& e) {
-            return e.get_to() == rshortcut.get_to();
+        auto&& target_vertex = g_.GetVertex(backward_shortcut.get_backward_from());
+        Edge& backward_edge = target_vertex.FindBackwardEdge([&](const Edge& e) {
+            return e.get_backward_to() == backward_shortcut.get_backward_to();
         });
-        redge.Swap(rshortcut);
+        backward_edge.Swap(backward_shortcut);
     }
 }
 
@@ -159,11 +159,11 @@ double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
     size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {
-           for(auto&& e : vertex.get_edges()) {
-               if (!g_.GetVertex(e.get_to()).IsContracted()) {
+            vertex.ForEachEdge([&](Edge& e) {
+                if (!g_.GetVertex(e.get_to()).IsContracted()) {
                    ++deg;
-               }
-           }
+                }
+            });
            ++count;
         }
         

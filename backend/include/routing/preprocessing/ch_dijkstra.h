@@ -192,9 +192,9 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 			return true;
 		}
 		
-		for(auto&& edge : vertex.get_edges()) {
+		vertex.ForEachEdge([&](Edge& edge) {
 			UpdateNeighbour(min_member, edge, q, limits);
-		}
+		});
 	}
 	return false;
 }
@@ -205,16 +205,16 @@ double CHDijkstra<G>::OneHopBackwardSearch(unsigned_id_type target_vertex_id) co
 	auto&& end_vertex = g_.GetVertex(target_vertex_id);
 
 	double min_path_length = GetPathLength(target_vertex_id);
-	for(auto&& redge : end_vertex.get_reverse_edges()) {
-		double d = GetPathLength(redge.get_to());
+	end_vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
+		double d = GetPathLength(backward_edge.get_backward_to());
 		if (d == std::numeric_limits<double>::max()) {
-			continue;
+			return;
 		}
-		double path_length = d + redge.get_length(); 
+		double path_length = d + backward_edge.get_length(); 
 		if (min_path_length > path_length) {
 			min_path_length = path_length;
 		}
-	}
+	});
 	return min_path_length;
 }
 

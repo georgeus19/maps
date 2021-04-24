@@ -17,6 +17,9 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
+#include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/vertices/basic_vertex.h"
+#include "routing/vertices/ch_vertex.h"
 
 #include <string>
 #include <vector>
@@ -27,7 +30,8 @@ using namespace database;
 using namespace query;
 using namespace preprocessing;
 // using namespace testing;
-using G = AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>;
+using Vertex = CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>;
+using G = AdjacencyListGraph<Vertex, CHSearchEdge>;
 
 struct GraphForEachEdgeTestsParameter;
 
@@ -124,12 +128,12 @@ TEST(GraphTests, ForEachVertexBasicGraphTest) {
  
 
     std::vector<G::Vertex> expected_vertices{
-        ContractionSearchVertex<CHSearchEdge>{1},
-        ContractionSearchVertex<CHSearchEdge>{2},
-        ContractionSearchVertex<CHSearchEdge>{3},
-        ContractionSearchVertex<CHSearchEdge>{4},
-        ContractionSearchVertex<CHSearchEdge>{5},
-        ContractionSearchVertex<CHSearchEdge>{6}
+        Vertex{1, VectorEdgeRange<CHSearchEdge>{}},
+        Vertex{2, VectorEdgeRange<CHSearchEdge>{}},
+        Vertex{3, VectorEdgeRange<CHSearchEdge>{}},
+        Vertex{4, VectorEdgeRange<CHSearchEdge>{}},
+        Vertex{5, VectorEdgeRange<CHSearchEdge>{}},
+        Vertex{6, VectorEdgeRange<CHSearchEdge>{}}
     };
 
     EXPECT_THAT(actual_vertices, testing::UnorderedElementsAreArray(expected_vertices));

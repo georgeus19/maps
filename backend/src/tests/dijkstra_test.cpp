@@ -13,6 +13,8 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
+#include "routing/vertices/ch_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -20,7 +22,7 @@ using namespace routing;
 using namespace query;
 using namespace database;
 // using namespace testing;
-using G = AdjacencyListGraph<BasicVertex<BasicEdge>, BasicEdge>;
+using G = AdjacencyListGraph<BasicVertex<BasicEdge, VectorEdgeRange<BasicEdge>>, BasicEdge>;
 
 class DijkstraTest : public testing::Test {
     protected:

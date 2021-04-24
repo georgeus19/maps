@@ -18,6 +18,8 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/query/bidirectional_dijkstra.h"
+#include "routing/vertices/ch_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
 
 #include <string>
 #include <vector>
@@ -30,7 +32,8 @@ using namespace database;
 using namespace query;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+// using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
 
 struct VertexMeasuresTest {
     int32_t edge_difference;

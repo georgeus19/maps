@@ -11,6 +11,8 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
+#include "routing/vertices/ch_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
 
 
 #include <vector>
@@ -24,7 +26,8 @@ using namespace database;
 using namespace routing;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+// using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
 const string kDbName = "gis";
 const string kUser = "postgres";
 const string kPassword = "wtz2trln";

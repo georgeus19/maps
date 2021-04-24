@@ -38,7 +38,9 @@ private:
     ShortcutFinder<Graph> shortcut_finder_;
     ContractionParameters parameters_;
 
-    void CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices);
+    void AddDeletedNeighbour(std::vector<unsigned_id_type>& deleted_neighbours, unsigned_id_type neighbour_id);
+
+    void IncrementCurrentEdgeCount(size_t& adjacent_edges_count, unsigned_id_type neighbour_id);
 
     size_t CalculateCurrentEdgeCount(const std::vector<Edge>& edges);
 
@@ -53,15 +55,29 @@ int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex) {
 
 template <typename Graph>
 int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex, std::vector<Edge>& shortcuts) {
-    size_t adjacent_edges_count = CalculateCurrentEdgeCount(vertex.get_edges()) + CalculateCurrentEdgeCount(vertex.get_reverse_edges());
+    size_t adjacent_edges_count = 0;
+    vertex.ForEachEdge([&](Edge& edge) {
+        unsigned_id_type neighbour_id = edge.get_to();
+        IncrementCurrentEdgeCount(adjacent_edges_count, neighbour_id);
+    });
+    vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
+        unsigned_id_type neighbour_id = backward_edge.get_backward_to();
+        IncrementCurrentEdgeCount(adjacent_edges_count, neighbour_id);
+    });
     return shortcuts.size() - adjacent_edges_count;
 }
 
 template <typename Graph>
 int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
     std::vector<unsigned_id_type> deleted_neighbours{};
-    CalculateDeletedNeighbours(vertex.get_edges(), deleted_neighbours);
-    CalculateDeletedNeighbours(vertex.get_reverse_edges(), deleted_neighbours);
+    vertex.ForEachEdge([&](Edge& edge) {
+        unsigned_id_type neighbour_id = edge.get_to();
+        AddDeletedNeighbour(deleted_neighbours, neighbour_id);
+    });
+    vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
+        unsigned_id_type neighbour_id = backward_edge.get_backward_to();
+        AddDeletedNeighbour(deleted_neighbours, neighbour_id);
+    });
     return deleted_neighbours.size();
 }
 
@@ -80,26 +96,19 @@ inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& ve
 }
 
 template <typename Graph>
-void VertexMeasures<Graph>::CalculateDeletedNeighbours(const std::vector<Edge>& edges, std::vector<unsigned_id_type>& counted_vertices) {
-    for(auto&& edge : edges) {
-        unsigned_id_type neighbour_id = edge.get_to();
-        Vertex& neighbour = g_.GetVertex(neighbour_id);
-        if (neighbour.IsContracted() && counted_vertices.end() == std::find(counted_vertices.begin(), counted_vertices.end(), neighbour_id)) {
-            counted_vertices.push_back(neighbour_id);
-        }   
-    }
+void VertexMeasures<Graph>::AddDeletedNeighbour(std::vector<unsigned_id_type>& deleted_neighbours, unsigned_id_type neighbour_id) {
+    Vertex& neighbour = g_.GetVertex(neighbour_id);
+    if (neighbour.IsContracted() && deleted_neighbours.end() == std::find(deleted_neighbours.begin(), deleted_neighbours.end(), neighbour_id)) {
+        deleted_neighbours.push_back(neighbour_id);
+    }   
 }
 
 template <typename Graph>
-size_t VertexMeasures<Graph>::CalculateCurrentEdgeCount(const std::vector<Edge>& edges) {
-    size_t count = 0;
-    for(auto&& edge : edges) {
-        Vertex& vertex = g_.GetVertex(edge.get_to());
-        if (!vertex.IsContracted()) {
-            ++count;
-        }   
-    }
-    return count;
+void VertexMeasures<Graph>::IncrementCurrentEdgeCount(size_t& adjacent_edges_count, unsigned_id_type neighbour_id) {
+    Vertex& neighbour = g_.GetVertex(neighbour_id);
+    if (!neighbour.IsContracted()) {
+        ++adjacent_edges_count;
+    }   
 }
 
 

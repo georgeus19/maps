@@ -28,9 +28,13 @@ public:
             return touched_vertices_[vertex.get_osm_id()].previous;
         }
 
-        virtual Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
+        virtual unsigned_id_type GetFrom(const Edge& e) const = 0;
 
-        virtual Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) = 0;
+        virtual unsigned_id_type GetTo(const Edge& e) const = 0;
+
+        virtual Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) = 0;
+
+        virtual Edge& FindBackwardEdge(Vertex& vertex, unsigned_id_type target_vertex_id) = 0;
 
         virtual void AddEdge(std::vector<Edge>& route, Edge&& edge) = 0;
     protected:
@@ -43,12 +47,24 @@ public:
     public:
         BiDijkstraForwardGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
-        Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
-            return vertex.FindEdge(f);
+        unsigned_id_type GetFrom(const Edge& e) const override {
+            return e.get_from();
         }
 
-        Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
-            return vertex.FindReverseEdge(f);
+        unsigned_id_type GetTo(const Edge& e) const override {
+            return e.get_to();
+        }
+
+        Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
+            return vertex.FindEdge([=](const Edge& e) {
+                return e.get_to() == target_vertex_id;
+            });
+        }
+
+        Edge& FindBackwardEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
+            return vertex.FindBackwardEdge([=](const Edge& e) {
+                return e.get_backward_to() == target_vertex_id;
+            });
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
@@ -66,20 +82,29 @@ public:
     public:
         BiDijkstraBackwardGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
-        Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
-            return vertex.FindReverseEdge(f);
+        unsigned_id_type GetFrom(const Edge& e) const override {
+            return e.get_backward_from();
         }
 
-        Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
-            return vertex.FindEdge(f);
+        unsigned_id_type GetTo(const Edge& e) const override {
+            return e.get_backward_to();
+        }
+
+        Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
+            return vertex.FindBackwardEdge([=](const Edge& e) {
+                return e.get_backward_to() == target_vertex_id;
+            });
+        }
+
+        Edge& FindBackwardEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
+            return vertex.FindEdge([=](const Edge& e) {
+                return e.get_to() == target_vertex_id;
+            });
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
             if (edge.IsShortcut()) {
                 std::vector<Edge> underlying_edges = retriever_.UnpackShortcut(this, std::move(edge));
-                for(auto&& e : underlying_edges) {
-                    e.Reverse();
-                }
                 route.insert(route.end(), underlying_edges.begin(), underlying_edges.end());
             } else {
                 edge.Reverse();
@@ -92,12 +117,22 @@ public:
     public:
         DijkstraGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
-        Edge& FindEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
-            return vertex.FindEdge(f);
+        unsigned_id_type GetFrom(const Edge& e) const override {
+            return e.get_from();
         }
 
-        Edge& FindReverseEdge(Vertex& vertex, const std::function<bool(const Edge&)>& f) override {
-            throw NotImplementedException{"DijkstraGraphInfo FindReverseEdge not implemented - no other reverse edges!"};
+        unsigned_id_type GetTo(const Edge& e) const override {
+            return e.get_to();
+        }
+
+        Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
+            return vertex.FindEdge([=](const Edge& e) {
+                return e.get_to() == target_vertex_id;
+            });
+        }
+
+        Edge& FindBackwardEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
+            throw NotImplementedException{"DijkstraGraphInfo FindBackwardEdge not implemented - no other reverse edges!"};
         }
 
         void AddEdge(std::vector<Edge>& route, Edge&& edge) override {
@@ -137,18 +172,14 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     }
     while (current_vertex_id != start_node) {
         Vertex& current_vertex = g_.GetVertex(current_vertex_id);
-        Edge edge = graph_info->FindEdge(current_vertex, [=](const Edge& e) {
-            return e.get_to() == previous_vertex_id;
-        });
+        Edge edge = graph_info->FindEdge(current_vertex, previous_vertex_id);
         graph_info->AddEdge(route, std::move(edge));
         previous_vertex_id = current_vertex_id;
         current_vertex_id = graph_info->GetPrevious(current_vertex);
     }
 
     // Find the correct edge of the route's first vertex == start_node.
-    Edge edge = graph_info->FindEdge(g_.GetVertex(current_vertex_id), [=](const Edge& e) {
-        return e.get_to() == previous_vertex_id;
-    });
+    Edge edge = graph_info->FindEdge(g_.GetVertex(current_vertex_id), previous_vertex_id);
     graph_info->AddEdge(route, std::move(edge));
 
     std::reverse(route.begin(), route.end());;
@@ -165,7 +196,7 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     while (!shortcut_stack.empty() || edge.IsShortcut()) {
         if (edge.IsShortcut()) {
             shortcut_stack.push(edge);
-            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), edge.get_to(), true);
+            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), graph_info->GetTo(edge), true);
         } else {
             // Add the non-shortcut edges to route.
             underlying_edges.push_back(std::move(edge));
@@ -177,8 +208,8 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
             // The former edge belongs to the downward graph if for forward dijkstra search
             // resp to the upward graph in case of backward dijkstra search.
             // So the edge needs to be reverse so that its direction is correct.
-            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex(), false);
-            edge.Reverse();
+            edge = GetUnderlyingEdge(graph_info, graph_info->GetFrom(edge), edge.get_contracted_vertex(), false);
+            // edge.Reverse();
         }
     }
     // Last non-shortcut edge was not added due to empty stack and not being a shortcut.
@@ -192,13 +223,10 @@ template <typename Graph, typename VertexRoutingProperties>
 inline RouteRetriever<Graph, VertexRoutingProperties>::Edge& RouteRetriever<Graph, VertexRoutingProperties>::GetUnderlyingEdge(
     GraphInfo* graph_info, unsigned_id_type source_vertex_id, unsigned_id_type target_vertex_id, bool normal_edge) {
     if (normal_edge) {
-        return graph_info->FindEdge(g_.GetVertex(source_vertex_id), [=](const Edge& e) {
-            return e.get_to() == target_vertex_id;
-        });
+        return graph_info->FindEdge(g_.GetVertex(source_vertex_id), target_vertex_id);
     } else {
-        return graph_info->FindReverseEdge(g_.GetVertex(target_vertex_id), [=](const Edge& e) {
-            return e.get_to() == source_vertex_id;
-        });
+        // The other direction -> target is source and the other way around.
+        return graph_info->FindBackwardEdge(g_.GetVertex(target_vertex_id), source_vertex_id);
     }
 }
 

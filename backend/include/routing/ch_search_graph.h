@@ -138,14 +138,14 @@ CHSearchGraph<V, E>::Capacities CHSearchGraph<V, E>::PrecomputeCapacities(Graph&
     size_t upward_edges = 0;
     size_t downward_edges = 0;
     graph.ForEachVertex([&](typename Graph::Vertex& vertex) {
-        for(auto&& edge : vertex.get_edges()) {
+        vertex.ForEachEdge([&](Edge& edge) {
             auto&& to = graph.GetVertex(edge.get_to());
             if (vertex.get_ordering_rank() < to.get_ordering_rank()) {
                 ++upward_edges;
             } else {
                 ++downward_edges;
             }
-        }
+        });
     });
     assert(upward_edges + downward_edges == graph.GetEdgeCount());
     return Capacities{vertex_count, upward_edges, downward_edges};
@@ -160,14 +160,14 @@ void CHSearchGraph<V, E>::LoadEdges(Graph& graph) {
     auto downward_edges_end_it = downward_edges_.begin();
     graph.ForEachVertex([&](typename Graph::Vertex& vertex) { 
         upward_edges_begin_it = upward_edges_end_it;
-        for(auto&& edge : vertex.get_edges()) {
+        vertex.ForEachEdge([&](Edge& edge) {
             LoadEdge(graph, vertex, edge, upward_edges_, upward_edges_end_it);
-        }
+        });
         downward_edges_begin_it = downward_edges_end_it;
-        for(auto&& redge : vertex.get_reverse_edges()) {
-            LoadEdge(graph, vertex, redge, downward_edges_, downward_edges_end_it);
-        }
-        vertices_[vertex.get_osm_id()] = V{vertex.get_osm_id(), vertex.get_ordering_rank(), upward_edges_begin_it, upward_edges_end_it, downward_edges_begin_it, downward_edges_end_it};
+        vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
+            LoadEdge(graph, vertex, backward_edge, downward_edges_, downward_edges_end_it);
+        });
+        // vertices_[vertex.get_osm_id()] = V{vertex.get_osm_id(), vertex.get_ordering_rank(), upward_edges_begin_it, upward_edges_end_it, downward_edges_begin_it, downward_edges_end_it};
     });
 }
 

@@ -13,6 +13,7 @@ using unsigned_id_type = std::uint64_t;
  * used only in simple algorithms.
  */
 class BasicEdge {
+    enum Type { forward, backward, twoways };
 public:
    
     inline unsigned_id_type get_uid() const {
@@ -23,9 +24,18 @@ public:
         return from_;
     }
 
+    inline unsigned_id_type get_backward_from() const {
+        return to_;
+    }
+
     inline unsigned_id_type get_to() const {
         return to_;
     }
+
+    inline unsigned_id_type get_backward_to() const {
+        return from_;
+    }
+
 
     inline double get_length() const {
         return length_;
@@ -44,6 +54,12 @@ public:
     void Reverse(); 
 
     void Print() const;
+
+    bool IsForward() const;
+
+    bool IsBackward() const;
+
+    bool IsTwoways() const;
 
     /**
      * "Graphical" comparison of edges.
@@ -73,6 +89,8 @@ protected:
      * Length of the edge.
      */
     double length_;
+
+    Type type_;
 };
 
 

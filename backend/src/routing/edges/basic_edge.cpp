@@ -28,6 +28,18 @@ void BasicEdge::Print() const {
     std::cout << get_from() << "->" << get_to() << " length: " << get_length() << std::endl;
 }
 
+bool BasicEdge::IsForward() const {
+    return type_ == forward;
+}
+
+bool BasicEdge::IsBackward() const {
+    return type_ == backward;
+}
+
+bool BasicEdge::IsTwoways() const {
+    return type_ == twoways;
+}
+
 bool BasicEdge::operator==(const BasicEdge& other) const {
     // if (uid_ == other.uid_) { return true; }
         // If there can be two edges with same from, to.

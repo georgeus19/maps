@@ -17,6 +17,9 @@
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/bidirectional_graph.h"
+#include "routing/vertices/ch_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
+
 #include <string>
 #include <vector>
 #include <tuple>
@@ -28,7 +31,8 @@ using namespace query;
 using namespace database;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+// using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
 struct ExpectedVertexProperties;
 std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q);
 void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name); 

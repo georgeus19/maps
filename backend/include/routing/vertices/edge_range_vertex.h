@@ -20,10 +20,6 @@ public:
         return osm_id_;
     } 
 
-    inline EdgeRange& get_edges() {
-        return edges_;
-    }
-
     EdgeRangeVertex();
 
     EdgeRangeVertex(unsigned_id_type osm_id, EdgeIterator begin, EdgeIterator end);

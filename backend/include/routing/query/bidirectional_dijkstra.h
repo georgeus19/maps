@@ -125,6 +125,7 @@ private:
 
         virtual void ForEachEdge(Vertex& vertex, const std::function<void(Edge&)>& f) = 0;
         virtual void Enqueue(double cost_priority, unsigned_id_type vertex_id) = 0;
+        virtual unsigned_id_type GetTo(const Edge& e) const = 0;
     protected:
         PriorityQueue& queue_;
         UnorderedMap& touched_vertices_;
@@ -144,6 +145,9 @@ private:
             queue_.emplace(cost_priority, vertex_id, this);
         }
 
+        unsigned_id_type GetTo(const Edge& e) const override {
+            return e.get_to();
+        }
     };
 
     class BackwardDirection : public Direction {
@@ -153,11 +157,15 @@ private:
         BackwardDirection(PriorityQueue& q, UnorderedMap& tv) : Direction(q, tv) {}
 
         void ForEachEdge(Vertex& vertex, const std::function<void(Edge&)>& f) override {
-            vertex.ForEachReverseEdge(f);
+            vertex.ForEachBackwardEdge(f);
         }
 
         void Enqueue(double cost_priority, unsigned_id_type vertex_id) override {
             queue_.emplace(cost_priority, vertex_id, this);
+        }
+
+        unsigned_id_type GetTo(const Edge& e) const override {
+            return e.get_backward_to();
         }
     };
 };
@@ -200,7 +208,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         // if vertex->backward_cost, vertex->forward_cost settled - update path length.
 
         direction->ForEachEdge(vertex, [&](Edge& edge) {
-            unsigned_id_type neighbour_id = edge.get_to();
+            unsigned_id_type neighbour_id = direction->GetTo(edge);
             Vertex& neighbour = g_.GetVertex(neighbour_id);
             double new_cost = vertex_routing_properties.cost + edge.get_length();
             VertexRoutingProperties& neighbour_routing_properties = direction->GetRoutingProperties(neighbour_id);

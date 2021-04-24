@@ -37,10 +37,6 @@ public:
     CHSearchVertex& operator=(CHSearchVertex && other) = default;
     ~CHSearchVertex() = default;
 
-    void ForEachReverseEdge(const std::function<void(Edge&)>& f);
-
-    Edge& FindReverseEdge(const std::function<bool(const Edge&)>& f);
-
 protected:
     unsigned_id_type ordering_rank_;
 
@@ -54,18 +50,6 @@ CHSearchVertex<Edge, EdgeIterator>::CHSearchVertex(unsigned_id_type osm_id, unsi
         EdgeIterator reverse_edges_begin, EdgeIterator reverse_edges_end)
         : EdgeRangeVertex<Edge, EdgeIterator>(osm_id, edges_begin, edges_end), ordering_rank_(ordering_rank),
             reverse_edges_(reverse_edges_begin, reverse_edges_end) {}
-
-template <typename Edge, typename EdgeIterator>
-void CHSearchVertex<Edge, EdgeIterator>::ForEachReverseEdge(const std::function<void(Edge&)>& f) {
-    std::for_each(reverse_edges_.begin(), reverse_edges_.end(), f);
-}
-
-template <typename Edge, typename EdgeIterator>
-inline Edge& CHSearchVertex<Edge, EdgeIterator>::FindReverseEdge(const std::function<bool(const Edge&)>& f) {
-    return FindEdge(reverse_edges_, f);
-}
-
-
 
 
 }

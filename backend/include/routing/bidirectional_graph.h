@@ -41,7 +41,7 @@ public:
     inline void AddEdge(Edge&& edge) {
         Edge reverse_edge = edge;
         g_.AddEdge(std::move(edge));
-        AddReverseEdge(std::move(reverse_edge));
+        AddBackwardEdge(std::move(reverse_edge));
     }
 
     inline Vertex& GetVertex(unsigned_id_type id) {
@@ -67,10 +67,10 @@ public:
 private:
     Graph g_;
 
-    inline void AddReverseEdge(Edge&& edge) {
-        edge.Reverse();
+    inline void AddBackwardEdge(Edge&& edge) {
+        // edge.Reverse();
         g_.AddEdge(std::move(edge), [](Vertex& v, Edge&& e){
-            v.AddReverseEdge(std::move(e));
+            v.get_edges().AddEdge(std::move(e));// AddBackwardEdge(std::move(e));
         });
     }
 

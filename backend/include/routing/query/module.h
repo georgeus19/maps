@@ -1,6 +1,7 @@
 #ifndef BACKEND_QUERY_MAIN_H
 #define BACKEND_QUERY_MAIN_H
 
+#include "routing/routing_graph.h"
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
@@ -16,6 +17,8 @@
 #include "routing/basic_edge_endpoint_handler.h"
 #include "routing/edges/ch_search_edge.h"
 #include "routing/vertices/contraction_search_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/vertices/ch_vertex.h"
 
 #include <string>
 
@@ -33,7 +36,7 @@ const std::string kPort = "5432";
 
 struct DijkstraSetup {
     using Edge = BasicEdge;
-    using Vertex = BasicVertex<Edge>;
+    using Vertex = BasicVertex<Edge, VectorEdgeRange<Edge>>;
     using Graph = AdjacencyListGraph<Vertex, Edge>;
     using DbGraph = database::UnpreprocessedDbGraph;
     using Algorithm = Dijkstra<Graph>;
@@ -42,7 +45,7 @@ struct DijkstraSetup {
 
 struct CHSetup {
     using Edge = CHSearchEdge;
-    using Vertex = ContractionSearchVertex<Edge>;
+    using Vertex = CHVertex<Edge, VectorEdgeRange<Edge>>;
     using Graph = BidirectionalGraph<AdjacencyListGraph<Vertex, Edge>>;
     using DbGraph = database::CHDbGraph;
     using Algorithm = BidirectionalDijkstra<Graph>;

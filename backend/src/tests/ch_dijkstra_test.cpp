@@ -14,6 +14,9 @@
 #include "routing/basic_edge_endpoint_handler.h"
 #include "routing/preprocessing/ch_dijkstra.h"
 #include "tests/graph_test.h"
+#include "routing/vertices/ch_vertex.h"
+#include "routing/edge_ranges/vector_edge_range.h"
+
 #include <string>
 #include <vector>
 using namespace std;
@@ -23,7 +26,8 @@ using namespace preprocessing;
 
 using namespace database;
 // using namespace testing;
-using G = AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+// using G = AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
 
 class CHDijkstraTest : public testing::Test {
     protected:
