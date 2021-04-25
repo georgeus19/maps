@@ -35,19 +35,3 @@ using namespace preprocessing;
 
 // using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
 using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
-
-TEST(ShortcutFinderGeographyTest, SimpleGeographyCopyTest) {
-    G g{};
-    std::string expected_geography{"Geo121"};
-    g.AddEdge(std::move(CHPreprocessingEdge{0, 1, 2, 1, 0, expected_geography}));
-
-    g.AddEdge(std::move(CHPreprocessingEdge{1, 2, 3, 1, 0, "Geo231"}));
-
-    ShortcutFinder<G> shortcut_finder{g, ContractionParameters{11, 5, 1, 1, 0}};
-    auto&& shortcuts = shortcut_finder.FindShortcuts(g.GetVertex(2));
-    
-    std::cout << shortcuts.new_edges[0].get_geography() << std::endl;
-    EXPECT_EQ(shortcuts.new_edges.size(), 1);
-    EXPECT_EQ(shortcuts.new_edges[0].get_geography(), expected_geography);
-    
-}

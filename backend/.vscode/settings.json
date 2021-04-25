@@ -70,6 +70,7 @@
         "strstream": "cpp",
         "complex": "cpp",
         "csignal": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "*.ipp": "cpp"
     }
 }

@@ -8,16 +8,21 @@ BasicEdge::BasicEdge(database::DbEdgeIterator* it) :
     uid_(it->GetUid()),
     from_(it->GetFrom()),
     to_(it->GetTo()),
-    length_(it->GetLength()) {}
+    length_(it->GetLength()),
+    type_(Type::EdgeType::forward) {}
 
 BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
-        uid_(uid), from_(from), to_(to), length_(length) {}
+        uid_(uid), from_(from), to_(to), length_(length), type_(Type::EdgeType::forward) {}
+
+BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, Type::EdgeType type) :
+        uid_(uid), from_(from), to_(to), length_(length), type_(type) {}
 
 void BasicEdge::Swap(BasicEdge & other) {
     std::swap(uid_, other.uid_);
     std::swap(from_, other.from_);
     std::swap(to_, other.to_);
     std::swap(length_, other.length_);
+    std::swap(type_, other.type_);
 }
 
 void BasicEdge::Reverse() {
@@ -25,19 +30,19 @@ void BasicEdge::Reverse() {
 }
 
 void BasicEdge::Print() const {
-    std::cout << get_from() << "->" << get_to() << " length: " << get_length() << std::endl;
+    std::cout << get_from() << "->" << get_to() << " length: " << get_length() << " type: " << GetType() << std::endl;
 }
 
 bool BasicEdge::IsForward() const {
-    return type_ == forward;
+    return type_ == Type::forward;
 }
 
 bool BasicEdge::IsBackward() const {
-    return type_ == backward;
+    return type_ == Type::backward;
 }
 
-bool BasicEdge::IsTwoways() const {
-    return type_ == twoways;
+bool BasicEdge::IsTwoway() const {
+    return type_ == Type::twoway;
 }
 
 bool BasicEdge::operator==(const BasicEdge& other) const {
@@ -53,6 +58,24 @@ bool BasicEdge::operator==(const BasicEdge& other) const {
 
 bool BasicEdge::operator!=(const BasicEdge& other) const {
     return !((*this) == other);
+}
+
+std::string BasicEdge::GetType() const {
+    std::string s;
+    switch(type_) {
+        case Type::EdgeType::forward:
+            s = "forward";
+            break;
+        case Type::EdgeType::backward:
+            s = "backward";
+            break;
+        case Type::EdgeType::twoway:
+            s = "twoway";
+            break;
+        default:
+            s = "invalid";
+    }
+    return s;
 }
 
 

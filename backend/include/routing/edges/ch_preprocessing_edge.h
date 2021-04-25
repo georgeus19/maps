@@ -20,13 +20,9 @@ public:
         return contracted_vertex_;
     }
 
-    inline const std::string& get_geography() const {
-        return geography_;
-    }
-
     CHPreprocessingEdge();
     CHPreprocessingEdge(database::DbEdgeIterator*);
-    CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex, const std::string& geography);
+    CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex);
     CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
     CHPreprocessingEdge(const CHPreprocessingEdge & other) = default;
     CHPreprocessingEdge(CHPreprocessingEdge && other) = default;
@@ -39,7 +35,6 @@ public:
 private:
     bool shortcut_;
     unsigned_id_type contracted_vertex_;
-    std::string geography_;
 };
 
 

@@ -137,6 +137,7 @@ void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
 
     for(auto&& shortcut : shortcuts.improving_edges) {
         Edge backward_shortcut = shortcut;
+        backward_shortcut.SetBackward();
 
         auto&& source_vertex = g_.GetVertex(shortcut.get_from());
         Edge& edge = source_vertex.FindEdge([&](const Edge& e) {

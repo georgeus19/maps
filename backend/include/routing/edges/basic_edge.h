@@ -13,7 +13,9 @@ using unsigned_id_type = std::uint64_t;
  * used only in simple algorithms.
  */
 class BasicEdge {
-    enum Type { forward, backward, twoways };
+    struct Type {
+        enum EdgeType { forward, backward, twoway };
+    };
 public:
    
     inline unsigned_id_type get_uid() const {
@@ -36,14 +38,22 @@ public:
         return from_;
     }
 
-
     inline double get_length() const {
         return length_;
+    }
+
+    inline void SetTwoway() {
+        type_ = Type::twoway;
+    }
+
+    inline void SetBackward() {
+        type_ = Type::backward;
     }
 
     BasicEdge();
     BasicEdge(database::DbEdgeIterator*);
     BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
+    BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, Type::EdgeType type);
     BasicEdge(const BasicEdge & other) = default;
     BasicEdge(BasicEdge && other) = default;
     BasicEdge& operator= (const BasicEdge & other) = default;
@@ -59,7 +69,7 @@ public:
 
     bool IsBackward() const;
 
-    bool IsTwoways() const;
+    bool IsTwoway() const;
 
     /**
      * "Graphical" comparison of edges.
@@ -90,7 +100,10 @@ protected:
      */
     double length_;
 
-    Type type_;
+    Type::EdgeType type_;
+
+private:
+    std::string GetType() const;
 };
 
 

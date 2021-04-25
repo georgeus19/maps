@@ -29,14 +29,7 @@ public:
     using Vertex = Graph::Vertex;
     using Edge = Graph::Edge;
 
-    inline BidirectionalGraph() : g_() {
-        size_t edge_count = 10914384;
-
-        // for(uint64_t i = 0; i < edge_count; ++i) {
-        //     AddEdge(Edge{3, 42, 3, 2});
-        //     // unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex
-        // }
-    }
+    inline BidirectionalGraph() : g_() {}
 
     inline void AddEdge(Edge&& edge) {
         Edge reverse_edge = edge;
@@ -68,9 +61,12 @@ private:
     Graph g_;
 
     inline void AddBackwardEdge(Edge&& edge) {
-        // edge.Reverse();
-        g_.AddEdge(std::move(edge), [](Vertex& v, Edge&& e){
-            v.get_edges().AddEdge(std::move(e));// AddBackwardEdge(std::move(e));
+        unsigned_id_type backward_from_node = edge.get_backward_from();
+        if (edge.IsForward()) {
+            edge.SetBackward();
+        }
+        g_.AddEdge(std::move(edge), backward_from_node, [](Vertex& v, Edge&& e){
+            v.get_edges().AddEdge(std::move(e));
         });
     }
 

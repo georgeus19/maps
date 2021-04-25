@@ -19,6 +19,10 @@ public:
         return osm_id_;
     } 
 
+    inline void set_osm_id(unsigned_id_type osm_id) {
+        osm_id_ = osm_id;
+    } 
+
     inline EdgeRange& get_edges() {
         return edges_;
     }
@@ -65,7 +69,7 @@ protected:
 };
 
 template <typename Edge, typename EdgeRange>
-BasicVertex<Edge, EdgeRange>::BasicVertex() : osm_id_(), edges_() {}
+BasicVertex<Edge, EdgeRange>::BasicVertex() : osm_id_(0), edges_() {}
 
 template <typename Edge, typename EdgeRange>
 BasicVertex<Edge, EdgeRange>::BasicVertex(unsigned_id_type osm_id, EdgeRange&& edges)
@@ -80,7 +84,7 @@ unsigned_id_type BasicVertex<Edge, EdgeRange>::GetPreviousDefaultValue() const {
 template <typename Edge, typename EdgeRange>
 void BasicVertex<Edge, EdgeRange>::ForEachEdge(const std::function<void(Edge&)>& f) {
     for (auto&& e : edges_) {
-        if (e.IsForward() || e.IsTwoways()) {
+        if (e.IsForward() || e.IsTwoway()) {
             f(e);
         }
     }
@@ -89,7 +93,7 @@ void BasicVertex<Edge, EdgeRange>::ForEachEdge(const std::function<void(Edge&)>&
 template <typename Edge, typename EdgeRange>
 void BasicVertex<Edge, EdgeRange>::ForEachBackwardEdge(const std::function<void(Edge&)>& f) {
      for (auto&& e : edges_) {
-        if (e.IsBackward() || e.IsTwoways()) {
+        if (e.IsBackward() || e.IsTwoway()) {
             f(e);
         }
     }
@@ -113,7 +117,8 @@ Edge& BasicVertex<Edge, EdgeRange>::FindEdge(EdgeRange& edges, bool forward_edge
     for (auto&& e : edges) {
         if (forward_edges && e.IsBackward()) {
             continue;
-        } else if (e.IsForward()) {
+        } 
+        if (!forward_edges && e.IsForward()) {
             continue;
         }
         if (f(e) && e.get_length() < min_length) {

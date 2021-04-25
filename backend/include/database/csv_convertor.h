@@ -73,7 +73,6 @@ template<typename Edge>
 void CsvConvertor::SaveEdge(const Edge& edge) {
     f_ << std::to_string(0) << "; "
         << std::to_string(edge.get_uid()) << "; " 
-        << edge.get_geography() << "; " 
         << std::to_string(edge.get_from()) << "; " 
         << std::to_string(edge.get_to()) << "; " 
         << std::to_string(edge.get_length()) << "; " 
