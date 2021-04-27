@@ -28,10 +28,6 @@ public:
             return touched_vertices_[vertex.get_osm_id()].previous;
         }
 
-        virtual unsigned_id_type GetFrom(const Edge& e) const = 0;
-
-        virtual unsigned_id_type GetTo(const Edge& e) const = 0;
-
         virtual Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) = 0;
 
         virtual Edge& FindBackwardEdge(Vertex& vertex, unsigned_id_type target_vertex_id) = 0;
@@ -47,14 +43,6 @@ public:
     public:
         BiDijkstraForwardGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
-        unsigned_id_type GetFrom(const Edge& e) const override {
-            return e.get_from();
-        }
-
-        unsigned_id_type GetTo(const Edge& e) const override {
-            return e.get_to();
-        }
-
         Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
             return vertex.FindEdge([=](const Edge& e) {
                 return e.get_to() == target_vertex_id;
@@ -63,7 +51,7 @@ public:
 
         Edge& FindBackwardEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
             return vertex.FindBackwardEdge([=](const Edge& e) {
-                return e.get_backward_to() == target_vertex_id;
+                return e.get_to() == target_vertex_id;
             });
         }
 
@@ -82,17 +70,9 @@ public:
     public:
         BiDijkstraBackwardGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
 
-        unsigned_id_type GetFrom(const Edge& e) const override {
-            return e.get_backward_from();
-        }
-
-        unsigned_id_type GetTo(const Edge& e) const override {
-            return e.get_backward_to();
-        }
-
         Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
             return vertex.FindBackwardEdge([=](const Edge& e) {
-                return e.get_backward_to() == target_vertex_id;
+                return e.get_to() == target_vertex_id;
             });
         }
 
@@ -116,14 +96,6 @@ public:
     class DijkstraGraphInfo : public GraphInfo {
     public:
         DijkstraGraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : GraphInfo(retriever, tv) {}
-
-        unsigned_id_type GetFrom(const Edge& e) const override {
-            return e.get_from();
-        }
-
-        unsigned_id_type GetTo(const Edge& e) const override {
-            return e.get_to();
-        }
 
         Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) override {
             return vertex.FindEdge([=](const Edge& e) {
@@ -166,7 +138,6 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     Vertex& end_vertex = g_.GetVertex(end_node);
     unsigned_id_type current_vertex_id = graph_info->GetPrevious(end_vertex);
 
-
     if (GetPreviousDefaultValue() == graph_info->GetPrevious(end_vertex) ) {
         return route;
     }
@@ -196,7 +167,7 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
     while (!shortcut_stack.empty() || edge.IsShortcut()) {
         if (edge.IsShortcut()) {
             shortcut_stack.push(edge);
-            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), graph_info->GetTo(edge), true);
+            edge = GetUnderlyingEdge(graph_info, edge.get_contracted_vertex(), edge.get_to(), true);
         } else {
             // Add the non-shortcut edges to route.
             underlying_edges.push_back(std::move(edge));
@@ -208,8 +179,8 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
             // The former edge belongs to the downward graph if for forward dijkstra search
             // resp to the upward graph in case of backward dijkstra search.
             // So the edge needs to be reverse so that its direction is correct.
-            edge = GetUnderlyingEdge(graph_info, graph_info->GetFrom(edge), edge.get_contracted_vertex(), false);
-            // edge.Reverse();
+            edge = GetUnderlyingEdge(graph_info, edge.get_from(), edge.get_contracted_vertex(), false);
+            edge.Reverse();
         }
     }
     // Last non-shortcut edge was not added due to empty stack and not being a shortcut.

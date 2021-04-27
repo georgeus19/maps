@@ -166,14 +166,8 @@ template <typename V, typename E>
 template <typename Graph>
 bool CHSearchGraph<V, E>::IsToHigherOrderingRank(Graph& graph, const typename Graph::Edge& edge) {
     unsigned_id_type from, to;
-    if (edge.IsForward() || edge.IsTwoway()) {
-        from = edge.get_from();
-        to = edge.get_to();
-    }
-    if (edge.IsBackward()) {
-        from = edge.get_backward_from();
-        to = edge.get_backward_to();
-    }
+    from = edge.get_from();
+    to = edge.get_to();
     if (graph.GetVertex(from).get_ordering_rank() < graph.GetVertex(to).get_ordering_rank()) {
         return true;
     }

@@ -24,16 +24,8 @@ public:
         return from_;
     }
 
-    inline unsigned_id_type get_backward_from() const {
-        return to_;
-    }
-
     inline unsigned_id_type get_to() const {
         return to_;
-    }
-
-    inline unsigned_id_type get_backward_to() const {
-        return from_;
     }
 
     inline double get_length() const {

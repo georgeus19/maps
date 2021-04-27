@@ -36,7 +36,7 @@ public:
 
     ShortcutContainer<Edge> FindShortcuts(Vertex& vertex);
 
-    std::vector<Edge> FindShortcuts(Vertex& contracted_vertex, const Edge& former_edge); 
+    std::vector<Edge> FindShortcuts(Vertex& contracted_vertex, const Edge& backward_former_edge); 
 
     size_t GetSearchSpaceSize();
 
@@ -71,14 +71,14 @@ ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::F
 }
 
 template <typename Graph>
-std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& contracted_vertex, const Edge& former_edge) {
+std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& contracted_vertex, const Edge& backward_former_edge) {
     std::vector<Edge> shortcuts{};
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(1, 11);
     const size_t random_half = 6;
 
-    unsigned_id_type source_vertex_id = former_edge.get_from();
+    unsigned_id_type source_vertex_id = backward_former_edge.get_to();
     Vertex& source_vertex = g_.GetVertex(source_vertex_id);
 
     if (source_vertex.IsContracted()) {
@@ -89,7 +89,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         return shortcuts;
     }
     double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
-    double max_cost = former_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
+    double max_cost = backward_former_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
     
     typename CHDijkstra<Graph>::SearchRangeLimits limits{max_cost, parameters_.get_hop_count() - 1};
     typename CHDijkstra<Graph>::TargetVerticesMap target_vertices = GetTargetVertices(contracted_vertex);
@@ -100,7 +100,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         if (g_.GetVertex(target_vertex_id).IsContracted()) {
             return;
         }
-        double shortcut_length = former_edge.get_length() + latter_edge.get_length();
+        double shortcut_length = backward_former_edge.get_length() + latter_edge.get_length();
         double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
@@ -138,7 +138,7 @@ double ShortcutFinder<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vert
         auto&& target_vertex = g_.GetVertex(edge.get_to());
         if (!target_vertex.IsContracted()) {
             target_vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
-                auto&& v = g_.GetVertex(backward_edge.get_backward_to());
+                auto&& v = g_.GetVertex(backward_edge.get_to());
                 if (!v.IsContracted() && backward_edge.get_length() < min_length) {
                     min_length = backward_edge.get_length();
                 }

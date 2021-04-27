@@ -61,7 +61,7 @@ int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex, std::vect
         IncrementCurrentEdgeCount(adjacent_edges_count, neighbour_id);
     });
     vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
-        unsigned_id_type neighbour_id = backward_edge.get_backward_to();
+        unsigned_id_type neighbour_id = backward_edge.get_to();
         IncrementCurrentEdgeCount(adjacent_edges_count, neighbour_id);
     });
     return shortcuts.size() - adjacent_edges_count;
@@ -75,7 +75,7 @@ int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
         AddDeletedNeighbour(deleted_neighbours, neighbour_id);
     });
     vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
-        unsigned_id_type neighbour_id = backward_edge.get_backward_to();
+        unsigned_id_type neighbour_id = backward_edge.get_to();
         AddDeletedNeighbour(deleted_neighbours, neighbour_id);
     });
     return deleted_neighbours.size();

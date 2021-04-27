@@ -39,6 +39,7 @@ public:
             Edge backward_edge{edge};
             edge.SetForward();
             g_.AddEdge(std::move(edge));
+            backward_edge.Reverse();
             backward_edge.SetBackward();
             AddBackwardEdge(std::move(backward_edge));
         }
@@ -68,7 +69,7 @@ private:
     Graph g_;
 
     inline void AddBackwardEdge(Edge&& backward_edge) {
-        unsigned_id_type backward_from_node = backward_edge.get_backward_from();
+        unsigned_id_type backward_from_node = backward_edge.get_from();
         g_.AddEdge(std::move(backward_edge), backward_from_node);
     }
 

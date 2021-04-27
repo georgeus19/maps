@@ -206,7 +206,7 @@ double CHDijkstra<G>::OneHopBackwardSearch(unsigned_id_type target_vertex_id) co
 
 	double min_path_length = GetPathLength(target_vertex_id);
 	end_vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
-		double d = GetPathLength(backward_edge.get_backward_to());
+		double d = GetPathLength(backward_edge.get_to());
 		if (d == std::numeric_limits<double>::max()) {
 			return;
 		}

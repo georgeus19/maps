@@ -138,6 +138,7 @@ void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
     for(auto&& shortcut : shortcuts.improving_edges) {
         Edge backward_shortcut = shortcut;
         backward_shortcut.SetBackward();
+        backward_shortcut.Reverse();
 
         auto&& source_vertex = g_.GetVertex(shortcut.get_from());
         Edge& edge = source_vertex.FindEdge([&](const Edge& e) {
@@ -145,9 +146,9 @@ void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
         });
         edge.Swap(shortcut);
 
-        auto&& target_vertex = g_.GetVertex(backward_shortcut.get_backward_from());
+        auto&& target_vertex = g_.GetVertex(backward_shortcut.get_from());
         Edge& backward_edge = target_vertex.FindBackwardEdge([&](const Edge& e) {
-            return e.get_backward_to() == backward_shortcut.get_backward_to();
+            return e.get_to() == backward_shortcut.get_to();
         });
         backward_edge.Swap(backward_shortcut);
     }
