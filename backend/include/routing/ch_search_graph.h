@@ -53,16 +53,13 @@ private:
 
     std::vector<V> vertices_;
 
-    std::vector<E> upward_edges_;
-
-    std::vector<E> downward_edges_;
+    std::vector<E> edges_;
 
     struct Capacities {
         size_t vertices_capacity;
-        size_t upward_edges_capacity;
-        size_t downward_edges_capacity;
+        size_t edges_capacity;
 
-        Capacities(size_t vc, size_t uec, size_t dec) : vertices_capacity(vc), upward_edges_capacity(uec), downward_edges_capacity(dec) {}
+        Capacities(size_t vc, size_t ec) : vertices_capacity(vc), edges_capacity(ec) {}
     };
 
     template <typename Graph>
@@ -72,34 +69,31 @@ private:
     void LoadEdges(Graph& graph);
 
     template <typename Graph>
-    void LoadEdge(Graph& graph, const typename Graph::Vertex& from, const typename Graph::Edge& edge,
-        std::vector<E>& output_edges, typename std::vector<E>::iterator& end_it);
+    bool IsToHigherOrderingRank(Graph& graph, const typename Graph::Edge& edge);
+
 };
 
 template <typename V, typename E>
-CHSearchGraph<V, E>::CHSearchGraph() : vertices_(), upward_edges_(), downward_edges_() {}
+CHSearchGraph<V, E>::CHSearchGraph() : vertices_() {}
 
 template <typename V, typename E>
 template <typename Graph>
 void CHSearchGraph<V, E>::Load(Graph& graph) {
     Capacities capacities = PrecomputeCapacities(graph);
     vertices_.assign(capacities.vertices_capacity, V{});
-    upward_edges_.reserve(capacities.upward_edges_capacity);
-    downward_edges_.reserve(capacities.downward_edges_capacity);
+    edges_.reserve(capacities.edges_capacity);
     LoadEdges(graph);
-    std::cout << "old upward_edges_.capacity: " << capacities.upward_edges_capacity << ::std::endl;
-    std::cout << "old downward_edges_.capacity: " << capacities.downward_edges_capacity << ::std::endl;
-    std::cout << "upward_edges_.capacity: " << upward_edges_.capacity() << ::std::endl;
-    std::cout << "downward_edges_.capacity: " << downward_edges_.capacity() << ::std::endl;
-    std::cout << "upward_edges_.size: " << upward_edges_.size() << ::std::endl;
-    std::cout << "downward_edges_.size: " << downward_edges_.size() << ::std::endl;
-    assert(capacities.upward_edges_capacity == upward_edges_.capacity());
-    assert(capacities.downward_edges_capacity == downward_edges_.capacity());
+    std::cout << "vertices_.size: " << vertices_.size() << ::std::endl;
+    std::cout << "old edges_.capacity: " << capacities.edges_capacity << ::std::endl;
+    std::cout << "edges_.capacity: " << edges_.capacity() << ::std::endl;
+    std::cout << "edges_.size: " << edges_.size() << ::std::endl;
+    assert(capacities.edges_capacity == edges_.capacity());
 }
 
 template <typename V, typename E>
 inline V& CHSearchGraph<V, E>::GetVertex(unsigned_id_type id) {
-    assert(id > 0 && id < vertices_.size());
+    assert(id < vertices_.size());
+    assert(id == vertices_[id].get_osm_id());
     return vertices_[id];
 }
 
@@ -112,12 +106,10 @@ void CHSearchGraph<V, E>::ForEachVertex(const std::function<void(V&)>& f) {
 
 template <typename V, typename E>
 void CHSearchGraph<V, E>::ForEachEdge(const std::function<void(E&)>& f) {
-    for(auto&& edge : upward_edges_) {
+    for (auto&& edge : edges_) {
+        // vertex.ForEachEdge(f);
+        // vertex.ForEachBackwardEdge(f);
         f(edge);
-    }
-
-    for(auto&& reverse_edge : downward_edges_) {
-        f(reverse_edge);
     }
 }
 
@@ -128,58 +120,80 @@ size_t CHSearchGraph<V, E>::GetVertexCount() const {
 
 template <typename V, typename E>
 size_t CHSearchGraph<V, E>::GetEdgeCount() {
-    return upward_edges_.size() + downward_edges_.size();
+    size_t count = 0;
+    ForEachEdge([&](E& e) {
+        ++count;
+    });
+    return count;
 }
 
 template <typename V, typename E>
 template <typename Graph>
 CHSearchGraph<V, E>::Capacities CHSearchGraph<V, E>::PrecomputeCapacities(Graph& graph) {
-    size_t vertex_count = graph.GetVertexCount() + 1;
-    size_t upward_edges = 0;
-    size_t downward_edges = 0;
+    size_t max_vertex_id = 0;
+    size_t edges = 0;
     graph.ForEachVertex([&](typename Graph::Vertex& vertex) {
-        vertex.ForEachEdge([&](Edge& edge) {
-            auto&& to = graph.GetVertex(edge.get_to());
-            if (vertex.get_ordering_rank() < to.get_ordering_rank()) {
-                ++upward_edges;
-            } else {
-                ++downward_edges;
+        for(auto&& edge : vertex.get_edges()) {
+            if (IsToHigherOrderingRank(graph, edge)) {
+                ++edges;
             }
-        });
+            // if (edge.IsTwoway()) {
+            //     ++edges;
+            // } else if (IsToHigherOrderingRank(graph, edge)) {
+            //     ++edges;
+            // }
+        }
+        if (vertex.get_osm_id() > max_vertex_id) {
+            max_vertex_id = vertex.get_osm_id();
+        }
     });
-    assert(upward_edges + downward_edges == graph.GetEdgeCount());
-    return Capacities{vertex_count, upward_edges, downward_edges};
+    return Capacities{max_vertex_id + 1, edges};
 }
 
 template <typename V, typename E>
 template <typename Graph>
 void CHSearchGraph<V, E>::LoadEdges(Graph& graph) {
-    auto upward_edges_begin_it = upward_edges_.begin();
-    auto upward_edges_end_it = upward_edges_.begin();
-    auto downward_edges_begin_it = downward_edges_.begin();
-    auto downward_edges_end_it = downward_edges_.begin();
+    auto edges_begin_it = edges_.begin();
+    auto edges_end_it = edges_.end();
     graph.ForEachVertex([&](typename Graph::Vertex& vertex) { 
-        upward_edges_begin_it = upward_edges_end_it;
-        vertex.ForEachEdge([&](Edge& edge) {
-            LoadEdge(graph, vertex, edge, upward_edges_, upward_edges_end_it);
-        });
-        downward_edges_begin_it = downward_edges_end_it;
-        vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
-            LoadEdge(graph, vertex, backward_edge, downward_edges_, downward_edges_end_it);
-        });
-        // vertices_[vertex.get_osm_id()] = V{vertex.get_osm_id(), vertex.get_ordering_rank(), upward_edges_begin_it, upward_edges_end_it, downward_edges_begin_it, downward_edges_end_it};
+        edges_begin_it = edges_end_it;
+        for(auto&& edge : vertex.get_edges()) {
+            edges_begin_it = edges_end_it;
+            if (IsToHigherOrderingRank(graph, edge)) {
+                edges_.push_back(edge);
+                ++edges_end_it;
+            }
+            // bool add = false;
+            // if (edge.IsTwoway()) {
+            //     add = true;
+            // } else {
+            //     add = IsToHigherOrderingRank(graph, edge);
+            // }
+            // if (add) {
+            //     edges_.push_back(edge);
+            //     ++edges_end_it;
+            // }
+        }
+        vertices_[vertex.get_osm_id()] = V{vertex.get_osm_id(), typename V::EdgeRange{edges_begin_it, edges_end_it}, vertex.get_ordering_rank()};
     });
 }
 
 template <typename V, typename E>
 template <typename Graph>
-void CHSearchGraph<V, E>::LoadEdge(Graph& graph, const typename Graph::Vertex& from, const typename Graph::Edge& edge,
-    std::vector<E>& output_edges, typename std::vector<E>::iterator& end_it) {
-    auto&& to = graph.GetVertex(edge.get_to());
-    if (from.get_ordering_rank() < to.get_ordering_rank()) {
-        output_edges.emplace_back(edge.get_uid(), edge.get_from(), edge.get_to(), edge.get_length(), edge.get_contracted_vertex());
-        ++end_it;
+bool CHSearchGraph<V, E>::IsToHigherOrderingRank(Graph& graph, const typename Graph::Edge& edge) {
+    unsigned_id_type from, to;
+    if (edge.IsForward() || edge.IsTwoway()) {
+        from = edge.get_from();
+        to = edge.get_to();
     }
+    if (edge.IsBackward()) {
+        from = edge.get_backward_from();
+        to = edge.get_backward_to();
+    }
+    if (graph.GetVertex(from).get_ordering_rank() < graph.GetVertex(to).get_ordering_rank()) {
+        return true;
+    }
+    return false;
 }
 
 

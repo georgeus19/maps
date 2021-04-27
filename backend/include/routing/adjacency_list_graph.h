@@ -32,10 +32,6 @@ public:
 
     AdjacencyListGraph();
 
-    /**
-     * Add `edge` to graph.
-     * @param edge Edge which is added to graph.
-     */
     void AddEdge(E&& edge);
 
     /**
@@ -49,7 +45,7 @@ public:
 
     void ForEachEdge(const std::function<void(E&)>& f);
 
-    void AddEdge(E&& edge, unsigned_id_type target_vertex_id, const std::function<void(V&, E&& e)>& add_edge);
+    void AddEdge(E&& edge, unsigned_id_type target_vertex_id);
 
     size_t GetVertexCount() const;
 
@@ -71,10 +67,15 @@ AdjacencyListGraph<V, E>::AdjacencyListGraph() : vertices_() {}
 
 template <typename V, typename E>
 inline void AdjacencyListGraph<V, E>::AddEdge(E&& edge) {
+    assert(!edge.IsBackward());
+    if (edge.IsTwoway()) {
+        E other_direction_edge{edge};
+        other_direction_edge.Reverse();
+        unsigned_id_type from = other_direction_edge.get_from();
+        AddEdge(std::move(other_direction_edge), from);
+    }
     unsigned_id_type from_node = edge.get_from();
-    AddEdge(std::move(edge), from_node, [](V& v, E&& e) {
-        v.get_edges().AddEdge(std::move(e));            
-    });
+    AddEdge(std::move(edge), from_node);
 }
 
 template <typename V, typename E>
@@ -100,7 +101,7 @@ void AdjacencyListGraph<V, E>::ForEachEdge(const std::function<void(E&)>& f) {
 }
 
 template <typename V, typename E>
-void AdjacencyListGraph<V, E>::AddEdge(E&& e, unsigned_id_type target_vertex_id, const std::function<void(V&, E&& e)>& add_edge) {
+void AdjacencyListGraph<V, E>::AddEdge(E&& e, unsigned_id_type target_vertex_id) {
     unsigned_id_type max_vertex_id = std::max(e.get_from(), e.get_to());
     if (vertices_.size() <= max_vertex_id) {
         vertices_.resize(max_vertex_id + 1);
@@ -109,7 +110,7 @@ void AdjacencyListGraph<V, E>::AddEdge(E&& e, unsigned_id_type target_vertex_id,
     SetOsmId(e.get_from());
     SetOsmId(e.get_to());
     auto&& vertex = GetVertex(target_vertex_id);
-    add_edge(vertex, std::move(e));
+    vertex.get_edges().AddEdge(std::move(e));  
 }
 
 template <typename V, typename E>

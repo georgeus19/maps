@@ -32,9 +32,16 @@ public:
     inline BidirectionalGraph() : g_() {}
 
     inline void AddEdge(Edge&& edge) {
-        Edge reverse_edge = edge;
-        g_.AddEdge(std::move(edge));
-        AddBackwardEdge(std::move(reverse_edge));
+        assert(!edge.IsBackward());
+        if (edge.IsTwoway()) {
+            g_.AddEdge(std::move(edge));
+        } else {
+            Edge backward_edge{edge};
+            edge.SetForward();
+            g_.AddEdge(std::move(edge));
+            backward_edge.SetBackward();
+            AddBackwardEdge(std::move(backward_edge));
+        }
     }
 
     inline Vertex& GetVertex(unsigned_id_type id) {
@@ -60,14 +67,9 @@ public:
 private:
     Graph g_;
 
-    inline void AddBackwardEdge(Edge&& edge) {
-        unsigned_id_type backward_from_node = edge.get_backward_from();
-        if (edge.IsForward()) {
-            edge.SetBackward();
-        }
-        g_.AddEdge(std::move(edge), backward_from_node, [](Vertex& v, Edge&& e){
-            v.get_edges().AddEdge(std::move(e));
-        });
+    inline void AddBackwardEdge(Edge&& backward_edge) {
+        unsigned_id_type backward_from_node = backward_edge.get_backward_from();
+        g_.AddEdge(std::move(backward_edge), backward_from_node);
     }
 
 };

@@ -9,9 +9,11 @@
 
 namespace routing {
 
-template <typename Edge, typename EdgeRange>
-class CHVertex : public BasicVertex<Edge, EdgeRange> {
+template <typename Edge, typename ERange>
+class CHVertex : public BasicVertex<Edge, ERange> {
 public:
+    using EdgeRange = ERange;
+
     inline unsigned_id_type get_ordering_rank() const {
         return ordering_rank_;
     }
@@ -26,12 +28,12 @@ public:
 
     CHVertex();
 
-    CHVertex(unsigned_id_type osm_id, EdgeRange&& edges, unsigned_id_type ordering_rank);
+    CHVertex(unsigned_id_type osm_id, ERange&& edges, unsigned_id_type ordering_rank);
 
-    CHVertex(unsigned_id_type osm_id, EdgeRange&& edges);
+    CHVertex(unsigned_id_type osm_id, ERange&& edges);
 
-    CHVertex(const CHVertex<Edge, EdgeRange>& other) = default;
-    CHVertex(CHVertex<Edge, EdgeRange>&& other) = default;
+    CHVertex(const CHVertex<Edge, ERange>& other) = default;
+    CHVertex(CHVertex<Edge, ERange>&& other) = default;
     CHVertex& operator=(const CHVertex& other) = default;
     CHVertex& operator=(CHVertex&& other) = default;
     ~CHVertex() = default;
@@ -39,16 +41,16 @@ public:
 protected:
     unsigned_id_type ordering_rank_;
 };
-template <typename Edge, typename EdgeRange>
-CHVertex<Edge, EdgeRange>::CHVertex() : BasicVertex<Edge, EdgeRange>(), ordering_rank_() {}
+template <typename Edge, typename ERange>
+CHVertex<Edge, ERange>::CHVertex() : BasicVertex<Edge, ERange>(), ordering_rank_() {}
 
-template <typename Edge, typename EdgeRange>
-CHVertex<Edge, EdgeRange>::CHVertex(unsigned_id_type osm_id, EdgeRange&& edges, unsigned_id_type ordering_rank)
-        : BasicVertex<Edge, EdgeRange>(osm_id, std::move(edges)), ordering_rank_(ordering_rank) {}
+template <typename Edge, typename ERange>
+CHVertex<Edge, ERange>::CHVertex(unsigned_id_type osm_id, ERange&& edges, unsigned_id_type ordering_rank)
+        : BasicVertex<Edge, ERange>(osm_id, std::move(edges)), ordering_rank_(ordering_rank) {}
 
-template <typename Edge, typename EdgeRange>
-CHVertex<Edge, EdgeRange>::CHVertex(unsigned_id_type osm_id, EdgeRange&& edges)
-        : BasicVertex<Edge, EdgeRange>(osm_id, std::move(edges)), ordering_rank_(0) {}
+template <typename Edge, typename ERange>
+CHVertex<Edge, ERange>::CHVertex(unsigned_id_type osm_id, ERange&& edges)
+        : BasicVertex<Edge, ERange>(osm_id, std::move(edges)), ordering_rank_(0) {}
 
 
 }

@@ -102,6 +102,22 @@ INSTANTIATE_TEST_CASE_P(
                 CHSearchEdge{12, 5, 6, 2},
                 CHSearchEdge{13, 6, 5, 3}
             }
+        },
+        GraphForEachEdgeTestsParameter{
+            [](G& g){ TestBidirectedGraph(g); },
+            std::vector<G::Edge> {
+                typename G::Edge{0, 1, 2, 2, G::Edge::EdgeType::forward},
+                typename G::Edge{1, 1, 3, 3, G::Edge::EdgeType::twoway},
+                typename G::Edge{1, 3, 1, 3, G::Edge::EdgeType::twoway},
+                typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward},
+                typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway},
+                typename G::Edge{3, 4, 3, 2, G::Edge::EdgeType::twoway},
+                typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway},
+                typename G::Edge{4, 5, 4, 3, G::Edge::EdgeType::twoway},
+                typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward},
+                typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward},
+                typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward}
+            }
         }
     )
 );
@@ -125,7 +141,6 @@ TEST(GraphTests, ForEachVertexBasicGraphTest) {
     g.ForEachVertex([&](G::Vertex& vertex) {
         actual_vertices.push_back(vertex);
     });
- 
 
     std::vector<G::Vertex> expected_vertices{
         Vertex{1, VectorEdgeRange<CHSearchEdge>{}},

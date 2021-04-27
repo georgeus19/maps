@@ -21,7 +21,9 @@ public:
 
     CHSearchEdge();
     CHSearchEdge(database::DbEdgeIterator*);
+    CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, EdgeType type, unsigned_id_type contracted_vertex);
     CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex);
+    CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, EdgeType type);
     CHSearchEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
     CHSearchEdge(const CHSearchEdge & other) = default;
     CHSearchEdge(CHSearchEdge && other) = default;

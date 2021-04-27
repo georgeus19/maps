@@ -22,6 +22,8 @@ public:
 
     CHPreprocessingEdge();
     CHPreprocessingEdge(database::DbEdgeIterator*);
+    CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, EdgeType type, unsigned_id_type contracted_vertex);
+    CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, EdgeType type);
     CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, unsigned_id_type contracted_vertex);
     CHPreprocessingEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length);
     CHPreprocessingEdge(const CHPreprocessingEdge & other) = default;

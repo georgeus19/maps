@@ -4,15 +4,16 @@
 namespace routing {
 
 template <typename Edge, typename EdgeIterator>
-class VectorEdgeRange {
+class IteratorEdgeRange {
 public:
+
+    IteratorEdgeRange();
+
+    IteratorEdgeRange(EdgeIterator begin, EdgeIterator end);
+
     EdgeIterator begin();
 
     EdgeIterator end();
-
-    void AddEdge(Edge&& edge);
-
-    void AddEdge(const Edge& edge);
 
 private:
     EdgeIterator begin_;
@@ -20,12 +21,18 @@ private:
 };
 
 template <typename Edge, typename EdgeIterator>
-inline EdgeIterator VectorEdgeRange<Edge, EdgeIterator>::begin() {
+inline IteratorEdgeRange<Edge, EdgeIterator>::IteratorEdgeRange() : begin_(), end_() {}
+
+template <typename Edge, typename EdgeIterator>
+inline IteratorEdgeRange<Edge, EdgeIterator>::IteratorEdgeRange(EdgeIterator begin, EdgeIterator end) : begin_(begin), end_(end) {}
+
+template <typename Edge, typename EdgeIterator>
+inline EdgeIterator IteratorEdgeRange<Edge, EdgeIterator>::begin() {
     return begin_;
 }
 
 template <typename Edge, typename EdgeIterator>
-inline EdgeIterator VectorEdgeRange<Edge, EdgeIterator>::end() {
+inline EdgeIterator IteratorEdgeRange<Edge, EdgeIterator>::end() {
     return end_;
 }
 

@@ -9,12 +9,12 @@ BasicEdge::BasicEdge(database::DbEdgeIterator* it) :
     from_(it->GetFrom()),
     to_(it->GetTo()),
     length_(it->GetLength()),
-    type_(Type::EdgeType::forward) {}
+    type_(EdgeType::forward) {}
 
 BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
-        uid_(uid), from_(from), to_(to), length_(length), type_(Type::EdgeType::forward) {}
+        uid_(uid), from_(from), to_(to), length_(length), type_(EdgeType::forward) {}
 
-BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, Type::EdgeType type) :
+BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length, EdgeType type) :
         uid_(uid), from_(from), to_(to), length_(length), type_(type) {}
 
 void BasicEdge::Swap(BasicEdge & other) {
@@ -34,15 +34,15 @@ void BasicEdge::Print() const {
 }
 
 bool BasicEdge::IsForward() const {
-    return type_ == Type::forward;
+    return type_ == EdgeType::forward;
 }
 
 bool BasicEdge::IsBackward() const {
-    return type_ == Type::backward;
+    return type_ == EdgeType::backward;
 }
 
 bool BasicEdge::IsTwoway() const {
-    return type_ == Type::twoway;
+    return type_ == EdgeType::twoway;
 }
 
 bool BasicEdge::operator==(const BasicEdge& other) const {
@@ -63,13 +63,13 @@ bool BasicEdge::operator!=(const BasicEdge& other) const {
 std::string BasicEdge::GetType() const {
     std::string s;
     switch(type_) {
-        case Type::EdgeType::forward:
+        case EdgeType::forward:
             s = "forward";
             break;
-        case Type::EdgeType::backward:
+        case EdgeType::backward:
             s = "backward";
             break;
-        case Type::EdgeType::twoway:
+        case EdgeType::twoway:
             s = "twoway";
             break;
         default:

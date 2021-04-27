@@ -149,4 +149,43 @@ void TestPathShortcutGraph(G& g) {
 }
 
 
+template <typename G>
+void TestBidirectedGraph(G& graph) {
+	graph.AddEdge(std::move(typename G::Edge{0, 1, 2, 2, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{1, 1, 3, 3, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward}));
+}
+
+template <typename G>
+void TestBidirectedSearchGraph(G& graph) {
+	graph.AddEdge(std::move(typename G::Edge{0, 1, 2, 2, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{1, 1, 3, 3, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward}));
+
+	// Shortcuts.
+	graph.AddEdge(std::move(typename G::Edge{8, 1, 4, 3, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{9, 1, 5, 8, G::Edge::EdgeType::twoway}));
+	graph.AddEdge(std::move(typename G::Edge{10, 1, 6, 11, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{11, 2, 5, 15, G::Edge::EdgeType::forward}));
+
+	graph.GetVertex(1).set_ordering_rank(3);   
+	graph.GetVertex(2).set_ordering_rank(5);   
+	graph.GetVertex(3).set_ordering_rank(1);   
+	graph.GetVertex(4).set_ordering_rank(2);   
+	graph.GetVertex(5).set_ordering_rank(6);   
+	graph.GetVertex(6).set_ordering_rank(4);   
+}
+
+
 #endif // GRAPH_TEST_H

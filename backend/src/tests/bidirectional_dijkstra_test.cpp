@@ -21,6 +21,7 @@
 #include "routing/vertices/ch_search_vertex.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/edge_ranges/iterator_edge_range.h"
 
 #include <string>
 #include <vector>
@@ -34,7 +35,7 @@ using namespace preprocessing;
 // using G = BidirectionalGraph<AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>>;
 using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
 // using SearchGraph = CHSearchGraph<CHSearchVertex<CHSearchEdge, typename std::vector<CHSearchEdge>::iterator>, CHSearchEdge>;
-using SearchGraph = CHSearchGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>;
+using SearchGraph = CHSearchGraph<CHVertex<CHSearchEdge, IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>>, CHSearchEdge>;
 
 class BidirectionalDijkstraTests : public testing::Test {
     protected:
