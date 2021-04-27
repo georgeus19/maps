@@ -158,7 +158,6 @@ void CHSearchGraph<V, E>::LoadEdges(Graph& graph) {
     graph.ForEachVertex([&](typename Graph::Vertex& vertex) { 
         edges_begin_it = edges_end_it;
         for(auto&& edge : vertex.get_edges()) {
-            edges_begin_it = edges_end_it;
             if (IsToHigherOrderingRank(graph, edge)) {
                 edges_.push_back(edge);
                 ++edges_end_it;
