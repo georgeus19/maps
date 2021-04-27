@@ -206,3 +206,23 @@ TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraphRightBackwardRecursi
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
 }
 
+TEST(BidirectionalDijkstraTestsNotFixture, GraphWithTwowayEdges) {
+    G load_graph;
+    TestBidirectedSearchGraph(load_graph);
+    SearchGraph search_graph{};
+    search_graph.Load(load_graph);
+ 
+    Algorithm<BidirectionalDijkstra<SearchGraph>> alg{search_graph};
+    alg.Run(1, 6);
+    vector<Dijkstra<SearchGraph>::Edge> path = alg.GetRoute();
+    for(auto&& e : path) {
+        e.Print();
+    }
+
+    vector<Dijkstra<SearchGraph>::Edge> expected_path {
+        CHSearchEdge{1, 1, 3, 3, CHSearchEdge::EdgeType::twoway}, CHSearchEdge{1, 3, 4, 2, CHSearchEdge::EdgeType::twoway},
+        CHSearchEdge{1, 4, 5, 3, CHSearchEdge::EdgeType::twoway}, CHSearchEdge{1, 5, 6, 2, CHSearchEdge::EdgeType::backward}
+    };
+
+    EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
+}

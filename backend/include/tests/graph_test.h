@@ -173,11 +173,11 @@ void TestBidirectedSearchGraph(G& graph) {
 	graph.AddEdge(std::move(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward}));
 
 	// Shortcuts.
-	graph.AddEdge(std::move(typename G::Edge{8, 1, 4, 3, G::Edge::EdgeType::twoway}));
-	graph.AddEdge(std::move(typename G::Edge{9, 1, 5, 8, G::Edge::EdgeType::twoway}));
-	graph.AddEdge(std::move(typename G::Edge{10, 1, 6, 11, G::Edge::EdgeType::forward}));
-	graph.AddEdge(std::move(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward}));
-	graph.AddEdge(std::move(typename G::Edge{11, 2, 5, 15, G::Edge::EdgeType::forward}));
+	graph.AddEdge(std::move(typename G::Edge{8, 1, 4, 3, G::Edge::EdgeType::twoway, 3}));
+	graph.AddEdge(std::move(typename G::Edge{9, 1, 5, 8, G::Edge::EdgeType::twoway, 4}));
+	graph.AddEdge(std::move(typename G::Edge{10, 1, 6, 11, G::Edge::EdgeType::forward, 4}));
+	graph.AddEdge(std::move(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward, 1}));
+	graph.AddEdge(std::move(typename G::Edge{12, 2, 5, 15, G::Edge::EdgeType::forward, 6}));
 
 	graph.GetVertex(1).set_ordering_rank(3);   
 	graph.GetVertex(2).set_ordering_rank(5);   

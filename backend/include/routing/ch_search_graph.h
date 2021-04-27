@@ -137,11 +137,6 @@ CHSearchGraph<V, E>::Capacities CHSearchGraph<V, E>::PrecomputeCapacities(Graph&
             if (IsToHigherOrderingRank(graph, edge)) {
                 ++edges;
             }
-            // if (edge.IsTwoway()) {
-            //     ++edges;
-            // } else if (IsToHigherOrderingRank(graph, edge)) {
-            //     ++edges;
-            // }
         }
         if (vertex.get_osm_id() > max_vertex_id) {
             max_vertex_id = vertex.get_osm_id();
@@ -162,16 +157,6 @@ void CHSearchGraph<V, E>::LoadEdges(Graph& graph) {
                 edges_.push_back(edge);
                 ++edges_end_it;
             }
-            // bool add = false;
-            // if (edge.IsTwoway()) {
-            //     add = true;
-            // } else {
-            //     add = IsToHigherOrderingRank(graph, edge);
-            // }
-            // if (add) {
-            //     edges_.push_back(edge);
-            //     ++edges_end_it;
-            // }
         }
         vertices_[vertex.get_osm_id()] = V{vertex.get_osm_id(), typename V::EdgeRange{edges_begin_it, edges_end_it}, vertex.get_ordering_rank()};
     });
