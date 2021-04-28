@@ -31,11 +31,7 @@ public:
 
     RoutingGraph(Graph& g);
 
-    /**
-     * Add `edge` to graph.
-     * @param edge Edge which is added to graph.
-     */
-    void AddEdge(Edge&& edge);
+    void AddVertex(Vertex&& vertex);
 
     /**
      * Return point to vertex with `id`.
@@ -44,50 +40,62 @@ public:
      */
     Vertex& GetVertex(unsigned_id_type id);
 
-    void ForEachVertex(const std::function<void(Vertex&)>& f);
+    // void ForEachVertex(const std::function<void(Vertex&)>& f);
 
-    void ForEachEdge(const std::function<void(Edge&)>& f);
+    // void ForEachEdge(const std::function<void(Edge&)>& f);
 
-    void AddEdge(Edge&& edge, const std::function<void(Vertex&, Edge&& e)>& add_edge);
+    // size_t GetVertexCount() const;
 
-    size_t GetVertexCount() const;
-
-    size_t GetEdgeCount();
+    // size_t GetEdgeCount();
 
 private:
     Graph& g_;
     std::vector<Vertex> additional_vertices_;
-    std::vector<Edge> additional_edges_;
-
 };
 
 template <typename Graph>
 RoutingGraph<Graph>::RoutingGraph(Graph& g) : g_(g) {}
 
 template <typename Graph>
+void RoutingGraph<Graph>::AddVertex(Vertex&& vertex) {
+    additional_vertices_.push_back(std::move(vertex));
+}
+
+template <typename Graph>
 inline typename Graph::Vertex& RoutingGraph<Graph>::GetVertex(unsigned_id_type id) {
+    for(auto&& vertex : additional_vertices_) {
+        if (vertex.get_osm_id() == id) {
+            return vertex;
+        }
+    }
     return g_.GetVertex(id);
 }
 
-template <typename Graph>
-void RoutingGraph<Graph>::ForEachVertex(const std::function<void(Vertex&)>& f) {
-    g_.ForEachVertex(f);
-}
+// template <typename Graph>
+// void RoutingGraph<Graph>::ForEachVertex(const std::function<void(Vertex&)>& f) {
+//     for(auto&& vertex : additional_vertices_) {
+//         f(vertex);
+//     }
+//     g_.ForEachVertex(f);
+// }
 
-template <typename Graph>
-void RoutingGraph<Graph>::ForEachEdge(const std::function<void(Edge&)>& f) {
-    g_.ForEachEdge(f);
-}
+// template <typename Graph>
+// void RoutingGraph<Graph>::ForEachEdge(const std::function<void(Edge&)>& f) {
+//     for(auto&& edge : additional_edges_) {
+//         f(edge);
+//     }
+//     g_.ForEachEdge(f);
+// }
 
-template <typename Graph>
-size_t RoutingGraph<Graph>::GetVertexCount() const {
-    return g_.GetVertexCount();
-}
+// template <typename Graph>
+// size_t RoutingGraph<Graph>::GetVertexCount() const {
+//     return g_.GetVertexCount() + additional_vertices_.size();
+// }
 
-template <typename Graph>
-size_t RoutingGraph<Graph>::GetEdgeCount() {
-    return g_.GetEdgeCount();
-}
+// template <typename Graph>
+// size_t RoutingGraph<Graph>::GetEdgeCount() {
+//     return g_.GetEdgeCount();
+// }
 
 
 

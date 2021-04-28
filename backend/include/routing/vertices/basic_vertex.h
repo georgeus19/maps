@@ -122,6 +122,7 @@ Edge& BasicVertex<Edge, EdgeRange>::FindEdge(EdgeRange& edges, bool forward_edge
             continue;
         }
         if (f(e) && e.get_length() < min_length) {
+            min_length = e.get_length();
             edge = &e;
         }
     }
