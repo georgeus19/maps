@@ -16,7 +16,6 @@
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/query/module.h"
 #include "utility/point.h"
-#include "routing/adjacency_list_graph_vector.h"
 #include "routing/ch_search_graph.h"
 #include <string>
 #include <vector>
