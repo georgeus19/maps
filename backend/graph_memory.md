@@ -10,6 +10,7 @@
 | AdjacencyGraph with old edges and old vertices in big two vectors | 64/ 56 | 1879000/10914384 | 4326 - 22 - 3045 |
 | AdjacencyGraph with edges and vertices in big two vectors | 48/ 48 | 1879000/10914384 | 7320 - 6363 |
 | CHSearchGraph with upward and downward graph memory optimization | 48/ 48 | 1879000/10914384 | 6820 - 6363 |
+|  |  |  | 4221 |
 
 
 

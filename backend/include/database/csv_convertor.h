@@ -72,9 +72,11 @@ void CsvConvertor::SaveVertexOrdering(Graph& graph) {
 template<typename Edge>
 void CsvConvertor::SaveEdge(const Edge& edge) {
     f_ << std::to_string(0) << "; "
-        << std::to_string(edge.get_uid()) << "; " 
+        << std::to_string(edge.get_uid()) << ";" 
+        << "null; " 
         << std::to_string(edge.get_from()) << "; " 
         << std::to_string(edge.get_to()) << "; " 
+        << std::to_string(edge.IsTwoway()) << "; " 
         << std::to_string(edge.get_length()) << "; " 
         << std::to_string(edge.IsShortcut()) << "; "
         << std::to_string(edge.get_contracted_vertex());

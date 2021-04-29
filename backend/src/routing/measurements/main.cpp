@@ -23,6 +23,9 @@
 #include <chrono>
 #include "routing/vertices/ch_search_vertex.h"
 #include "routing/vertices/edge_range_vertex.h"
+#include "routing/edge_ranges/iterator_edge_range.h"
+#include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/vertices/ch_vertex.h"
 
 using namespace std;
 using namespace routing;
@@ -30,8 +33,9 @@ using namespace query;
 using namespace database;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>>;
-using GImmutable = CHSearchGraph<CHSearchVertex<CHSearchEdge, std::vector<CHSearchEdge>::iterator>, CHSearchEdge>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
+// using SearchGraph = CHSearchGraph<CHSearchVertex<CHSearchEdge, typename std::vector<CHSearchEdge>::iterator>, CHSearchEdge>;
+using SearchGraph = CHSearchGraph<CHVertex<CHSearchEdge, IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>>, CHSearchEdge>;
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -74,10 +78,10 @@ void LoadGraph(G& g) {
     std::cout << "Database helper init (ctor): " << std::endl;
     PrintMemoryUsage();
     // d.LoadFullGraph("CHcznoloops", g, &db_graph);
-    d.LoadFullGraph("abc", g, &db_graph);
-    d.LoadAdditionalVertexProperties("abc_vertex_ordering", g);
+    d.LoadFullGraph("CHczedges", g, &db_graph);
+    d.LoadAdditionalVertexProperties("CHczedges_vertex_ordering", g);
     
-    std::cout << "vertex size: " << sizeof(ContractionSearchVertex<CHSearchEdge>) << std::endl;
+    std::cout << "vertex size: " << sizeof(CHVertex<CHSearchEdge, IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>>) << std::endl;
     std::cout << "vertex count: " << g.GetVertexCount() << std::endl;
     std::cout << "edge size: " << sizeof(CHSearchEdge) << std::endl;
     std::cout << "edge count: " << g.GetEdgeCount() << std::endl; 
@@ -86,10 +90,11 @@ void LoadGraph(G& g) {
 }
 
 
-void LoadImmutableGraph(GImmutable& gi) {
+void LoadImmutableGraph(SearchGraph& gi) {
     G g{};
     LoadGraph(g);
     gi.Load(g);
+    std::cout << "Search graph load: " << std::endl;
     PrintMemoryUsage();
     G gg{};
     LoadGraph(gg);
@@ -104,7 +109,7 @@ int main(int argc, const char ** argv) {
     std::cout << "Program starting: " << std::endl;
     PrintMemoryUsage();
     // G g{};
-    GImmutable g{};
+    SearchGraph g{};
     PrintMemoryUsage();
     // LoadGraph(g);
     LoadImmutableGraph(g);

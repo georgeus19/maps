@@ -40,7 +40,8 @@ void CopyWriter::WriteInitSql(const string& table_name) {
 
 void CopyWriter::WriteEdge(const string &table_name, const Edge &edge) {
     // Write edge to data file. Data format is CSV with ';' delimiters.
-    string data = edge.get_osm_id() + "; " + edge.get_uid() + "; " + edge.get_geography() + "; " + edge.get_from() + "; " + edge.get_to();
+    string data = edge.get_osm_id() + "; " + edge.get_uid() + "; " + edge.get_geography() + "; " + edge.get_from() + "; " + edge.get_to() 
+        + "; " + edge.get_undirected();
     f_data_ << data << std::endl;
 }
 
@@ -55,7 +56,8 @@ std::string CopyWriter::GetCreateEdgesTable(const std::string& table_name) const
         "   uid BIGINT PRIMARY KEY, " \
         "   geog geography(LINESTRING) NOT NULL, " \
         "   from_node BIGINT NOT NULL, " \
-        "   to_node BIGINT NOT NULL " \
+        "   to_node BIGINT NOT NULL, " \
+        "   undirected BOOLEAN NOT NULL " \
         "); ";
 }
 
@@ -74,9 +76,9 @@ std::string CopyWriter::GetCreateVertexIdMappingTable(const std::string& edges_t
 }
 
 std::string CopyWriter::GetInsertToFinalTable(const std::string& final_table, const std::string& edges_table, const std::string& mapping_table) const {
-    return "INSERT INTO " + final_table + "(osm_id, uid, geog, from_node, to_node) " \
+    return "INSERT INTO " + final_table + "(osm_id, uid, geog, from_node, to_node, undirected) " \
         " ( " \
-        "   SELECT e.osm_id, e.uid, e.geog, vfrom.new_id, vto.new_id " \
+        "   SELECT e.osm_id, e.uid, e.geog, vfrom.new_id, vto.new_id, e.undirected " \
         "   FROM " + edges_table + " AS e INNER JOIN " + mapping_table + " AS vfrom ON from_node = vfrom.osm_id " \
         "   INNER JOIN " + mapping_table + " AS vto ON to_node = vto.osm_id " \
         " ); ";

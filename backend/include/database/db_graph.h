@@ -54,6 +54,7 @@ public:
             " ST_AsText(" + alias_expression + "geog), "
             + alias_expression + "from_node, "
             + alias_expression + "to_node, "
+            + alias_expression + "undirected, "
             + alias_expression + "length ";
     }
 
@@ -86,6 +87,7 @@ public:
         " ST_AsText(" + alias_expression + "geog), "
         + alias_expression + "from_node, "
         + alias_expression + "to_node, "
+        + alias_expression + "undirected, "
         + alias_expression + "length, "
         + alias_expression + "shortcut, "
         + alias_expression + "contracted_vertex ";
@@ -95,15 +97,16 @@ public:
         std::string create_table_sql = "CREATE TABLE " + new_table + " ( " \
 				"osm_id BIGINT NOT NULL, " \
 				"uid BIGINT PRIMARY KEY, " \
-				"geog geography(LINESTRING) NOT NULL, " \
+				"geog geography(LINESTRING), " \
 				"from_node BIGINT NOT NULL, " \
 				"to_node BIGINT NOT NULL, " \
+                "undirected BOOLEAN NOT NULL, " \
                 "length DOUBLE PRECISION NOT NULL, "
 				"shortcut BOOLEAN NOT NULL, " \
 				"contracted_vertex BIGINT NOT NULL); ";
-        std::string insert_basic_graph_sql = "INSERT INTO " + new_table + "(osm_id, uid, geog, from_node, to_node, length, shortcut, contracted_vertex) " \
+        std::string insert_basic_graph_sql = "INSERT INTO " + new_table + "(osm_id, uid, geog, from_node, to_node, undirected, length, shortcut, contracted_vertex) " \
                 "( " \
-                "SELECT osm_id, uid, geog, from_node, to_node, length, false, 0 FROM "+ basic_graph_table + " " \
+                "SELECT osm_id, uid, geog, from_node, to_node, undirected, length, false, 0 FROM "+ basic_graph_table + " " \
                 "); ";
         return create_table_sql + insert_basic_graph_sql;
     }

@@ -33,12 +33,14 @@ public:
      */
     std::vector<Edge> FilterDuplicateShortcuts(const std::vector<Edge>& shortcuts);
 
+    std::vector<Edge> MergeUnorderedShortcuts(const std::vector<Edge>& shortcuts);
     
     /**
      * Classify shortcuts into `ShortcutContainer`.
      * @see ShortcutContainer
      */
     ShortcutContainer<Edge> ClassifyShortcuts(std::vector<Edge>&& shortcuts);
+
 
 private:
     Graph& g_;
@@ -62,6 +64,22 @@ std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::FilterD
         bool filter = false;
         for(auto&& other_shortcut : shortcuts) {
             IsDuplicate(shortcut, other_shortcut, filter);
+        }
+        if (!filter) {
+            unique_shortcuts.push_back(std::move(shortcut));
+        }
+    }
+    return unique_shortcuts;
+}
+
+template <typename Graph>
+std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::MergeUnorderedShortcuts(const std::vector<Edge>& shortcuts) {
+    std::vector<Edge> unique_shortcuts;
+    unique_shortcuts.reserve(shortcuts.size());
+    for(auto&& s : shortcuts) {
+        Edge shortcut{s};
+        bool filter = false;
+        for(auto&& other_shortcut : shortcuts) {
             IsTwoway(shortcut, other_shortcut, filter);
         }
         if (!filter) {

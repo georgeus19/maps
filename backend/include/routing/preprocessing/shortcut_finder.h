@@ -67,16 +67,13 @@ ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::F
         s = filter.FilterDuplicateShortcuts(s);
         shortcuts.insert(shortcuts.end(), std::make_move_iterator(s.begin()), std::make_move_iterator(s.end()));
     });
+    shortcuts = filter.MergeUnorderedShortcuts(shortcuts);
     return filter.ClassifyShortcuts(std::move(shortcuts));
 }
 
 template <typename Graph>
 std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& contracted_vertex, const Edge& backward_former_edge) {
     std::vector<Edge> shortcuts{};
-    std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<> distrib(1, 11);
-    const size_t random_half = 6;
 
     unsigned_id_type source_vertex_id = backward_former_edge.get_to();
     Vertex& source_vertex = g_.GetVertex(source_vertex_id);

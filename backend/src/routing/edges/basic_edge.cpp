@@ -9,7 +9,11 @@ BasicEdge::BasicEdge(database::DbEdgeIterator* it) :
     from_(it->GetFrom()),
     to_(it->GetTo()),
     length_(it->GetLength()),
-    type_(EdgeType::forward) {}
+    type_(EdgeType::forward) {
+        if (it->GetUndirected()) {
+            type_ = EdgeType::twoway;
+        }
+     }
 
 BasicEdge::BasicEdge(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length) :
         uid_(uid), from_(from), to_(to), length_(length), type_(EdgeType::forward) {}
@@ -48,10 +52,10 @@ bool BasicEdge::IsTwoway() const {
 bool BasicEdge::operator==(const BasicEdge& other) const {
     // if (uid_ == other.uid_) { return true; }
         // If there can be two edges with same from, to.
-        if (from_ == other.from_ && to_ == other.to_ && length_ == other.length_) { return true; }
+        if (from_ == other.from_ && to_ == other.to_ && length_ == other.length_ && type_ == other.type_) { return true; }
         // If a way is not oneway then there are at least 2 edges with same geography and closest edge
         // can be any of the two - there is no way to check that we selecting it.
-        if (from_ == other.to_ && to_ == other.from_ && length_ == other.length_) { return true; }
+        if (from_ == other.to_ && to_ == other.from_ && length_ == other.length_ && type_ == other.type_) { return true; }
 
         return false;
 }

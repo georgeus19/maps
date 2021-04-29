@@ -93,10 +93,10 @@ namespace osm_parser {
                 return;
             }
 
-            bool oneway = false;
+            bool undirected = true;
             auto && oneway_value = tags.get_value_by_key("oneway");
             if (oneway_value == "yes" || oneway_value == "true" || oneway_value == "1") {
-                oneway = true;
+                undirected = false;
             }
 
             const osmium::WayNodeList &nodes = way.nodes();
@@ -122,14 +122,14 @@ namespace osm_parser {
 
                 bool is_intersection = value > 1 && value != osmium::index::empty_value<size_t>();
                 if (is_intersection) {
-                    Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), second->positive_ref()};
+                    Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), second->positive_ref(), undirected};
 
                     // `second` iterator points directly to the last point
                     // of the segment. Create iterator `to` which right is
                     // after `second`.
                     const_nodelist_iterator to = second;
                     ++to;
-                    SaveEdge(first, to, edge, oneway);
+                    SaveEdge(first, to, edge);
                     first = second;
                 }
             }
@@ -148,8 +148,8 @@ namespace osm_parser {
                 // which points directly before `second`.
                 const_nodelist_iterator last_point = second;
                 --last_point;
-                Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), last_point->positive_ref()};
-                SaveEdge(first, second, edge, oneway);
+                Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), last_point->positive_ref(), undirected};
+                SaveEdge(first, second, edge);
             }
             first = second;
         }
@@ -161,18 +161,14 @@ namespace osm_parser {
          * @param from Iterator pointing to the first node of the segment.
          * @param to Iterator pointing to the last node of the segment.
          * @param edge Segment representing the edge without geometry.
-         * @param oneway If oneway is false reciprocal segment is also saved.
+         * @param undirected If undirected is false reciprocal segment is also saved.
          */
-        void SaveEdge(const_nodelist_iterator &from, const_nodelist_iterator &to, Edge &edge, bool oneway) {
+        void SaveEdge(const_nodelist_iterator &from, const_nodelist_iterator &to, Edge &edge) {
             if (edge.from_ == edge.to_) {
                 return; // Running stadium lines, circle around oil station -> useless for routing..
             }
             auto &&linestring = CreateLineString(from, to);
             if (linestring != "") {
-                if (oneway == false) {
-                    Edge reciprocal_edge{edge.osm_id_, ++id_counter_, linestring, edge.to_, edge.from_};
-                    writer_.WriteEdge(table_name_, reciprocal_edge);
-                }
                 edge.set_geography(std::move(linestring));
                 // Write sql command to insert row.
                 writer_.WriteEdge(table_name_, edge);

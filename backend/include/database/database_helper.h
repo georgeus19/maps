@@ -390,7 +390,7 @@ template <typename Graph>
 void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
     auto&& current_dir = std::filesystem::current_path();
     std::string data_path{current_dir.string() + "/shortcuts.csv"};
-    std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV;";
+    std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV NULL 'null';";
     CsvConvertor convertor{data_path};
     convertor.SaveEdges(graph, [](const typename Graph::Edge& edge) {
         return edge.IsShortcut();

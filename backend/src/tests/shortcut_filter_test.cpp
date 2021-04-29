@@ -180,3 +180,47 @@ TEST_P(ShortcutFilterFilterShortcutsTests, FilterShortcutsSimpleTest) {
 }
 
 
+class ShortcutFilterTwowayEdgeMergeTests : public testing::TestWithParam<FilterShortcutsParameter> {
+    protected:
+    
+    G g_;
+    void SetUp() override {
+        TestBasicReverseGraph(g_);
+    }
+};
+
+INSTANTIATE_TEST_CASE_P(
+    ShortcutFilterTwowayEdgeMergeTestParameters, 
+    ShortcutFilterTwowayEdgeMergeTests,
+    ::testing::Values(
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{
+                CHPreprocessingEdge{10, 1, 4, 1, CHPreprocessingEdge::EdgeType::forward},
+                CHPreprocessingEdge{10, 4, 1, 1, CHPreprocessingEdge::EdgeType::forward}
+            },
+            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 4, 1, CHPreprocessingEdge::EdgeType::twoway}}
+        },
+        FilterShortcutsParameter{ 
+            std::vector<CHPreprocessingEdge>{
+                CHPreprocessingEdge{10, 1, 4, 3, CHPreprocessingEdge::EdgeType::forward},
+                CHPreprocessingEdge{10, 4, 1, 1, CHPreprocessingEdge::EdgeType::forward}
+            },
+            std::vector<CHPreprocessingEdge>{
+                CHPreprocessingEdge{10, 1, 4, 3, CHPreprocessingEdge::EdgeType::forward},
+                CHPreprocessingEdge{10, 4, 1, 1, CHPreprocessingEdge::EdgeType::forward}
+            }
+        }
+    )
+);
+
+TEST_P(ShortcutFilterTwowayEdgeMergeTests, MergeTwowayShortcuts) {
+    FilterShortcutsParameter param = GetParam();
+    ShortcutFilter<G> filter{g_};
+    auto&& actual_shortcuts = filter.MergeUnorderedShortcuts(param.input_shortcuts);
+    Print(param.input_shortcuts, "Input shortcuts");
+    Print(actual_shortcuts, "Actual shorctuts");
+    Print(param.expected_shortcuts, "Expected shortcuts");
+
+    EXPECT_THAT(actual_shortcuts, testing::ElementsAreArray(param.expected_shortcuts));
+}
+

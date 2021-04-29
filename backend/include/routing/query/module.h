@@ -67,7 +67,6 @@ std::string CCalculateShortestRoute(const std::string & table_name/*, typename S
         throw RouteNotFoundException("Start and end point are the same.");
     }
 
-    
     // Load graph.
     utility::Point graph_center{(start.lon_ + end.lon_) / 2, (start.lat_ + end.lat_) / 2};
     typename Setup::Graph g{};

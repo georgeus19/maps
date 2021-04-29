@@ -55,10 +55,6 @@ INSTANTIATE_TEST_CASE_P(
     )
 );
 
-
-
-
-
 TEST_P(GraphContractorSimpleEdgesTests, SimpleCHPreprocessingEdgesTest) {
     size_t tested_vertex_id = std::get<0>(GetParam());
     std::vector<CHPreprocessingEdge> expected = std::get<1>(GetParam());
@@ -93,10 +89,25 @@ INSTANTIATE_TEST_CASE_P(
     SimpleContractionBackwardEdgesTestParameters, 
     GraphContractorSimpleBackwardEdgesTests,
     ::testing::Values(
-        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 1, 2}, CHPreprocessingEdge{1, 3, 4, 2}, CHPreprocessingEdge{1, 3, 5, 6}}),
-        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 2}, CHPreprocessingEdge{1, 5, 6, 3}, CHPreprocessingEdge{1, 5, 3, 5}}),
-        std::make_tuple(6, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 6, 2, 8}, CHPreprocessingEdge{1, 6, 4, 6}, CHPreprocessingEdge{1, 6, 5, 2}, CHPreprocessingEdge{1, 6, 3, 9}}),
-        std::make_tuple(2, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 2, 1, 2}}),
+        std::make_tuple(3, std::vector<CHPreprocessingEdge> { 
+            CHPreprocessingEdge{1, 3, 1, 2, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 3, 4, 2, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 3, 5, 6, CHPreprocessingEdge::EdgeType::backward}
+        }),
+        std::make_tuple(5, std::vector<CHPreprocessingEdge> { 
+            CHPreprocessingEdge{1, 5, 4, 2, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 5, 6, 3, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 5, 3, 5, CHPreprocessingEdge::EdgeType::backward}
+        }),
+        std::make_tuple(6, std::vector<CHPreprocessingEdge> { 
+            CHPreprocessingEdge{1, 6, 2, 8, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 6, 4, 6, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 6, 5, 2, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 6, 3, 9, CHPreprocessingEdge::EdgeType::backward}
+        }),
+        std::make_tuple(2, std::vector<CHPreprocessingEdge> { 
+            CHPreprocessingEdge{1, 2, 1, 2, CHPreprocessingEdge::EdgeType::backward}
+        }),
         std::make_tuple(1, std::vector<CHPreprocessingEdge> {})
     )
 );

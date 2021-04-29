@@ -37,6 +37,7 @@ public:
     virtual uint64_t GetFrom() const = 0;
     virtual uint64_t GetTo() const = 0;
     virtual double GetLength() const = 0;
+    virtual bool GetUndirected() const = 0;
     virtual bool GetShortcut() const = 0;
     virtual uint64_t GetContractedVertex() const = 0;
     virtual std::string GetGeography() const = 0;
@@ -75,8 +76,12 @@ public:
         return it_[3].as<uint64_t>();
     }
 
+    bool GetUndirected() const override {
+        return it_[4].as<bool>();
+    }
+
     double GetLength() const override {
-        return it_[4].as<double>();
+        return it_[5].as<double>();
     }
 
     bool GetShortcut() const override {
@@ -118,17 +123,22 @@ public:
         return it_[3].as<uint64_t>();
     }
 
+    bool GetUndirected() const override {
+        return it_[4].as<bool>();
+    }
+
     double GetLength() const override {
-        return it_[4].as<double>();
+        return it_[5].as<double>();
     }
 
     bool GetShortcut() const override {
-        return it_[5].as<bool>();
+        return it_[6].as<bool>();
     }
 
     uint64_t GetContractedVertex() const override {
-        return it_[6].as<uint64_t>();
+        return it_[7].as<uint64_t>();
     }
+
 
 };
 
