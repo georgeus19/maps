@@ -40,14 +40,6 @@ public:
      */
     Vertex& GetVertex(unsigned_id_type id);
 
-    // void ForEachVertex(const std::function<void(Vertex&)>& f);
-
-    // void ForEachEdge(const std::function<void(Edge&)>& f);
-
-    // size_t GetVertexCount() const;
-
-    // size_t GetEdgeCount();
-
 private:
     Graph& g_;
     std::vector<Vertex> additional_vertices_;
@@ -71,31 +63,6 @@ inline typename Graph::Vertex& RoutingGraph<Graph>::GetVertex(unsigned_id_type i
     return g_.GetVertex(id);
 }
 
-// template <typename Graph>
-// void RoutingGraph<Graph>::ForEachVertex(const std::function<void(Vertex&)>& f) {
-//     for(auto&& vertex : additional_vertices_) {
-//         f(vertex);
-//     }
-//     g_.ForEachVertex(f);
-// }
-
-// template <typename Graph>
-// void RoutingGraph<Graph>::ForEachEdge(const std::function<void(Edge&)>& f) {
-//     for(auto&& edge : additional_edges_) {
-//         f(edge);
-//     }
-//     g_.ForEachEdge(f);
-// }
-
-// template <typename Graph>
-// size_t RoutingGraph<Graph>::GetVertexCount() const {
-//     return g_.GetVertexCount() + additional_vertices_.size();
-// }
-
-// template <typename Graph>
-// size_t RoutingGraph<Graph>::GetEdgeCount() {
-//     return g_.GetEdgeCount();
-// }
 
 
 

@@ -49,6 +49,10 @@ public:
 
     size_t GetEdgeCount();
 
+    unsigned_id_type GetMaxVertexId();
+    
+    unsigned_id_type GetMaxEdgeId();
+
 private:
 
     std::vector<V> vertices_;
@@ -125,6 +129,22 @@ size_t CHSearchGraph<V, E>::GetEdgeCount() {
         ++count;
     });
     return count;
+}
+
+template <typename V, typename E>
+unsigned_id_type CHSearchGraph<V, E>::GetMaxVertexId() {
+    return vertices_.size();
+}
+    
+template <typename V, typename E>
+unsigned_id_type CHSearchGraph<V, E>::GetMaxEdgeId() {
+    size_t max_id = 0;
+    ForEachEdge([&](E& e) {
+        if (e.get_uid() > max_id) {
+            max_id = e.get_uid();
+        }
+    });
+    return max_id;
 }
 
 template <typename V, typename E>

@@ -45,7 +45,7 @@ public:
 private:
     Graph& g_;
 
-    bool IsTwoway(Edge& shortcut, const Edge& other_shortcut, bool& filter);
+    void IsTwoway(Edge& shortcut, const Edge& other_shortcut, bool& filter);
 
     bool IsDuplicate(Edge& shortcut, const Edge& other_shortcut, bool& filter);
 
@@ -119,17 +119,16 @@ ShortcutContainer<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::C
 }
 
 template <typename Graph>
-bool ShortcutFilter<Graph>::IsTwoway(Edge& shortcut, const Edge& other_shortcut, bool& filter) {
+void ShortcutFilter<Graph>::IsTwoway(Edge& shortcut, const Edge& other_shortcut, bool& filter) {
     bool reverse_edge = shortcut.get_from() == other_shortcut.get_to() && shortcut.get_to() == other_shortcut.get_from();
     bool same_length = utility::AreEqual<double>(shortcut.get_length(), other_shortcut.get_length());
     if (reverse_edge && same_length) {
-        if (shortcut.get_from() < other_shortcut.get_from()) {
+        if (shortcut.get_from() < shortcut.get_to()) {
             shortcut.SetTwoway();
         } else {
             filter = true;
         }
     }
-    return filter;
 }
 
 template <typename Graph>

@@ -37,6 +37,7 @@ inline ContractionParameters::ContractionParameters(unsigned_id_type free_edge_i
     deleted_neighbours_coefficient_(dnc), space_size_coefficient_(ssc) {}
 
 inline unsigned_id_type ContractionParameters::NextFreeEdgeId() {
+    ++free_edge_id_;
     return ++free_edge_id_;
 }
 

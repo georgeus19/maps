@@ -51,6 +51,9 @@ public:
 
     size_t GetEdgeCount();
 
+    unsigned_id_type GetMaxVertexId();
+    unsigned_id_type GetMaxEdgeId();
+
 private:
     /**
      * Internal graph representations. Unfortunately, even though the ids
@@ -67,7 +70,6 @@ AdjacencyListGraph<V, E>::AdjacencyListGraph() : vertices_() {}
 
 template <typename V, typename E>
 inline void AdjacencyListGraph<V, E>::AddEdge(E&& edge) {
-    assert(!edge.IsBackward());
     if (edge.IsTwoway()) {
         E other_direction_edge{edge};
         other_direction_edge.Reverse();
@@ -126,6 +128,24 @@ size_t AdjacencyListGraph<V, E>::GetEdgeCount() {
     });
     return count;
 }
+
+template <typename V, typename E>
+unsigned_id_type AdjacencyListGraph<V, E>::GetMaxVertexId() {
+    return vertices_.size();
+}
+
+template <typename V, typename E>
+unsigned_id_type AdjacencyListGraph<V, E>::GetMaxEdgeId() {
+    size_t max_id = 0;
+    ForEachEdge([&](E& edge){
+        if (edge.get_uid() > max_id) {
+            max_id = edge.get_uid();
+        }
+    });
+    return max_id;
+}
+
+
 
 template <typename V, typename E>
 void AdjacencyListGraph<V, E>::SetOsmId(unsigned_id_type vertex_id) {

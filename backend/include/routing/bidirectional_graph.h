@@ -41,7 +41,7 @@ public:
             g_.AddEdge(std::move(edge));
             backward_edge.Reverse();
             backward_edge.SetBackward();
-            AddBackwardEdge(std::move(backward_edge));
+            g_.AddEdge(std::move(backward_edge));
         }
     }
 
@@ -65,14 +65,16 @@ public:
         return g_.GetEdgeCount();
     }
 
-private:
-    Graph g_;
-
-    inline void AddBackwardEdge(Edge&& backward_edge) {
-        unsigned_id_type backward_from_node = backward_edge.get_from();
-        g_.AddEdge(std::move(backward_edge), backward_from_node);
+    unsigned_id_type GetMaxVertexId() {
+        return g_.GetMaxVertexId();
+    }
+    
+    unsigned_id_type GetMaxEdgeId() {
+        return g_.GetMaxEdgeId();
     }
 
+private:
+    Graph g_;
 };
 
 

@@ -61,7 +61,7 @@ ShortcutFinder<Graph>::ShortcutFinder(Graph& g, const ContractionParameters& p) 
 template <typename Graph>
 ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& vertex) {
     std::vector<Edge> shortcuts{};
-    ShortcutFilter filter{g_};
+    ShortcutFilter<Graph> filter{g_};
     vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
         auto&& s = FindShortcuts(vertex, backward_edge);
         s = filter.FilterDuplicateShortcuts(s);
@@ -101,7 +101,6 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
-
             shortcuts.emplace_back(parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
         }
     });

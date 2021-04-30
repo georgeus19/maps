@@ -239,7 +239,7 @@ private:
 };
 
 template <typename Edge>
-std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge> & edges, const std::string & table_name) {
+std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const std::string & table_name) {
 
     std::string sql_start = " SELECT ST_AsGeoJSON(geog) " \
                             " FROM " + table_name + " WHERE ";
@@ -393,7 +393,11 @@ void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
     std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV NULL 'null';";
     CsvConvertor convertor{data_path};
     convertor.SaveEdges(graph, [](const typename Graph::Edge& edge) {
-        return edge.IsShortcut();
+        bool twoway_condition = true;
+        if (edge.IsTwoway()) {
+            twoway_condition = edge.get_from() < edge.get_to();
+        }
+        return edge.IsShortcut() && twoway_condition;
     });
 
     pqxx::work w(connection_);

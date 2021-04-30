@@ -31,39 +31,33 @@ class BasicEdgeEndpointHandler {
     /**
      * Number from which greater numbers are free to use as new node ids.
      */
-    unsigned_id_type node_id_from_;
-
-    /**
-     * Number from which greater numbers are free to use as new node ids.
-     */
-    unsigned_id_type node_id_to_;
+    unsigned_id_type endpoint_id_;
 
     /**
      * Number from which greater numbers are free to use as new edge ids.
      */
-    unsigned_id_type edge_id_from_;
-
-    /**
-     * Number from which greater numbers are free to use as new edge ids.
-     */
-    unsigned_id_type edge_id_to_;
+    unsigned_id_type free_edge_id_;
 
     /**
      * Indices to rows acquired from db when looking for segments.
      */
-    const size_t kAdjEdgeFrom = 0;
-    const size_t kAdjEdgeTo = 1;
-    const size_t kClosestEdgeFrom = 2;
-    const size_t kClosestEdgeTo = 3;
-    const size_t kLength = 4;
-    const size_t kGeometry = 5;
-    const size_t kSelectedSegmentLength = 6;
-    const size_t kMaxUid = 7;
+    static const size_t kAdjEdgeFrom = 0;
+    static const size_t kAdjEdgeTo = 1;
+    static const size_t kClosestEdgeFrom = 2;
+    static const size_t kClosestEdgeTo = 3;
+    static const size_t kLength = 4;
+    static const size_t kGeometry = 5;
+    static const size_t kSelectedSegmentLength = 6;
+    static const size_t kMaxUid = 7;
 public:
+    BasicEdgeEndpointHandler();
+    BasicEdgeEndpointHandler(database::DbGraph* db_graph, unsigned_id_type endpoint_id_, unsigned_id_type free_edge_id);
 
-    BasicEdgeEndpointHandler(database::DbGraph* db_graph, unsigned_id_type node_id_from, unsigned_id_type node_id_to,
-                                unsigned_id_type edge_id_from, unsigned_id_type edge_id_to);
-
+    BasicEdgeEndpointHandler(const BasicEdgeEndpointHandler& other) = default;
+    BasicEdgeEndpointHandler(BasicEdgeEndpointHandler&& other) = default;
+    BasicEdgeEndpointHandler& operator=(const BasicEdgeEndpointHandler& other) = default;
+    BasicEdgeEndpointHandler& operator=(BasicEdgeEndpointHandler&& other) = default;
+    ~BasicEdgeEndpointHandler() = default;
     /**
      * Create new edges that are from the closest points of the endpoint's closest graph edge to the endpoint to
      * endpoint's closest graph edge endpoints(real intersection). Basically split the closest edge to endpoint
@@ -85,7 +79,7 @@ public:
      */
     std::string GetEndpointEdgeGeometry(unsigned_id_type edge_id);
 
-    unsigned_id_type get_node_id_to();
+    unsigned_id_type get_endpoint_id__to();
 
     unsigned_id_type get_edge_id_to();
 private:
@@ -103,21 +97,22 @@ private:
      * @param r Db row representing segment.
      * @param result_edges Output value where new edges are added to.
      * @param edge_id Edge id which is free to use as well as the +1 id.
-     * @param node_id Node id which is free to use and which is one endpoint of the segment.
+     * @param endpoint_id_ Node id which is free to use and which is one endpoint of the segment.
      * @param intersection_id Id of original intersection that will serve as the other endpoint.
      */
     void AddReciprocalEdges(database::DbRow r, std::vector<Edge> & result_edges, unsigned_id_type & edge_id,
-                                                        unsigned_id_type node_id, unsigned_id_type intersection_id);
+                                                        unsigned_id_type intersection_id);
 };
 
 template <typename Edge>
-BasicEdgeEndpointHandler<Edge>::BasicEdgeEndpointHandler(database::DbGraph* db_graph, unsigned_id_type node_id_from, unsigned_id_type node_id_to,
-                                                       unsigned_id_type edge_id_from, unsigned_id_type edge_id_to)
-            : segment_geometries_(), db_graph_(db_graph), node_id_from_(node_id_from), node_id_to_(node_id_to),
-              edge_id_from_(edge_id_from), edge_id_to_(edge_id_to) {}
+BasicEdgeEndpointHandler<Edge>::BasicEdgeEndpointHandler() : segment_geometries_(), db_graph_(), endpoint_id_(), free_edge_id_() {}
 
 template <typename Edge>
-std::vector<Edge> BasicEdgeEndpointHandler<Edge>::CalculateEndpointEdges(utility::Point p, const std::string &table_name, database::DatabaseHelper &d) {
+BasicEdgeEndpointHandler<Edge>::BasicEdgeEndpointHandler(database::DbGraph* db_graph, unsigned_id_type endpoint_id, unsigned_id_type free_edge_id)
+            : segment_geometries_(), db_graph_(db_graph), endpoint_id_(endpoint_id), free_edge_id_(free_edge_id) {}
+
+template <typename Edge>
+std::vector<Edge> BasicEdgeEndpointHandler<Edge>::CalculateEndpointEdges(utility::Point p, const std::string& table_name, database::DatabaseHelper& d) {
     std::vector<database::DbRow> rows = d.GetClosestSegments(p, table_name, db_graph_);
 
     // Endpoint has a closest edge that has no neighbours.
@@ -125,16 +120,8 @@ std::vector<Edge> BasicEdgeEndpointHandler<Edge>::CalculateEndpointEdges(utility
         throw RouteNotFoundException{"Route cannot be found - endpoint edge has no neighbours."};
     }
 
-    // When user does not know which edge ids are free and endpoint handler has not been used before.
-    if (edge_id_from_ == edge_id_to_) {
-        edge_id_from_ = rows[0].get<unsigned_id_type>(kMaxUid) + 1;
-    }
-    // When user does not know which node ids are free and endpoint handler has not been used before.
-    if (node_id_from_ == node_id_to_) {
-        node_id_from_ = 0;
-    }
-    unsigned_id_type edge_id = edge_id_from_;
-    unsigned_id_type node_id = node_id_from_;
+    unsigned_id_type edge_id = free_edge_id_;
+    unsigned_id_type endpoint_id_ = endpoint_id_;
 
     std::vector<Edge> result_edges{};
 
@@ -149,7 +136,6 @@ std::vector<Edge> BasicEdgeEndpointHandler<Edge>::CalculateEndpointEdges(utility
     }
 
     // Create edges from the segment that intersects adjacent edge from sql query.
-
     database::DbRow selected_seg_row = rows[selected_segment_index];
     unsigned_id_type adj_edge_from = selected_seg_row.get<unsigned_id_type>(kAdjEdgeFrom);
     unsigned_id_type adj_edge_to = selected_seg_row.get<unsigned_id_type>(kAdjEdgeTo);
@@ -165,7 +151,7 @@ std::vector<Edge> BasicEdgeEndpointHandler<Edge>::CalculateEndpointEdges(utility
     if (adj_edge_to == closest_edge_from) { segment_original_intersection = adj_edge_to; closest_edge_from_used = true; }
     if (adj_edge_to == closest_edge_to) { segment_original_intersection = adj_edge_to; }
 
-    AddReciprocalEdges(selected_seg_row, result_edges, edge_id, node_id, segment_original_intersection);
+    AddReciprocalEdges(selected_seg_row, result_edges, edge_id, segment_original_intersection);
 
     if (rows.size() == 1) {
         return result_edges;
@@ -176,11 +162,9 @@ std::vector<Edge> BasicEdgeEndpointHandler<Edge>::CalculateEndpointEdges(utility
     size_t other_index = (selected_segment_index == 0) ? 1 : 0;
 
     unsigned_id_type other_intersection = closest_edge_from_used ? closest_edge_to : closest_edge_from;
-    AddReciprocalEdges(rows[other_index], result_edges, edge_id, node_id, other_intersection);
+    AddReciprocalEdges(rows[other_index], result_edges, edge_id, other_intersection);
 
-    ++node_id;
-    edge_id_to_ = edge_id;
-    node_id_to_ = node_id;
+    free_edge_id_ = edge_id;
 
     return result_edges;
 }
@@ -196,13 +180,8 @@ std::string BasicEdgeEndpointHandler<Edge>::GetEndpointEdgeGeometry(unsigned_id_
 }
 
 template <typename Edge>
-unsigned_id_type BasicEdgeEndpointHandler<Edge>::get_node_id_to() {
-    return node_id_to_;
-}
-
-template <typename Edge>
 unsigned_id_type BasicEdgeEndpointHandler<Edge>::get_edge_id_to() {
-    return edge_id_to_;
+    return free_edge_id_;
 }
 
 template <typename Edge>
@@ -233,14 +212,14 @@ size_t BasicEdgeEndpointHandler<Edge>::CalculateSelectedSegmentIndex(std::vector
 
 template <typename Edge>
 void BasicEdgeEndpointHandler<Edge>::AddReciprocalEdges(database::DbRow r, std::vector<Edge> & result_edges, unsigned_id_type & edge_id,
-                                                    unsigned_id_type node_id, unsigned_id_type intersection_id) {
+                                                    unsigned_id_type intersection_id) {
     double length = r.get<double>(kLength);
     std::string geometry = r.get<std::string>(kGeometry);
 
     segment_geometries_.insert(make_pair(edge_id, geometry));
-    result_edges.push_back(Edge{edge_id++, node_id, intersection_id, length});
+    result_edges.push_back(Edge{edge_id++, endpoint_id_, intersection_id, length});
     segment_geometries_.insert(make_pair(edge_id, geometry));
-    result_edges.push_back(Edge{edge_id++, intersection_id, node_id, length});
+    result_edges.push_back(Edge{edge_id++, intersection_id, endpoint_id_, length});
 
 }
 

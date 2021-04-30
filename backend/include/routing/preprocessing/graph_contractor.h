@@ -37,8 +37,6 @@ private:
     void AddShortcuts(ShortcutContainer<Edge>&& shortcuts);
 
     double CalculateOverlayGraphAverageDegree() const;
-
-   
 };
 
 template <typename Graph>
@@ -128,7 +126,6 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
     return q;
 }
 
-
 template <typename Graph>
 void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
     for(auto&& edge : shortcuts.new_edges) {
@@ -137,7 +134,9 @@ void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
 
     for(auto&& shortcut : shortcuts.improving_edges) {
         Edge backward_shortcut = shortcut;
-        backward_shortcut.SetBackward();
+        if (backward_shortcut.IsForward()) {
+            backward_shortcut.SetBackward();
+        }
         backward_shortcut.Reverse();
 
         auto&& source_vertex = g_.GetVertex(shortcut.get_from());
@@ -146,8 +145,8 @@ void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
         });
         edge.Swap(shortcut);
 
-        auto&& target_vertex = g_.GetVertex(backward_shortcut.get_from());
-        Edge& backward_edge = target_vertex.FindBackwardEdge([&](const Edge& e) {
+        auto&& backward_source_vertex = g_.GetVertex(backward_shortcut.get_from());
+        Edge& backward_edge = backward_source_vertex.FindBackwardEdge([&](const Edge& e) {
             return e.get_to() == backward_shortcut.get_to();
         });
         backward_edge.Swap(backward_shortcut);
