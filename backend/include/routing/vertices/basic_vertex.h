@@ -129,7 +129,8 @@ Edge& BasicVertex<Edge, EdgeRange>::FindEdge(EdgeRange& edges, bool forward_edge
     if (edge) {
         return *edge;
     } else {
-        throw EdgeNotFoundException("Edge not found");
+        std::string s = ((forward_edges) ? "Forward " : "Backward ");
+        throw EdgeNotFoundException(s + "edge not found ");
     }
 }
 

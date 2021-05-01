@@ -38,13 +38,13 @@ using namespace preprocessing;
 
 TEST(QueryModuleTests, QueryModuleTest) {
     // std::string table_name = "czedges";
-    utility::Point source{13.393973958925121, 49.73380001564838};
-    utility::Point target{13.399605229319672,  49.72901499324271};
-    // // lon lat
-     std::string edge_table = "CHczedges";
-    auto&& g = CHSetup::CreateGraph(edge_table);
-    Router<CHSetup> router{g, edge_table};
-    auto&& result = router.CalculateShortestRoute("CHczedges", source, target);
+    // utility::Point source{13.393973958925121, 49.73380001564838};
+    // utility::Point target{13.399605229319672,  49.72901499324271};
+    // // // lon lat
+    //  std::string edge_table = "CHczedges";
+    // auto&& g = CHSetup::CreateGraph(edge_table);
+    // Router<CHSetup> router{g, edge_table};
+    // auto&& result = router.CalculateShortestRoute("CHczedges", source, target);
     // utility::Point source{13.376990, 49.746841}; // plzen
     // // utility::Point target{15.608720, 50.627522}; // vrchlabi
     // utility::Point target{13.391600, 49.934470}; // plasy

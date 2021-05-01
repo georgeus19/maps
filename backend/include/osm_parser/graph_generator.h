@@ -104,7 +104,6 @@ namespace osm_parser {
                 std::cout << "Way consists of less than 2 points." << std::endl;
                 return;
             }
-
             const_nodelist_iterator first = nodes.cbegin();
             const_nodelist_iterator second = nodes.cbegin();
             ++second;

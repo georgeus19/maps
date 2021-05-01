@@ -166,7 +166,6 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 	size_t dead_members = 0;
 	size_t target_vertices_found = 0;
 	while(!q.empty()) {
-		++settled_vertices_;
 		PriorityQueueMember min_member = q.top();
 		q.pop();
 		assert(touched_vertices_.contains(min_member.vertex_id));
@@ -180,6 +179,7 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 			++dead_members;
 			continue;
 		}
+		++settled_vertices_;
 		assert(vertex_routing_properties.cost == min_member.cost);
 		auto&& it = target_vertices.find(min_member.vertex_id);
 		if (it != target_vertices.end() && it->second == false) {
@@ -191,7 +191,6 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 		if (all_target_vertices_found || max_cost_surpassed) {
 			return true;
 		}
-		
 		vertex.ForEachEdge([&](Edge& edge) {
 			UpdateNeighbour(min_member, edge, q, limits);
 		});
