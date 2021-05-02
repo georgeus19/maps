@@ -279,6 +279,7 @@ function ConstraintContainer(props) {
 function Constraint(props) {
     return (
         <div className="Constraint">
+            <input type="range" min="0" max="10"></input>
             <Button>constraint placeholder...</Button>
         </div>
     );

@@ -227,7 +227,9 @@ public:
     void CreateGraphTable(const std::string& graph_table_name, const std::string& new_table_name, DbGraph* db_graph);
 
     template <typename Graph>
-    void LoadAdditionalVertexProperties(const std::string& vertices_table, Graph&g);    
+    void LoadAdditionalVertexProperties(const std::string& vertices_table, Graph&g);  
+
+    void CreateGreenIndex(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table);
     
 private:
     
