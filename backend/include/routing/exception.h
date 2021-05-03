@@ -18,17 +18,11 @@ public:
 
     RouteNotFoundException(std::string && message);
 
-    RouteNotFoundException(const RouteNotFoundException & other);
-
-    RouteNotFoundException(RouteNotFoundException && other);
-
-    RouteNotFoundException & operator=(const RouteNotFoundException & other);
-
-    RouteNotFoundException & operator=(RouteNotFoundException && other);
-
-    ~RouteNotFoundException() override;
-
-    void Swap(RouteNotFoundException & other);
+    RouteNotFoundException(const RouteNotFoundException & other) = default;
+    RouteNotFoundException(RouteNotFoundException && other) = default;
+    RouteNotFoundException & operator=(const RouteNotFoundException & other) = default;
+    RouteNotFoundException & operator=(RouteNotFoundException && other) = default;
+    ~RouteNotFoundException() = default;
 
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
@@ -45,17 +39,11 @@ public:
 
     NotImplementedException(std::string && message);
 
-    NotImplementedException(const NotImplementedException & other);
-
-    NotImplementedException(NotImplementedException && other);
-
-    NotImplementedException & operator=(const NotImplementedException & other);
-
-    NotImplementedException & operator=(NotImplementedException && other);
-
-    ~NotImplementedException() override;
-
-    void Swap(NotImplementedException & other);
+    NotImplementedException(const NotImplementedException & other) = default;
+    NotImplementedException(NotImplementedException && other) = default;
+    NotImplementedException & operator=(const NotImplementedException & other) = default;
+    NotImplementedException & operator=(NotImplementedException && other) = default;
+    ~NotImplementedException() = default;
 
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
@@ -69,17 +57,11 @@ public:
 
     VertexNotFoundException(std::string && message);
 
-    VertexNotFoundException(const VertexNotFoundException & other);
-
-    VertexNotFoundException(VertexNotFoundException && other);
-
-    VertexNotFoundException & operator=(const VertexNotFoundException & other);
-
-    VertexNotFoundException & operator=(VertexNotFoundException && other);
-
-    ~VertexNotFoundException() override;
-
-    void Swap(VertexNotFoundException & other);
+    VertexNotFoundException(const VertexNotFoundException & other) = default;
+    VertexNotFoundException(VertexNotFoundException && other) = default;
+    VertexNotFoundException & operator=(const VertexNotFoundException & other) = default;
+    VertexNotFoundException & operator=(VertexNotFoundException && other) = default;
+    ~VertexNotFoundException() = default;
 
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
@@ -93,20 +75,33 @@ public:
 
     EdgeNotFoundException(std::string && message);
 
-    EdgeNotFoundException(const EdgeNotFoundException & other);
-
-    EdgeNotFoundException(EdgeNotFoundException && other);
-
-    EdgeNotFoundException & operator=(const EdgeNotFoundException & other);
-
-    EdgeNotFoundException & operator=(EdgeNotFoundException && other);
-
-    ~EdgeNotFoundException() override;
+    EdgeNotFoundException(const EdgeNotFoundException & other) = default;
+    EdgeNotFoundException(EdgeNotFoundException && other) = default;
+    EdgeNotFoundException & operator=(const EdgeNotFoundException & other) = default;
+    EdgeNotFoundException & operator=(EdgeNotFoundException && other) = default;
+    ~EdgeNotFoundException() = default;
 
     void Swap(EdgeNotFoundException & other);
 
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
+
+class InvalidValueException : public std::exception {
+    std::string message_;
+public:
+    InvalidValueException();
+    InvalidValueException(const std::string & message);
+    InvalidValueException(std::string && message);
+    InvalidValueException(const InvalidValueException & other) = default;
+    InvalidValueException(InvalidValueException && other) = default;
+    InvalidValueException & operator=(const InvalidValueException & other) = default;
+    InvalidValueException & operator=(InvalidValueException && other) = default;
+    ~InvalidValueException() = default;
+
+    const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
+};
+
+
 }
 
 #endif //BACKEND_EXCEPTION_H

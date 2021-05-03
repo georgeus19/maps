@@ -32,7 +32,7 @@ class DbRow {
      */
     pqxx::result::const_iterator c_;
 public:
-    DbRow(const pqxx::result::const_iterator & c) : c_(c) {}
+    DbRow(const pqxx::result::const_iterator& c) : c_(c) {}
 
     /**
      * Get data from specified column from db row.
@@ -42,7 +42,7 @@ public:
      * @return Data from column i cast to T type.
      */
     template <typename T>
-    T get(int i) {
+    T get(int i) const {
         return c_[i].as<T>();
     }
 };
@@ -86,8 +86,8 @@ private:
     pqxx::connection connection_;
 
 public:
-    DatabaseHelper(const std::string & db_name, const std::string & user, const std::string & password,
-                    const std::string & host_address, const std::string & port);
+    DatabaseHelper(const std::string& db_name, const std::string& user, const std::string& password,
+                    const std::string& host_address, const std::string& port);
 
     ~DatabaseHelper();
 
@@ -97,6 +97,10 @@ public:
      * @return True if it is possible to connect to db.
      */
     bool IsDbOpen();
+
+    void RunTransactional(const std::string& sql);
+
+    void RunNontransactional(const std::string& sql, const std::function<void(const DbRow&)> f);
 
     /**
      * Find a graph edge that would be closest to `point`.
@@ -229,8 +233,6 @@ public:
     template <typename Graph>
     void LoadAdditionalVertexProperties(const std::string& vertices_table, Graph&g);  
 
-    void CreateGreenIndex(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table);
-    
 private:
     
     template <typename Graph>

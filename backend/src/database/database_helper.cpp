@@ -18,6 +18,21 @@ bool DatabaseHelper::IsDbOpen() {
 	return connection_.is_open();
 }
 
+void DatabaseHelper::RunTransactional(const std::string& sql) {
+	pqxx::work w(connection_);
+	w.exec(sql);
+	w.commit();
+}
+
+void DatabaseHelper::RunNontransactional(const std::string& sql, const std::function<void(const DbRow&)> f) {
+	pqxx::nontransaction n{connection_};
+	pqxx::result result{n.exec(sql)};
+
+	for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
+		f(DbRow{c});
+	}
+}
+
 /*
 	* Example of sql:
 -- Get the closest graph edge to POINT(13.394182 49.725673).
@@ -262,42 +277,6 @@ void DatabaseHelper::CreateGraphTable(const std::string& graph_table_name, const
 	pqxx::work w(connection_);
 	w.exec(sql);
 	w.commit();
-}
-
-void DatabaseHelper::CreateGreenIndex(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table) {
-	std::string green_places_table = osm_polygons_table + "_green_geom_temp"; 
-	std::string green_places_table_index = green_places_table + "_gix";
-	std::string green_index_table_index = green_index_table + "_idx";
-	std::string sql = 
-			"DROP INDEX IF EXISTS " + green_index_table_index  + "; "
-			"DROP TABLE IF EXISTS " + green_index_table + "; " 
-			"DROP TABLE IF EXISTS " + green_places_table + "; "
-			"CREATE TEMPORARY TABLE " + green_places_table + " AS "
-			"SELECT p.way "
-			"FROM " + osm_polygons_table + " AS p "
-			"WHERE p.natural IN ('wood', 'tree_row', 'tree', 'scrub', 'heath', 'moor', 'grassland', 'fell', 'tundra', "
-			"	'bare_rock', 'scree', 'shingle', 'sand', 'mud', 'water', 'wetland', 'glacier', 'bay', 'cape', 'strait', 'beach', 'coastline', "
-			"	'reef', 'spring', 'hot_spring', 'geyser', 'peak', 'dune', 'hill', 'volcano', 'valley', 'ridge', 'arete', 'cliff', 'saddle', "
-			"	'isthmus', 'peninsula', 'rock', 'stone', 'sinkhole', 'cave_entrance') "
-			"	OR p.landuse IN ('farmland', 'forest', 'meadow', 'orchard', 'vineyard', 'basin', 'grass', 'village_green'); "
-			"CREATE INDEX " + green_places_table_index + " on " + green_places_table + " USING GIST (way); "
-			"CREATE TABLE " + green_index_table + " AS  "
-			"SELECT "
-			"	edges.uid, "
-			"    SUM( "
-			"        ST_Area(ST_Intersection(edges.geom, green.way)) / ST_Area(edges.geom) "
-			"    ) AS green_fraction "
-			"FROM  "
-			"( "
-			"	SELECT uid, ST_Buffer(ST_Transform(geog::geometry, 3857), 30) as geom "
-			"	FROM " + edges_table + " "
-			") AS edges LEFT JOIN " + green_places_table + " as green ON edges.geom && green.way "
-			"GROUP BY edges.uid; "
-			"DROP INDEX IF EXISTS " + green_places_table_index + "; "
-			"CREATE UNIQUE INDEX " + green_index_table_index  + " ON " + green_index_table + " (uid); "; 
-	pqxx::work w(connection_);
-    w.exec(sql);
-    w.commit();
 }
 
 std::string DatabaseHelper::GetGeographyIndexName(const std::string& table_name) {
