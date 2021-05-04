@@ -101,6 +101,21 @@ public:
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
 
+class DataIndexAlreadyPresentException : public std::exception {
+    std::string message_;
+public:
+    DataIndexAlreadyPresentException();
+    DataIndexAlreadyPresentException(const std::string & message);
+    DataIndexAlreadyPresentException(std::string && message);
+    DataIndexAlreadyPresentException(const DataIndexAlreadyPresentException & other) = default;
+    DataIndexAlreadyPresentException(DataIndexAlreadyPresentException && other) = default;
+    DataIndexAlreadyPresentException & operator=(const DataIndexAlreadyPresentException & other) = default;
+    DataIndexAlreadyPresentException & operator=(DataIndexAlreadyPresentException && other) = default;
+    ~DataIndexAlreadyPresentException() = default;
+
+    const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
+};
+
 
 }
 

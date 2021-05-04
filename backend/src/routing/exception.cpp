@@ -57,7 +57,15 @@ const char* InvalidValueException::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_N
     return message_.c_str();
 }
 
+DataIndexAlreadyPresentException::DataIndexAlreadyPresentException() : message_("Data index already present.") {}
 
+DataIndexAlreadyPresentException::DataIndexAlreadyPresentException(const string & message) : message_(message) {}
+
+DataIndexAlreadyPresentException::DataIndexAlreadyPresentException(std::string && message) : message_(move(message)) {}
+
+const char* DataIndexAlreadyPresentException::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW {
+    return message_.c_str();
+}
 
 
 

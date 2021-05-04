@@ -49,7 +49,7 @@ void GreenIndex::Load(const std::string& green_index_table, size_t max_uid) {
     edge_green_values_.assign(max_uid + 1, GreenValue{});
     std::string sql = 
             "SELECT uid, COALESCE(green_fraction, 0) "
-            "FROM czedges_green_index; ";
+            "FROM " + green_index_table + "; ";
     auto&& load = [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
         double green_value = row.get<double>(1);
@@ -58,7 +58,7 @@ void GreenIndex::Load(const std::string& green_index_table, size_t max_uid) {
     d_.RunNontransactional(sql, load);
 }
 
-void GreenIndex::Normalize(double max) {
+void GreenIndex::Normalize(double scale_max) {
     double max_value = std::numeric_limits<double>::min();
     for(auto&& green_value : edge_green_values_) {
         if (green_value.valid) {
@@ -70,7 +70,7 @@ void GreenIndex::Normalize(double max) {
     for(auto&& green_value : edge_green_values_) {
         if (green_value.valid) {
             green_value.value /= max_value;
-            green_value.value *= max;
+            green_value.value *= scale_max;
         }
     }
 }

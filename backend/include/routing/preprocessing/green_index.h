@@ -17,11 +17,11 @@ class GreenIndex : public DataIndex{
 public:
     GreenIndex(database::DatabaseHelper& d);
 
-    void Create(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table) override;
+    void Create(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table);
 
     void Load(const std::string& green_index_table, size_t max_uid) override;
 
-    void Normalize(double max) override;
+    void Normalize(double scale_max) override;
 
     double Get(unsigned_id_type uid) override;
 private:

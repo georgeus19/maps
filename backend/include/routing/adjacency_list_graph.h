@@ -32,6 +32,12 @@ public:
 
     AdjacencyListGraph();
 
+    AdjacencyListGraph(const AdjacencyListGraph& other) = delete;
+    AdjacencyListGraph(AdjacencyListGraph&& other) = default;
+    AdjacencyListGraph& operator=(const AdjacencyListGraph& other) = delete;
+    AdjacencyListGraph& operator=(AdjacencyListGraph&& other) = default;
+    ~AdjacencyListGraph() = default;
+
     void AddEdge(E&& edge);
 
     /**

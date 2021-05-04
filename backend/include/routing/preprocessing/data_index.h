@@ -14,18 +14,12 @@ namespace preprocessing {
 
 class DataIndex{
 public:
-    virtual void Create(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table) = 0;
-
-    virtual void Load(const std::string& green_index_table, size_t max_uid) = 0;
+    virtual void Load(const std::string& index_table, size_t max_uid) = 0;
 
     virtual void Normalize(double max) = 0;
 
     virtual double Get(unsigned_id_type uid) = 0;
 };
-
-
-
-
 
 
 }

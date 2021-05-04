@@ -13,6 +13,7 @@
 #include "routing/preprocessing/graph_contractor.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/preprocessing/ch_data_manager.h"
 
 #include <chrono>
 #include <vector>
@@ -26,8 +27,7 @@ using namespace database;
 using namespace routing;
 using namespace preprocessing;
 
-// using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
+static void RunCHPreprocessing(const std::string& base_graph_table);
 const string kDbName = "gis";
 const string kUser = "postgres";
 const string kPassword = "wtz2trln";
@@ -35,50 +35,37 @@ const string kHostAddress = "127.0.0.1";
 const string kPort = "5432";
 int main(int argc, const char ** argv) {
     if (argc != 2) {
-        std::cout << "There must be 1 argument: input_graph_table" << std::endl;
+        std::cout << "There must be 1 argument: base_graph_table" << std::endl;
         return 1;
     }
 
     try {
-        DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
-        G g{};
-        std::string input_graph_table{argv[1]};
-        std::string output_graph_table{"CH" + input_graph_table};
-        std::string output_ordering_table{output_graph_table + "_vertex_ordering"};
-      
-        std::cout << "Load graph from " << input_graph_table << "." << std::endl;
-        UnpreprocessedDbGraph unpreprocessed_db_graph{};
-        d.LoadFullGraph<G>(input_graph_table, g, &unpreprocessed_db_graph);
-
-        std::cout << "Vertices: " << g.GetVertexCount() << std::endl;
-
-        std::cout << "Edges before contraction: " << g.GetEdgeCount() << std::endl;
-
-        ContractionParameters parameters{d.GetMaxEdgeId(input_graph_table), 5, 190, 120, 0};
-        GraphContractor<G> c{g, parameters};
-        c.ContractGraph();
-        std::cout << "Contraction done." << std::endl;
-
-        std::cout << "Edges after contraction: " << g.GetEdgeCount() << std::endl;
-
-        CHDbGraph ch_db_graph{};
-        d.CreateGraphTable(input_graph_table, output_graph_table, &ch_db_graph);
-
-        d.DropGeographyIndex(output_graph_table);
-        std::cout << "Geography index dropped." << std::endl;
-        
-        // Save shortcuts.
-        d.AddShortcuts(output_graph_table, g);
-        std::cout << "Shortcuts added to " + output_graph_table << "."<< std::endl;
-        d.CreateGeographyIndex(output_graph_table);
-        std::cout << "Geography index restored." << std::endl;
-
-        d.AddVertexOrdering(output_ordering_table, g);
-        std::cout << "Vertex ordering saved to " << output_ordering_table << "." << std::endl;
-
+        RunCHPreprocessing(argv[1]);
 
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
     
+}
+
+static void RunCHPreprocessing(const std::string& base_graph_table) {
+    DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
+    std::string output_graph_table{"CH" + base_graph_table};
+    std::string output_ordering_table{output_graph_table + "_vertex_ordering"};
+    
+    std::cout << "Load graph from " << base_graph_table << "." << std::endl;
+    CHDataManager manager{d};
+    CHDataManager::Graph g = manager.LoadBaseGraph(base_graph_table);
+
+    std::cout << "Vertices: " << g.GetVertexCount() << std::endl;
+
+    std::cout << "Edges before contraction: " << g.GetEdgeCount() << std::endl;
+
+    ContractionParameters parameters{d.GetMaxEdgeId(base_graph_table), 5, 190, 120, 0};
+    GraphContractor<CHDataManager::Graph> c{g, parameters};
+    c.ContractGraph();
+    std::cout << "Contraction done." << std::endl;
+
+    std::cout << "Edges after contraction: " << g.GetEdgeCount() << std::endl;
+    manager.SaveNewGraph(g, base_graph_table, output_graph_table);
 }

@@ -31,6 +31,12 @@ public:
 
     inline BidirectionalGraph() : g_() {}
 
+    BidirectionalGraph(const BidirectionalGraph& other) = delete;
+    BidirectionalGraph(BidirectionalGraph&& other) = default;
+    BidirectionalGraph& operator=(const BidirectionalGraph& other) = delete;
+    BidirectionalGraph& operator=(BidirectionalGraph&& other) = default;
+    ~BidirectionalGraph() = default;
+
     inline void AddEdge(Edge&& edge) {
         assert(!edge.IsBackward());
         if (edge.IsTwoway()) {
