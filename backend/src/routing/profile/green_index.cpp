@@ -1,4 +1,4 @@
-#include "routing/preprocessing/green_index.h"
+#include "routing/profile/green_index.h"
 #include "routing/exception.h"
 
 #include <string>
@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace routing {
-namespace preprocessing {
+namespace profile {
 
 GreenIndex::GreenIndex(database::DatabaseHelper& d) : d_(d), edge_green_values_() {}
 

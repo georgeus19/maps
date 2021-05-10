@@ -104,7 +104,9 @@ void AdjacencyListGraph<V, E>::ForEachVertex(const std::function<void(V&)>& f) {
 template <typename V, typename E>
 void AdjacencyListGraph<V, E>::ForEachEdge(const std::function<void(E&)>& f) {
     ForEachVertex([&](V& vertex) {
-        vertex.ForEachEdge(f);
+        for(auto&& edge : vertex.get_edges()) {
+            f(edge);
+        }
     });
 }
 

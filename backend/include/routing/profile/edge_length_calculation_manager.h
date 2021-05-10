@@ -30,7 +30,10 @@ public:
 
     void Normalize(double scale_max);
 
-protected:
+    template <typename Graph>
+    void SetEdgeLengths(Graph& graph);
+
+private:
     struct DataContainer;
     database::DatabaseHelper& d_;
     std::vector<DataContainer> data_;
@@ -50,6 +53,8 @@ protected:
 
     template <typename Index>
     bool IsIndexPresent(DataIndex* index);
+
+    double GetLength(unsigned_id_type uid);
 };
 
 template <typename Index>
@@ -93,6 +98,25 @@ void EdgeLengthCalculationManager::Normalize(double scale_max) {
         c.index->Normalize(scale_max);
     }
 }
+
+
+template <typename Graph>
+void EdgeLengthCalculationManager::SetEdgeLengths(Graph& graph) {
+    graph.ForEachEdge([](typename Graph::Edge& edge) {
+        edge.set_length(GetLength(edge.get_uid()));
+    });
+}
+
+double EdgeLengthCalculationManager::GetLength(unsigned_id_type uid) {
+    double length = 0;
+    for(auto&& d : data_) {
+        length += d.importance * d.index->Get(uid);
+    }
+    return length;
+}
+
+
+
 
 }
 }

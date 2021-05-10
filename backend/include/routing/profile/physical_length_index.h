@@ -1,9 +1,9 @@
-#ifndef BACKEND_PREPROCESSING_PHYSICAL_LENGTH_INDEX_H
-#define BACKEND_PREPROCESSING_PHYSICAL_LENGTH_INDEX_H
+#ifndef BACKEND_ROUTING_PROFILE_PHYSICAL_LENGTH_INDEX_H
+#define BACKEND_ROUTING_PROFILE_PHYSICAL_LENGTH_INDEX_H
 
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
-#include "routing/preprocessing/data_index.h"
+#include "routing/profile/data_index.h"
 
 #include <string>
 #include <vector>
@@ -11,7 +11,7 @@
 #include <limits>
 
 namespace routing {
-namespace preprocessing {
+namespace profile {
 
 class PhysicalLengthIndex : public DataIndex{
 public:
@@ -44,4 +44,4 @@ private:
 }
 }
 
-#endif //BACKEND_PREPROCESSING_PHYSICAL_LENGTH_INDEX_H
+#endif //BACKEND_ROUTING_PROFILE_PHYSICAL_LENGTH_INDEX_H

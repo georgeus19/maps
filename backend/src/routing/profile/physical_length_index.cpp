@@ -1,4 +1,4 @@
-#include "routing/preprocessing/physical_length_index.h"
+#include "routing/profile/physical_length_index.h"
 #include "routing/exception.h"
 
 #include <string>
@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace routing {
-namespace preprocessing {
+namespace profile {
 
 PhysicalLengthIndex::PhysicalLengthIndex(database::DatabaseHelper& d) : d_(d), edge_length_values_() {}
 

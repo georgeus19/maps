@@ -1,16 +1,15 @@
 #ifndef BACKEND_PREPROCESSING_CH_DATA_MANAGER_H
 #define BACKEND_PREPROCESSING_CH_DATA_MANAGER_H
 
-#include "routing/edges/basic_edge.h"
-#include "routing/preprocessing/data_index.h"
-#include "routing/preprocessing/green_index.h"
 #include "routing/exception.h"
-#include "routing/preprocessing/edge_length_calculation_manager.h"
 #include "routing/adjacency_list_graph.h"
 #include "routing/bidirectional_graph.h"
+#include "routing/edges/basic_edge.h"
 #include "routing/edges/ch_preprocessing_edge.h"
-#include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/vertices/ch_vertex.h"
+
+#include "routing/profile/data_index.h"
 
 #include "database/db_graph.h"
 #include "database/database_helper.h"
@@ -34,14 +33,11 @@ public:
 
     void SaveNewGraph(Graph& g, const std::string& base_graph_table, const std::string& output_graph_table);
 
-    EdgeLengthCalculationManager& get_edge_length_calculation_manager();
-
 private:
     database::DatabaseHelper& d_;
-    EdgeLengthCalculationManager length_manager_;
 };
 
-CHDataManager::CHDataManager(database::DatabaseHelper& d) : d_(d), length_manager_(d) {}
+CHDataManager::CHDataManager(database::DatabaseHelper& d) : d_(d) {}
 
 CHDataManager::Graph CHDataManager::LoadBaseGraph(const std::string& graph_table) {
     Graph g{};
@@ -67,9 +63,7 @@ void CHDataManager::SaveNewGraph(Graph& g, const std::string& base_graph_table, 
     std::cout << "Vertex ordering saved to " << output_ordering_table << "." << std::endl;
 }
 
-EdgeLengthCalculationManager& CHDataManager::get_edge_length_calculation_manager() {
-    return length_manager_;
-}
+
 
 }
 }

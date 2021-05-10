@@ -1,0 +1,35 @@
+[database]
+name = "gis"
+user = "postgres"
+password = "wtz2trln"
+host = "127.0.0.1"
+port = "5432"
+
+[algorithm]
+name = "ch"
+base_graph_table = "czedges"
+[algorithm.parameters]
+hop_count = 5
+edge_difference = 190
+deleted_neighbours = 120
+space_size = 0
+
+[[profile_properties]]
+name = "length"
+table_name = "czedges_length_index"
+importance = [ 100 ]
+[[profile_properties]]
+name = "green"
+table_name = "czedges_green_index"
+importance = [ 0, 40, 80 ]
+
+# [[graph]]
+# algorithm = "ch"
+# name = ""
+# custom_data =  [{ type = "length", importance = 2 }, { type = "green", importance = 2 }]
+# [[graph]]
+# algorithm = "ch"
+# custom_data =  [{ type = "length", importance = 2 }, { type = "green", importance = 2 }]
+# [[graph]]
+# algorithm = "ch"
+# custom_data =  [{ type = "green", importance = 2 }, { type = "green", importance = 2 }]

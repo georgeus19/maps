@@ -71,6 +71,8 @@
         "complex": "cpp",
         "csignal": "cpp",
         "cfenv": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "charconv": "cpp",
+        "csetjmp": "cpp"
     }
 }
