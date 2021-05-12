@@ -10,6 +10,7 @@
 #include "routing/configuration_parser.h"
 #include "routing/adjacency_list_graph.h"
 #include "routing/bidirectional_graph.h"
+#include "routing/constants.h"
 
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/contraction_vertex.h"
@@ -81,23 +82,23 @@ int main(int argc, const char ** argv) {
 
 static void CreateIndicies(const std::string& path) {
     auto&& data = toml::parse(path);
-    DatabaseConfig db_cfg{toml::find(data, "database")};
+    DatabaseConfig db_cfg{toml::find(data, Constants::Input::TableNames::kDatabase)};
     DatabaseHelper d{db_cfg.name, db_cfg.user, db_cfg.password, db_cfg.host, db_cfg.port};
     std::unordered_map<std::string, std::function<void(const toml::value&)>> indicies{
         {
-            "green",
+            Constants::IndexNames::kGreenIndex,
             [&](const toml::value& table){
                 GreenIndex index{d};
-                index.Create(toml::find<std::string>(table, "edges_table"),
-                    toml::find<std::string>(table, "polygon_table"),
-                    toml::find<std::string>(table, "index_table")
+                index.Create(toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
+                    toml::find<std::string>(table, Constants::Input::Indicies::kPolygonTable),
+                    toml::find<std::string>(table, Constants::Input::Indicies::kIndexTable)
                 ); 
             }
         },
-        {"length", [](const toml::value&){ /* no action necessary... - already present in base graph! */ }}
+        {Constants::IndexNames::kLengthIndex, [](const toml::value&){ /* no action necessary... - already present in base graph! */ }}
     };
-    for(auto&& index : toml::find<toml::array>(data, "indicies")) {
-        std::string name = toml::find<std::string>(index, "name");
+    for(auto&& index : toml::find<toml::array>(data, Constants::Input::TableNames::kIndicies)) {
+        std::string name = toml::find<std::string>(index, Constants::Input::kName);
         if (!indicies.contains(name)) {
             std::cout << "No index " << name << " exists." << std::endl;
             continue;
@@ -109,8 +110,8 @@ static void CreateIndicies(const std::string& path) {
 
 static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, unsigned_id_type max_edge_id, double scale_max) {
     std::unordered_map<std::string, std::function<void(ProfileGenerator&, ProfileProperty&)>> indicies{
-        {"green", [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddGreenIndex(prop.table_name, std::move(prop.options)); }},
-        {"length", [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddPhysicalLengthIndex(prop.table_name, std::move(prop.options)); }}
+        {Constants::IndexNames::kGreenIndex, [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddGreenIndex(prop.table_name, std::move(prop.options)); }},
+        {Constants::IndexNames::kLengthIndex, [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddPhysicalLengthIndex(prop.table_name, std::move(prop.options)); }}
     };
     ProfileGenerator gen{d, cfg.algorithm->base_graph_table, max_edge_id, scale_max};
     for(auto&& prop : cfg.profile_properties) {

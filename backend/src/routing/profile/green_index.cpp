@@ -1,5 +1,6 @@
 #include "routing/profile/green_index.h"
 #include "routing/exception.h"
+#include "routing/constants.h"
 
 #include <string>
 #include <vector>
@@ -86,7 +87,7 @@ double GreenIndex::Get(unsigned_id_type uid) {
 }
 
 std::string GreenIndex::GetName() const {
-    return "green";
+    return Constants::IndexNames::kGreenIndex;
 }
 
 

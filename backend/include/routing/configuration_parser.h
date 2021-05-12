@@ -1,6 +1,7 @@
 #ifndef BACKEND_ROUTING_CONFIGURATION_PARSER_H
 #define BACKEND_ROUTING_CONFIGURATION_PARSER_H
 #include "toml11/toml.hpp"
+#include "routing/constants.h"
 
 #include <functional>
 #include <iostream>
@@ -16,9 +17,12 @@ struct DatabaseConfig{
     std::string host;
     std::string port;
 
-    DatabaseConfig(const toml::value& table) : name(toml::find<std::string>(table, "name")),
-        user(toml::find<std::string>(table, "user")), password(toml::find<std::string>(table, "password")),
-        host(toml::find<std::string>(table, "host")), port(toml::find<std::string>(table, "port"))  {}
+    DatabaseConfig(const toml::value& table) :
+        name(toml::find<std::string>(table, Constants::Input::Database::kName)),
+        user(toml::find<std::string>(table, Constants::Input::Database::kUser)),
+        password(toml::find<std::string>(table, Constants::Input::Database::kPassword)),
+        host(toml::find<std::string>(table, Constants::Input::Database::kHost)),
+        port(toml::find<std::string>(table, Constants::Input::Database::kPort))  {}
 };
 
 struct ProfileProperty {
@@ -72,23 +76,21 @@ private:
 ConfigurationParser::ConfigurationParser(const std::string& config_path) : data_(toml::parse(config_path)) {}
 
 Configuration ConfigurationParser::Parse() {
-    auto&& database = toml::find(data_, "database");
-    std::string default_algorithm = "ch";
+    auto&& database = toml::find(data_, Constants::Input::TableNames::kDatabase);
+    std::string default_algorithm = Constants::AlgorithmNames::kContractionHierarchies;
     std::unordered_map<std::string, std::function<std::unique_ptr<AlgorithmConfig>(const toml::table&)>> algorithms {
-        {"ch", [](const toml::table& algorithm_config){
-                algorithm_config.at("name").as_string();
-
-                std::string name = algorithm_config.at("name").as_string();
-                std::string base_graph_table = algorithm_config.at("base_graph_table").as_string();
-                auto&& param = algorithm_config.at("parameters").as_table();
+        {Constants::AlgorithmNames::kContractionHierarchies, [](const toml::table& algorithm_config){
+                std::string name = algorithm_config.at(Constants::Input::kName).as_string();
+                std::string base_graph_table = algorithm_config.at(Constants::Input::kBaseGraphTable).as_string();
+                auto&& param = algorithm_config.at(Constants::Input::TableNames::kParameters).as_table();
 
                 return std::make_unique<AlgorithmConfig>(CHConfig{
                     std::move(name),
                     std::move(base_graph_table),
-                    static_cast<size_t>(param.at("hop_count").as_integer()),
-                    static_cast<int32_t>(param.at("edge_difference").as_integer()),
-                    static_cast<int32_t>(param.at("deleted_neighbours").as_integer()),
-                    static_cast<int32_t>(param.at("space_size").as_integer())
+                    static_cast<size_t>(param.at(Constants::Input::Preprocessing::kHopCount).as_integer()),
+                    static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kEdgeDifference).as_integer()),
+                    static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kDeletedNeighbours).as_integer()),
+                    static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kSpaceSize).as_integer())
                 });
             }
         }
@@ -96,21 +98,19 @@ Configuration ConfigurationParser::Parse() {
     
     DatabaseConfig db_config{database};
 
-    auto&& algorithm = toml::find(data_, "algorithm");
-    std::string alg_name = toml::find<std::string>(algorithm, "name");
+    auto&& algorithm = toml::find(data_, Constants::Input::TableNames::kAlgorithm);
+    std::string alg_name = toml::find<std::string>(algorithm, Constants::Input::kName);
     if (!algorithms.contains(alg_name)) {
         alg_name = default_algorithm;
     } 
     std::unique_ptr<AlgorithmConfig> alg = algorithms[alg_name](algorithm.as_table());
     
-    auto&& alg_param = toml::find(algorithm, "parameters");
-
     std::vector<ProfileProperty> profile_properties;
-    for(auto&& property : toml::find<toml::array>(data_, "profile_properties")) {
-        std::string name = toml::find<std::string>(property, "name");
-        std::string table_name = toml::find<std::string>(property, "table_name");
+    for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
+        std::string name = toml::find<std::string>(property, Constants::Input::kName);
+        std::string table_name = toml::find<std::string>(property, Constants::Input::kTableName);
         std::vector<int32_t> importance_options;
-        for(auto&& importance : toml::find<toml::array>(property, "importance")) {
+        for(auto&& importance : toml::find<toml::array>(property, Constants::Input::kImportance)) {
             importance_options.push_back(static_cast<int32_t>(importance.as_integer()));
         }
         profile_properties.emplace_back(std::move(name), std::move(table_name), std::move(importance_options));
@@ -123,4 +123,3 @@ Configuration ConfigurationParser::Parse() {
 }
 
 #endif //BACKEND_ROUTING_CONFIGURATION_PARSER_H
-

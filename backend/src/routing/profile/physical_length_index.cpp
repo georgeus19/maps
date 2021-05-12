@@ -1,5 +1,6 @@
 #include "routing/profile/physical_length_index.h"
 #include "routing/exception.h"
+#include "routing/constants.h"
 
 #include <string>
 #include <vector>
@@ -52,7 +53,7 @@ double PhysicalLengthIndex::Get(unsigned_id_type uid) {
 }
 
 std::string PhysicalLengthIndex::GetName() const {
-    return "length";
+    return Constants::IndexNames::kLengthIndex;
 }
 
 

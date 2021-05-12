@@ -8,7 +8,7 @@ port = "5432"
 [[indicies]]
 name = "green"
 edges_table = "czedges"
-polygon_table = "planet_osm_polygons"
+polygon_table = "planet_osm_polygon"
 index_table = "czedges_green_index"
 [[indicies]]
 name = "length"
