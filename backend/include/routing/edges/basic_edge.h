@@ -32,6 +32,10 @@ public:
         return length_;
     }
 
+    inline void set_length(double l) {
+        length_ = l;
+    }
+
     inline void SetForward() {
         type_ = EdgeType::forward;
     }

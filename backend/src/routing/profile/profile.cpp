@@ -5,7 +5,7 @@ namespace profile{
 
 Profile::Profile(double scale_max) : scale_max_(scale_max), properties_(), normalized_(false) {}
 
-void Profile::AddIndex(DataIndex* index, double importance) {
+void Profile::AddIndex(const std::shared_ptr<DataIndex>& index, int32_t importance) {
     normalized_ = false;
     properties_.emplace_back(index, importance);
 }
@@ -17,10 +17,19 @@ void Profile::Normalize() {
     normalized_ = true;
 }
 
+std::string Profile::GetName() const {
+    std::string name = "";
+    for(auto&& prop : properties_) {
+        name += prop.index->GetName();
+        name += std::to_string(prop.importance);
+    }
+    return name;
+}
+
 double Profile::GetLength(unsigned_id_type uid) {
     double length = 0;
     for(auto&& property : properties_) {
-        length += property.importance * property.index->Get(uid);
+        length += static_cast<double>(property.importance) * property.index->Get(uid);
     }
     return length;
 }    

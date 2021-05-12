@@ -85,6 +85,10 @@ double GreenIndex::Get(unsigned_id_type uid) {
     }
 }
 
+std::string GreenIndex::GetName() const {
+    return "green";
+}
+
 
 }
 }

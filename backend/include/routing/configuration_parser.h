@@ -16,16 +16,17 @@ struct DatabaseConfig{
     std::string host;
     std::string port;
 
-    DatabaseConfig(const std::string& n, const std::string& u, const std::string& pswd, const std::string& h, const std::string& p)
-        : name(n), user(u), password(pswd), host(h), port(p) {}
+    DatabaseConfig(const toml::value& table) : name(toml::find<std::string>(table, "name")),
+        user(toml::find<std::string>(table, "user")), password(toml::find<std::string>(table, "password")),
+        host(toml::find<std::string>(table, "host")), port(toml::find<std::string>(table, "port"))  {}
 };
 
 struct ProfileProperty {
     std::string name;
     std::string table_name;
-    std::vector<double> options;
+    std::vector<int32_t> options;
 
-    ProfileProperty(std::string&& n, std::string&& t, std::vector<double>&& o) : name(std::move(n)), table_name(std::move(t)), options(std::move(o)) {}
+    ProfileProperty(std::string&& n, std::string&& t, std::vector<int32_t>&& o) : name(std::move(n)), table_name(std::move(t)), options(std::move(o)) {}
 };
 
 
@@ -93,14 +94,7 @@ Configuration ConfigurationParser::Parse() {
         }
     };
     
-    DatabaseConfig db_config{
-        toml::find<std::string>(database, "name"),
-        toml::find<std::string>(database, "user"),
-        toml::find<std::string>(database, "password"),
-        toml::find<std::string>(database, "host"),
-        toml::find<std::string>(database, "port")
-    };
-
+    DatabaseConfig db_config{database};
 
     auto&& algorithm = toml::find(data_, "algorithm");
     std::string alg_name = toml::find<std::string>(algorithm, "name");
@@ -115,13 +109,11 @@ Configuration ConfigurationParser::Parse() {
     for(auto&& property : toml::find<toml::array>(data_, "profile_properties")) {
         std::string name = toml::find<std::string>(property, "name");
         std::string table_name = toml::find<std::string>(property, "table_name");
-        std::vector<double> importance_options;
+        std::vector<int32_t> importance_options;
         for(auto&& importance : toml::find<toml::array>(property, "importance")) {
-            importance_options.push_back(importance.is_floating() ? importance.as_floating(std::nothrow) : static_cast<double>(importance.as_integer()));
+            importance_options.push_back(static_cast<int32_t>(importance.as_integer()));
         }
-
         profile_properties.emplace_back(std::move(name), std::move(table_name), std::move(importance_options));
-
     }
 
     return Configuration{std::move(db_config), std::move(profile_properties), std::move(alg)};

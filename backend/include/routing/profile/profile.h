@@ -19,28 +19,30 @@ namespace routing{
 namespace profile{
 
 class Profile{
+    struct Property;
 public:
 
     Profile(double scale_max);
 
-    void AddIndex(DataIndex* index, double importance);
+    void AddIndex(const std::shared_ptr<DataIndex>& index, int32_t importance);
 
     template <typename Graph>
     void Set(Graph& graph);
 
     void Normalize();
 
+    std::string GetName() const;
+
 private:
-    struct Property;
     double scale_max_;
     std::vector<Property> properties_;
     bool normalized_;
 
     struct Property{
-        DataIndex* index;
-        double importance;
+        std::shared_ptr<DataIndex> index;
+        int32_t importance;
 
-        Property(DataIndex* ix, double im) : index(ix), importance(im) {}
+        Property(const std::shared_ptr<DataIndex>& ix, int32_t im) : index(ix), importance(im) {}
 
         Property(const Property& other) = default;
         Property(Property&& other) = default;
@@ -58,7 +60,7 @@ void Profile::Set(Graph& graph) {
         Normalize();
     }
 
-    graph.ForEachEdge([](typename Graph::Edge& edge) {
+    graph.ForEachEdge([&](typename Graph::Edge& edge) {
         edge.set_length(GetLength(edge.get_uid()));
     });
 }

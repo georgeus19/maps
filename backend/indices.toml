@@ -1,0 +1,14 @@
+[database]
+name = "gis"
+user = "postgres"
+password = "wtz2trln"
+host = "127.0.0.1"
+port = "5432"
+
+[[indicies]]
+name = "green"
+edges_table = "czedges"
+polygon_table = "planet_osm_polygons"
+index_table = "czedges_green_index"
+[[indicies]]
+name = "length"

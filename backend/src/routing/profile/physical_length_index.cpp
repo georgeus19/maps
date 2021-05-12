@@ -51,6 +51,10 @@ double PhysicalLengthIndex::Get(unsigned_id_type uid) {
     }
 }
 
+std::string PhysicalLengthIndex::GetName() const {
+    return "length";
+}
+
 
 
 

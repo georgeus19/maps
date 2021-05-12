@@ -24,6 +24,8 @@ public:
     void Normalize(double scale_max) override;
 
     double Get(unsigned_id_type uid) override;
+
+    std::string GetName() const override;
 private:
     struct GreenValue;
     database::DatabaseHelper& d_;
