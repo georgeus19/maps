@@ -10,9 +10,9 @@
 namespace routing {
 namespace profile {
 
-GreenIndex::GreenIndex(database::DatabaseHelper& d) : d_(d), edge_green_values_() {}
+GreenIndex::GreenIndex() : edge_green_values_() {}
 
-void GreenIndex::Create(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table) {
+void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table) {
     std::string green_places_table = osm_polygons_table + "_green_geom_temp"; 
 	std::string green_places_table_index = green_places_table + "_gix";
 	std::string green_index_table_index = green_index_table + "_idx";
@@ -43,20 +43,23 @@ void GreenIndex::Create(const std::string& edges_table, const std::string& osm_p
 			"GROUP BY edges.uid; "
 			"DROP INDEX IF EXISTS " + green_places_table_index + "; "
 			"CREATE UNIQUE INDEX " + green_index_table_index  + " ON " + green_index_table + " (uid); "; 
-    d_.RunTransactional(sql);
+    d.RunTransactional(sql);
 }
 
-void GreenIndex::Load(const std::string& green_index_table, size_t max_uid) {
-    edge_green_values_.assign(max_uid + 1, GreenValue{});
+void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_index_table) {
+    // edge_green_values_.assign(max_uid + 1, GreenValue{});
     std::string sql = 
             "SELECT uid, COALESCE(green_fraction, 0) "
             "FROM " + green_index_table + "; ";
     auto&& load = [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
         double green_value = row.get<double>(1);
+        if (uid >= edge_green_values_.size()) {
+            edge_green_values_.resize(uid + 1);
+        }
         edge_green_values_[uid] = green_value;
     };
-    d_.RunNontransactional(sql, load);
+    d.RunNontransactional(sql, load);
 }
 
 void GreenIndex::Normalize(double scale_max) {

@@ -14,7 +14,7 @@ namespace profile {
 
 class DataIndex{
 public:
-    virtual void Load(const std::string& index_table, size_t max_uid) = 0;
+    virtual void Load(database::DatabaseHelper& d, const std::string& index_table) = 0;
 
     virtual void Normalize(double max) = 0;
 

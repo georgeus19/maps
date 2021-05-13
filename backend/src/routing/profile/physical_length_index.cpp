@@ -10,19 +10,22 @@
 namespace routing {
 namespace profile {
 
-PhysicalLengthIndex::PhysicalLengthIndex(database::DatabaseHelper& d) : d_(d), edge_length_values_() {}
+PhysicalLengthIndex::PhysicalLengthIndex() : edge_length_values_() {}
 
-void PhysicalLengthIndex::Load(const std::string& index_table, size_t max_uid) {
-    edge_length_values_.assign(max_uid + 1, LengthValue{});
+void PhysicalLengthIndex::Load(database::DatabaseHelper& d, const std::string& index_table) {
+    // edge_length_values_.assign(max_uid + 1, LengthValue{});
     std::string sql = 
             "SELECT uid, length "
             "FROM " + index_table + "; ";
     auto&& load = [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
         double length_value = row.get<double>(1);
+        if (uid >= edge_length_values_.size()) {
+            edge_length_values_.resize(uid + 1);
+        }
         edge_length_values_[uid] = length_value;
     };
-    d_.RunNontransactional(sql, load);
+    d.RunNontransactional(sql, load);
 }
 
 void PhysicalLengthIndex::Normalize(double scale_max) {

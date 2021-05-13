@@ -67,6 +67,16 @@ const char* DataIndexAlreadyPresentException::what() const _GLIBCXX_TXN_SAFE_DYN
     return message_.c_str();
 }
 
+ParseException::ParseException() : message_("Invalid value accessed.") {}
+
+ParseException::ParseException(const string & message) : message_(message) {}
+
+ParseException::ParseException(std::string && message) : message_(move(message)) {}
+
+const char* ParseException::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW {
+    return message_.c_str();
+}
+
 
 
 }

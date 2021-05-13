@@ -15,9 +15,9 @@ namespace profile {
 
 class PhysicalLengthIndex : public DataIndex{
 public:
-    PhysicalLengthIndex(database::DatabaseHelper& d);
+    PhysicalLengthIndex();
 
-    void Load(const std::string& green_index_table, size_t max_uid) override;
+    void Load(database::DatabaseHelper& d, const std::string& green_index_table) override;
 
     void Normalize(double scale_max) override;
 
@@ -27,7 +27,6 @@ public:
     
 private:
     struct LengthValue;
-    database::DatabaseHelper& d_;
     std::vector<LengthValue> edge_length_values_;
 
     struct LengthValue {

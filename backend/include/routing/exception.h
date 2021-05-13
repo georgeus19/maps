@@ -116,6 +116,21 @@ public:
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
 
+class ParseException : public std::exception {
+    std::string message_;
+public:
+    ParseException();
+    ParseException(const std::string & message);
+    ParseException(std::string && message);
+    ParseException(const ParseException & other) = default;
+    ParseException(ParseException && other) = default;
+    ParseException & operator=(const ParseException & other) = default;
+    ParseException & operator=(ParseException && other) = default;
+    ~ParseException() = default;
+
+    const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
+};
+
 
 }
 

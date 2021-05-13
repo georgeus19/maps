@@ -18,7 +18,6 @@
 
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
-#include "routing/preprocessing/ch_data_manager.h"
 
 #include "routing/profile/profile_generator.h"
 #include "routing/profile/profile.h"
@@ -52,8 +51,6 @@ int main(int argc, const char ** argv) {
         PrintHelp();
         return 1;
     }
-    std::cout << "1: " << argv[1] << std::endl;
-    std::cout << "2: " << argv[2] << std::endl;
 
     try {
         if (std::string{argv[1]} == "--create-index") {
@@ -88,8 +85,9 @@ static void CreateIndicies(const std::string& path) {
         {
             Constants::IndexNames::kGreenIndex,
             [&](const toml::value& table){
-                GreenIndex index{d};
-                index.Create(toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
+                GreenIndex index{};
+                index.Create(d, 
+                    toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
                     toml::find<std::string>(table, Constants::Input::Indicies::kPolygonTable),
                     toml::find<std::string>(table, Constants::Input::Indicies::kIndexTable)
                 ); 
@@ -108,35 +106,32 @@ static void CreateIndicies(const std::string& path) {
     }
 }
 
-static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, unsigned_id_type max_edge_id, double scale_max) {
-    std::unordered_map<std::string, std::function<void(ProfileGenerator&, ProfileProperty&)>> indicies{
-        {Constants::IndexNames::kGreenIndex, [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddGreenIndex(prop.table_name, std::move(prop.options)); }},
-        {Constants::IndexNames::kLengthIndex, [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddPhysicalLengthIndex(prop.table_name, std::move(prop.options)); }}
-    };
-    ProfileGenerator gen{d, cfg.algorithm->base_graph_table, max_edge_id, scale_max};
+static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, double scale_max) {
+    ProfileGenerator gen{d, cfg.algorithm->base_graph_table, scale_max};
     for(auto&& prop : cfg.profile_properties) {
-        indicies[prop.name](gen, prop);
+        prop.index->Load(d, prop.table_name);
+        gen.AddIndex(std::move(prop.index), std::move(prop.options));
     }
     return gen.Generate();
 }
 
 static void RunCHPreprocessing(Configuration&& cfg) {
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    std::cout << "Load graph from " << cfg.algorithm->base_graph_table << "." << std::endl;
-    CHDataManager manager{d};
-    CHDataManager::Graph g{};
-    database::UnpreprocessedDbGraph unpreprocessed_db_graph{};
-    d.LoadFullGraph<CHDataManager::Graph>(cfg.algorithm->base_graph_table, g, &unpreprocessed_db_graph);
     TableNameRepository name_rep{cfg.algorithm->base_graph_table, cfg.algorithm->name};
-    for(auto&& profile : GenerateProfiles(d, cfg, g.GetMaxEdgeId(), 100)) {
+    for(auto&& profile : GenerateProfiles(d, cfg, 100)) {
+        std::cout << "Load graph from " << cfg.algorithm->base_graph_table << "." << std::endl;
+        using Graph = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
+        Graph g{};
+        database::UnpreprocessedDbGraph unpreprocessed_db_graph{};
+        d.LoadFullGraph<Graph>(cfg.algorithm->base_graph_table, g, &unpreprocessed_db_graph);
         std::cout << "Profile: " << profile.GetName() << std::endl;
         profile.Set(g);
         std::cout << "Vertices: " << g.GetVertexCount() << std::endl;
         std::cout << "Edges before contraction: " << g.GetEdgeCount() << std::endl;
         std::string ch_edges_table{name_rep.GetEdgesTable(profile)};
         std::string ch_vertex_table{name_rep.GetVerticesTable(profile)};
-        ContractionParameters parameters{d.GetMaxEdgeId(cfg.algorithm->base_graph_table), 5, 190, 120, 0};
-        GraphContractor<CHDataManager::Graph> c{g, parameters};
+        ContractionParameters parameters{g.GetMaxEdgeId() + 1, 5, 190, 120, 0};
+        GraphContractor<Graph> c{g, parameters};
         c.ContractGraph();
         std::cout << "Contraction done." << std::endl;
         std::cout << "Edges after contraction: " << g.GetEdgeCount() << std::endl;

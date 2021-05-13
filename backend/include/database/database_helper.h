@@ -398,10 +398,11 @@ void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
     CsvConvertor convertor{data_path};
     convertor.SaveEdges(graph, [](const typename Graph::Edge& edge) {
         bool twoway_condition = true;
+        bool forward_or_twoway = edge.IsTwoway() || edge.IsForward();
         if (edge.IsTwoway()) {
             twoway_condition = edge.get_from() < edge.get_to();
         }
-        return edge.IsShortcut() && twoway_condition;
+        return forward_or_twoway && edge.IsShortcut() && twoway_condition;
     });
 
     pqxx::work w(connection_);

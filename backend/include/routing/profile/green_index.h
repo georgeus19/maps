@@ -15,11 +15,11 @@ namespace profile {
 
 class GreenIndex : public DataIndex{
 public:
-    GreenIndex(database::DatabaseHelper& d);
+    GreenIndex();
 
-    void Create(const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table);
+    void Create(database::DatabaseHelper& d, const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table);
 
-    void Load(const std::string& green_index_table, size_t max_uid) override;
+    void Load(database::DatabaseHelper& d, const std::string& green_index_table) override;
 
     void Normalize(double scale_max) override;
 
@@ -28,7 +28,6 @@ public:
     std::string GetName() const override;
 private:
     struct GreenValue;
-    database::DatabaseHelper& d_;
     std::vector<GreenValue> edge_green_values_;
 
     struct GreenValue {

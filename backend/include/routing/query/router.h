@@ -42,7 +42,7 @@ public:
         Setup setup{d, table_name};
         RoutingGraph<typename Setup::Graph> routing_graph{base_graph_};
         auto&& db_graph = setup.CreateDbGraph();
-        auto&& route_endpoints = setup.AddRouteEndpoints(routing_graph, source, target, base_graph_max_vertex_id_, base_graph_max_edge_id_);
+        auto&& route_endpoints = setup.AddRouteEndpoints(routing_graph, source, target, base_graph_max_vertex_id_ + 1, base_graph_max_edge_id_ + 1);
 
             auto start_run = std::chrono::high_resolution_clock::now();
         Algorithm<typename Setup::Algorithm> alg{routing_graph};

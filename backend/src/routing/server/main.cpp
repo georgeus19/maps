@@ -4,15 +4,34 @@
 #include "routing/query/module.h"
 #include "utility/point.h"
 #include "routing/query/router.h"
+#include "routing/configuration_parser.h"
+#include "routing/profile/profile_generator.h"
+#include "database/database_helper.h"
 
 using namespace routing;
+using namespace profile;
 using namespace query;
+using namespace database;
+
+static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, unsigned_id_type max_edge_id, double scale_max) {
+    std::unordered_map<std::string, std::function<void(ProfileGenerator&, ProfileProperty&)>> indicies{
+        {Constants::IndexNames::kGreenIndex, [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddGreenIndex(prop.table_name, std::move(prop.options)); }},
+        {Constants::IndexNames::kLengthIndex, [](ProfileGenerator& gen, ProfileProperty& prop){ gen.AddPhysicalLengthIndex(prop.table_name, std::move(prop.options)); }}
+    };
+    ProfileGenerator gen{d, cfg.algorithm->base_graph_table, max_edge_id, scale_max};
+    for(auto&& prop : cfg.profile_properties) {
+        indicies[prop.name](gen, prop);
+    }
+    return gen.Generate();
+}
 
 int main(int argc, const char ** argv) {
     crow::SimpleApp app;
     std::string edge_table = "CHczedges";
     auto&& g = CHSetup::CreateGraph(edge_table);
     Router<CHSetup> router{g, edge_table};
+    ConfigurationParser parser{argv[1]};
+    auto&& cfg = parser.Parse();
 
     CROW_ROUTE(app, "/route")([&](const crow::request& req) {
             crow::json::wvalue response;

@@ -18,11 +18,9 @@ namespace profile{
 class ProfileGenerator {
 public:
 
-    ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table, unsigned_id_type max_edge_uid, double scale_max);
+    ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table, double scale_max);
 
-    void AddGreenIndex(const std::string& green_index_table, std::vector<int32_t>&& importance_options);
-
-    void AddPhysicalLengthIndex(const std::string& length_index_table, std::vector<int32_t>&& importance_options);
+    void AddIndex(std::shared_ptr<DataIndex>&& index, std::vector<int32_t>&& importance_options);
 
     std::vector<Profile> Generate();
 
@@ -30,7 +28,6 @@ private:
     struct IndexInfo;
     database::DatabaseHelper& d_;
     std::string base_graph_table_;
-    unsigned_id_type max_edge_uid_;
     double scale_max_;
 
     std::vector<IndexInfo> indices_;
@@ -46,19 +43,11 @@ private:
 
 };
 
-ProfileGenerator::ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table, unsigned_id_type max_edge_uid, double scale_max)
-    : d_(d), base_graph_table_(base_graph_table), max_edge_uid_(max_edge_uid), scale_max_(scale_max), indices_() {}
+ProfileGenerator::ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table, double scale_max)
+    : d_(d), base_graph_table_(base_graph_table), scale_max_(scale_max), indices_() {}
 
-void ProfileGenerator::AddGreenIndex(const std::string& green_index_table, std::vector<int32_t>&& importance_options) {
-    auto&& green_index = std::make_shared<GreenIndex>(d_);
-    green_index->Load(green_index_table, max_edge_uid_);
-    indices_.emplace_back(std::move(green_index), std::move(importance_options));
-}
-
-void ProfileGenerator::AddPhysicalLengthIndex(const std::string& length_index_table, std::vector<int32_t>&& importance_options) {
-    auto&& length_index = std::make_shared<PhysicalLengthIndex>(d_);
-    length_index->Load(length_index_table, max_edge_uid_);
-    indices_.emplace_back(std::move(length_index), std::move(importance_options));
+void ProfileGenerator::AddIndex(std::shared_ptr<DataIndex>&& index, std::vector<int32_t>&& importance_options) {
+    indices_.emplace_back(std::move(index), std::move(importance_options));
 }
 
 std::vector<Profile> ProfileGenerator::Generate() {

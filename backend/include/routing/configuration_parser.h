@@ -2,6 +2,10 @@
 #define BACKEND_ROUTING_CONFIGURATION_PARSER_H
 #include "toml11/toml.hpp"
 #include "routing/constants.h"
+#include "routing/exception.h"
+#include "routing/profile/data_index.h"
+#include "routing/profile/green_index.h"
+#include "routing/profile/physical_length_index.h"
 
 #include <functional>
 #include <iostream>
@@ -26,11 +30,11 @@ struct DatabaseConfig{
 };
 
 struct ProfileProperty {
-    std::string name;
+    std::shared_ptr<profile::DataIndex> index;
     std::string table_name;
     std::vector<int32_t> options;
 
-    ProfileProperty(std::string&& n, std::string&& t, std::vector<int32_t>&& o) : name(std::move(n)), table_name(std::move(t)), options(std::move(o)) {}
+    ProfileProperty(std::shared_ptr<profile::DataIndex>&& i, std::string&& t, std::vector<int32_t>&& o) : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
 };
 
 
@@ -107,13 +111,20 @@ Configuration ConfigurationParser::Parse() {
     
     std::vector<ProfileProperty> profile_properties;
     for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
+         std::unordered_map<std::string, std::function<std::shared_ptr<profile::DataIndex>()>> indicies{
+            {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
+            {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
+        };
         std::string name = toml::find<std::string>(property, Constants::Input::kName);
+        if (!indicies.contains(name)) {
+            throw ParseException{"Index " + name + " does not exist."};
+        }
         std::string table_name = toml::find<std::string>(property, Constants::Input::kTableName);
         std::vector<int32_t> importance_options;
         for(auto&& importance : toml::find<toml::array>(property, Constants::Input::kImportance)) {
             importance_options.push_back(static_cast<int32_t>(importance.as_integer()));
         }
-        profile_properties.emplace_back(std::move(name), std::move(table_name), std::move(importance_options));
+        profile_properties.emplace_back(indicies[name](), std::move(table_name), std::move(importance_options));
     }
 
     return Configuration{std::move(db_config), std::move(profile_properties), std::move(alg)};
