@@ -83,27 +83,27 @@ INSTANTIATE_TEST_CASE_P(
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 1, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 2, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-3, 0, -3}, 3, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
-        VertexMeasuresTestParameters{VertexMeasuresTest{-3, 0, -3}, 4, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
-        VertexMeasuresTestParameters{VertexMeasuresTest{-3, 0, -3}, 5, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
+        VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 4, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
+        VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 5, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-3, 0, -3}, 6, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 1, std::vector<unsigned_id_type>{ 6 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 1, -1}, 2, std::vector<unsigned_id_type>{ 6 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-3, 0, -3}, 3, std::vector<unsigned_id_type>{ 6 }, ContractionParameters{11, 5, 1, 1, 0}},
-        VertexMeasuresTestParameters{VertexMeasuresTest{-3, 1, -2}, 4, std::vector<unsigned_id_type>{ 6 }, ContractionParameters{11, 5, 1, 1, 0}},
+        VertexMeasuresTestParameters{VertexMeasuresTest{-2, 1, -1}, 4, std::vector<unsigned_id_type>{ 6 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 1, -1}, 5, std::vector<unsigned_id_type>{ 6 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 1, -1}, 1, std::vector<unsigned_id_type>{ 6, 3 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 1, -1}, 2, std::vector<unsigned_id_type>{ 6, 3 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 0}, 4, std::vector<unsigned_id_type>{ 6, 3 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 0}, 5, std::vector<unsigned_id_type>{ 6, 3 }, ContractionParameters{11, 5, 1, 1, 0}},
-        VertexMeasuresTestParameters{VertexMeasuresTest{-3, 1, -2}, 3, std::vector<unsigned_id_type>{ 4 }, ContractionParameters{11, 5, 1, 1, 0}},
+        VertexMeasuresTestParameters{VertexMeasuresTest{-4, 1, -3}, 3, std::vector<unsigned_id_type>{ 4 }, ContractionParameters{11, 5, 1, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-3, 1, -2}, 5, std::vector<unsigned_id_type>{ 4 }, ContractionParameters{11, 5, 1, 1, 0}}, // DN of one edge + reverse edge.
-        VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 0}, 3, std::vector<unsigned_id_type>{ 4, 5 }, ContractionParameters{11, 5, 1, 1, 0}}, // DN for two reverse edges.
+        VertexMeasuresTestParameters{VertexMeasuresTest{-3, 2, -1}, 3, std::vector<unsigned_id_type>{ 4, 5 }, ContractionParameters{11, 5, 1, 1, 0}}, // DN for two reverse edges.
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 0}, 5, std::vector<unsigned_id_type>{ 4, 3 }, ContractionParameters{11, 5, 1, 1, 0}}, // DN for two edges.
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -4}, 1, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 2, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -6}, 2, std::vector<unsigned_id_type>{}, ContractionParameters{11, 5, 3, 1, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 2}, 4, std::vector<unsigned_id_type>{ 6, 3 }, ContractionParameters{11, 5, 2, 3, 0}},
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 2, 6}, 5, std::vector<unsigned_id_type>{ 6, 3 }, ContractionParameters{11, 5, 0, 3, 0}},
-        VertexMeasuresTestParameters{VertexMeasuresTest{-3, 1, -15}, 3, std::vector<unsigned_id_type>{ 4 }, ContractionParameters{11, 5, 5, 0, 0}}
+        VertexMeasuresTestParameters{VertexMeasuresTest{-4, 1, -20}, 3, std::vector<unsigned_id_type>{ 4 }, ContractionParameters{11, 5, 5, 0, 0}}
     )
 );
 

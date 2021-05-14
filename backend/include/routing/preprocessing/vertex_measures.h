@@ -50,7 +50,7 @@ private:
 template <typename Graph>
 int32_t VertexMeasures<Graph>::CalculateEdgeDifference(Vertex& vertex) {
     auto&& shortcuts = shortcut_finder_.FindShortcuts(vertex);
-    return CalculateEdgeDifference(vertex, shortcuts.new_edges);
+    return CalculateEdgeDifference(vertex, shortcuts);
 }
 
 template <typename Graph>
@@ -84,7 +84,7 @@ int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
 template <typename Graph>
 inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
     auto&& shortcuts = shortcut_finder_.FindShortcuts(vertex);
-    return CalculateContractionAttractivity(vertex, shortcuts.new_edges);
+    return CalculateContractionAttractivity(vertex, shortcuts);
 }
 
 template <typename Graph>

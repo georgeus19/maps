@@ -4,7 +4,6 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/preprocessing/shortcut_finder.h"
-#include "routing/preprocessing/shortcut_container.h"
 #include <vector>
 #include <set>
 #include <queue>
@@ -34,7 +33,7 @@ private:
     VertexMeasures<Graph> vertex_measures_;
     unsigned_id_type free_ordering_rank_;
 
-    void AddShortcuts(ShortcutContainer<Edge>&& shortcuts);
+    void AddShortcuts(std::vector<Edge>&& shortcuts);
 
     double CalculateOverlayGraphAverageDegree() const;
 };
@@ -73,7 +72,7 @@ void GraphContractor<Graph>::ContractGraph() {
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractVertex(Vertex & vertex) {
-    ShortcutContainer<Edge> shortcuts = shortcut_finder_.FindShortcuts(vertex);
+    std::vector<Edge> shortcuts = shortcut_finder_.FindShortcuts(vertex);
     AddShortcuts(std::move(shortcuts));
     // vertex.SetContracted();
     vertex.set_ordering_rank(++free_ordering_rank_);
@@ -85,7 +84,7 @@ template <typename Graph>
 void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQueue& q) {
     assert(!q.empty());
 
-    ShortcutContainer<Edge> shortcuts;
+    std::vector<Edge> shortcuts;
     unsigned_id_type vertex_id;
     if (q.size() != 1) {
         while(true) {
@@ -94,7 +93,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
             q.pop();
             double priority_threshold = q.top().first;
             shortcuts = shortcut_finder_.FindShortcuts(vertex);
-            double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts.new_edges);
+            double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts);
             if (new_priority <= priority_threshold) {
                 break;
             }
@@ -127,29 +126,9 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
 }
 
 template <typename Graph>
-void GraphContractor<Graph>::AddShortcuts(ShortcutContainer<Edge>&& shortcuts) {
-    for(auto&& edge : shortcuts.new_edges) {
+void GraphContractor<Graph>::AddShortcuts(std::vector<Edge>&& shortcuts) {
+    for(auto&& edge : shortcuts) {
         g_.AddEdge(std::move(edge));
-    }
-
-    for(auto&& shortcut : shortcuts.improving_edges) {
-        Edge backward_shortcut = shortcut;
-        if (backward_shortcut.IsForward()) {
-            backward_shortcut.SetBackward();
-        }
-        backward_shortcut.Reverse();
-
-        auto&& source_vertex = g_.GetVertex(shortcut.get_from());
-        Edge& edge = source_vertex.FindEdge([&](const Edge& e) {
-            return e.get_to() == shortcut.get_to();
-        });
-        edge.Swap(shortcut);
-
-        auto&& backward_source_vertex = g_.GetVertex(backward_shortcut.get_from());
-        Edge& backward_edge = backward_source_vertex.FindBackwardEdge([&](const Edge& e) {
-            return e.get_to() == backward_shortcut.get_to();
-        });
-        backward_edge.Swap(backward_shortcut);
     }
 }
 
@@ -172,8 +151,8 @@ double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
     return ((double)deg) / ((double)count);
 }
 
-}
-}
 
 
+}
+}
 #endif //BACKEND_GRAPH_CONTRACTOR_H

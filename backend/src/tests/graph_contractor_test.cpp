@@ -50,7 +50,7 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(2, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 2, 6, 8}}),
         std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 4, 3}, CHPreprocessingEdge{1, 3, 5, 5}, CHPreprocessingEdge{1, 3, 6, 9}}),
         std::make_tuple(4, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 4, 3, 2}, CHPreprocessingEdge{1, 4, 5, 2}, CHPreprocessingEdge{1, 4, 6, 6}}),
-        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 6}}),
+        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 3, 7}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 6}}),
         std::make_tuple(6, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 6, 5, 3}})
     )
 );
@@ -73,7 +73,7 @@ TEST_P(GraphContractorSimpleEdgesTests, SimpleCHPreprocessingEdgesTest) {
         actual.push_back(e);
      });
     
-    EXPECT_THAT(actual, testing::ElementsAreArray(expected));
+    EXPECT_THAT(actual, testing::UnorderedElementsAreArray(expected));
 }
 
 class GraphContractorSimpleBackwardEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<CHPreprocessingEdge>>> {
@@ -92,6 +92,7 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(3, std::vector<CHPreprocessingEdge> { 
             CHPreprocessingEdge{1, 3, 1, 2, CHPreprocessingEdge::EdgeType::backward},
             CHPreprocessingEdge{1, 3, 4, 2, CHPreprocessingEdge::EdgeType::backward},
+            CHPreprocessingEdge{1, 3, 5, 7, CHPreprocessingEdge::EdgeType::backward},
             CHPreprocessingEdge{1, 3, 5, 6, CHPreprocessingEdge::EdgeType::backward}
         }),
         std::make_tuple(5, std::vector<CHPreprocessingEdge> { 
@@ -131,7 +132,7 @@ TEST_P(GraphContractorSimpleBackwardEdgesTests, SimpleContractionBackwardEdgesTe
         actual.push_back(e);
     });
 
-    EXPECT_THAT(actual, testing::ElementsAreArray(expected));
+    EXPECT_THAT(actual, testing::UnorderedElementsAreArray(expected));
 }
 
 class GraphContractorDoubleContractionEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<CHPreprocessingEdge>>> {
@@ -149,9 +150,9 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         std::make_tuple(1, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 1, 2, 2}, CHPreprocessingEdge{1, 1, 3, 2}}),
         std::make_tuple(2, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 2, 6, 8}}),
-        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 4, 3}, CHPreprocessingEdge{1, 3, 5, 5}, CHPreprocessingEdge{1, 3, 6, 7}}),
+        std::make_tuple(3, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 3, 4, 3}, CHPreprocessingEdge{1, 3, 5, 5}, CHPreprocessingEdge{1, 3, 6, 9}, CHPreprocessingEdge{1, 3, 6, 7}}),
         std::make_tuple(4, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 4, 3, 2}, CHPreprocessingEdge{1, 4, 5, 2}, CHPreprocessingEdge{1, 4, 6, 6}}),
-        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 6}}),
+        std::make_tuple(5, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 5, 4, 4}, CHPreprocessingEdge{1, 5, 6, 2}, CHPreprocessingEdge{1, 5, 3, 7}, CHPreprocessingEdge{1, 5, 3, 6}}),
         std::make_tuple(6, std::vector<CHPreprocessingEdge> { CHPreprocessingEdge{1, 6, 5, 3}, CHPreprocessingEdge{1, 6, 3, 9}})
     )
 );
@@ -178,7 +179,7 @@ TEST_P(GraphContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
         actual.push_back(e);
         e.Print();
     });
-    EXPECT_THAT(actual, testing::ElementsAreArray(expected));
+    EXPECT_THAT(actual, testing::UnorderedElementsAreArray(expected));
 }
 
 void ContractVertex(G& g, GraphContractor<G> & contractor, size_t id) {
@@ -193,8 +194,8 @@ TEST(GraphContractorContractionPriority, BasicGraphPriority) {
         std::make_pair(-2, 1),
         std::make_pair(-2, 2),
         std::make_pair(-3, 3),
-        std::make_pair(-3, 4),
-        std::make_pair(-3, 5),
+        std::make_pair(-2, 4),
+        std::make_pair(-2, 5),
         std::make_pair(-3, 6)
     };
 

@@ -21,7 +21,6 @@
 #include "routing/preprocessing/contraction_parameters.h"
 #include "tsl/robin_set.h"
 #include "tsl/robin_map.h"
-#include "routing/preprocessing/shortcut_container.h"
 #include "routing/preprocessing/shortcut_filter.h"
 
 namespace routing {
@@ -34,7 +33,7 @@ class ShortcutFinder {
 public:
     ShortcutFinder(Graph& g, const ContractionParameters& p);
 
-    ShortcutContainer<Edge> FindShortcuts(Vertex& vertex);
+    std::vector<Edge> FindShortcuts(Vertex& vertex);
 
     std::vector<Edge> FindShortcuts(Vertex& contracted_vertex, const Edge& backward_former_edge); 
 
@@ -59,7 +58,7 @@ ShortcutFinder<Graph>::ShortcutFinder(Graph& g, const ContractionParameters& p) 
     g_(g), parameters_(p), dijkstra_(g) {}
 
 template <typename Graph>
-ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& vertex) {
+std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& vertex) {
     std::vector<Edge> shortcuts{};
     ShortcutFilter<Graph> filter{g_};
     vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
@@ -67,8 +66,7 @@ ShortcutContainer<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::F
         s = filter.FilterDuplicateShortcuts(s);
         shortcuts.insert(shortcuts.end(), std::make_move_iterator(s.begin()), std::make_move_iterator(s.end()));
     });
-    shortcuts = filter.MergeUnorderedShortcuts(shortcuts);
-    return filter.ClassifyShortcuts(std::move(shortcuts));
+    return filter.MergeUnorderedShortcuts(shortcuts);
 }
 
 template <typename Graph>

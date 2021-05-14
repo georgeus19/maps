@@ -9,7 +9,6 @@
 #include <queue>
 #include <cassert>
 #include "routing/preprocessing/contraction_parameters.h"
-#include "routing/preprocessing/shortcut_container.h"
 #include "utility/comparison.h"
 
 namespace routing {
@@ -35,13 +34,6 @@ public:
 
     std::vector<Edge> MergeUnorderedShortcuts(const std::vector<Edge>& shortcuts);
     
-    /**
-     * Classify shortcuts into `ShortcutContainer`.
-     * @see ShortcutContainer
-     */
-    ShortcutContainer<Edge> ClassifyShortcuts(std::vector<Edge>&& shortcuts);
-
-
 private:
     Graph& g_;
 
@@ -87,35 +79,6 @@ std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::MergeUn
         }
     }
     return unique_shortcuts;
-}
-
-template <typename Graph>
-ShortcutContainer<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::ClassifyShortcuts(std::vector<Edge>&& shortcuts) {
-    std::vector<Edge> new_edges;
-    std::vector<Edge> improve_edges;
-    for(auto&& shortcut : shortcuts) {
-        auto&& source_vertex = g_.GetVertex(shortcut.get_from());
-        bool new_edge = true;
-        bool improve = false;
-        source_vertex.ForEachEdge([&](Edge& edge) {
-            bool same_target = shortcut.get_to() == edge.get_to();
-            bool same_edge_type = shortcut.IsTwoway() == edge.IsTwoway(); 
-            if (same_target && same_edge_type) {
-                if (shortcut.get_length() < edge.get_length()) {
-                    improve = true;
-                } 
-                new_edge = false;
-            }
-        });
-        if (new_edge) {
-            new_edges.push_back(std::move(shortcut));
-        }
-        if (improve) {
-            improve_edges.push_back(std::move(shortcut));
-        }
-
-    }
-    return ShortcutContainer<Edge>{std::move(new_edges), std::move(improve_edges)};
 }
 
 template <typename Graph>
