@@ -103,7 +103,7 @@ public:
         database::DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
         DbGraph db_graph{};
         d.LoadFullGraph<TemporaryGraph>(graph_table_name, g, &db_graph);
-        d.LoadAdditionalVertexProperties(graph_table_name + "_vertex_ordering", g);
+        d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
         Graph search_graph{};
         search_graph.Load(g);
         return search_graph;
