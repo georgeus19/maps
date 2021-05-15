@@ -64,17 +64,17 @@ void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_inde
 }
 
 void GreenIndex::Normalize(double scale_max) {
-    double max_value = std::numeric_limits<double>::min();
     for(auto&& green_value : edge_green_values_) {
         if (green_value.valid) {
-            if (max_value < green_value.value) {
-                max_value = green_value.value;
+            if (green_value.value > 1) {
+                green_value.value = 1;
             }
-        }
-    }
-    for(auto&& green_value : edge_green_values_) {
-        if (green_value.valid) {
-            green_value.value /= max_value;
+            
+            // The lower, the better green index in routing so it is necessary to flip it.
+            // The create query gives green_fraction the higher, the better.
+            green_value.value = 1 - green_value.value;
+
+            // The value should be within [0, scale_max].
             green_value.value *= scale_max;
         }
     }
