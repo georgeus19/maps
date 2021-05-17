@@ -1,14 +1,42 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import './primaryPanel.css';
 import SearchInput from './searchInput.js'
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl'
+import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Camera, Search, PlusSquare, PlusCircle, Trash2 } from 'react-feather';
 import { point } from 'leaflet';
+import { Range } from 'react-range';
 
 const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
+
+function profileReducer(profile, action) {
+    const actions = new Map([
+        ['set', (p) => {
+            return p;
+        }],
+        ['update', (new_property) => {
+            return profile.map((prop) => {
+                if (prop.name === new_property.name) {
+                    return new_property;
+                } else {
+                    return prop;
+                }
+            })
+        }]    
+    ]);
+
+    if (actions.has(action.type)) {
+        return actions.get(action.type)(action.value);
+    } else {
+        console.error("Action for profile not recognized.", action);
+        return profile;
+    }
+}
+
+
 
 /**
  * Component `PrimaryPanel` contains a header, a body (=tab) and a footer.
@@ -18,6 +46,8 @@ const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
  */
 function PrimaryPanel(props) {
     let tab;
+
+    const [profile, dispatchProfile] = useReducer(profileReducer, []);
 
     if (props.currentTab === TabEnum.searchTab) {
         tab = <SearchTab
@@ -29,6 +59,7 @@ function PrimaryPanel(props) {
             currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
             pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
             route={props.route} setRoute={props.setRoute}
+            profile={profile} dispatchProfile={dispatchProfile}
         ></RoutingTab>;
     } else if (props.currentTab === TabEnum.exportTab) {
         tab = <ExportTab setCurrentPoint={props.setCurrentPoint}></ExportTab>;
@@ -61,7 +92,7 @@ function Header(props) {
 /**
  * Component `RoutingTab` consists of two containers. 
  * Former is `PointContainer` that lets user define a route.
- * Latter is `ConstraintContainer` that lets user define special constraints for the route (e.g. max altitude).
+ * Latter is `Profile` that lets user define special ProfilePropertys for the route (e.g. max altitude).
  * @param {*} props 
  */
 function RoutingTab(props) {
@@ -71,10 +102,12 @@ function RoutingTab(props) {
                 currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
                 pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
                 route={props.route} setRoute={props.setRoute}
+                profile={props.profile}
             ></PointContainer>
-            <ConstraintContainer
+            <Profile
+                profile={props.profile} dispatchProfile={props.dispatchProfile}
                 currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
-            ></ConstraintContainer>
+            ></Profile>
         </div>
     );
 }
@@ -90,13 +123,13 @@ function PointContainer(props) {
      * Sends a request to server to calculate the best route based on `points`.
      * @param {Array of pairs} points [[lon, lat], ...] 
      */
-    function findRoute(coordinates) {
+    function findRoute(coordinates, profile) {
         let coordinatesPairs = [];
         for (let i = 0; i < coordinates.length - 1; i++) {
             coordinatesPairs.push([coordinates[i], coordinates[i + 1]]);
         }
         Promise.all(coordinatesPairs.map((pair) => {
-            return fetch('/route?coordinates=' + JSON.stringify(pair), {
+            return fetch('/route?coordinates=' + JSON.stringify(pair) + '&profile=' + JSON.stringify(profile), {
                     method: 'GET',
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8'
@@ -155,7 +188,7 @@ function PointContainer(props) {
         console.log("coordinates: ", coordinates);
         if (coordinates.length > 1) {
             // Fetch data from server and set route.
-            findRoute(coordinates);
+            findRoute(coordinates, props.profile);
         } else {
             // Clear route.
             props.setRoute({data:[], key:props.route.key < 0 ? 1 : -1});
@@ -260,27 +293,95 @@ function AddPoint(props) {
 }
 
 /**
- * Component `ConstraintContainer` hadles all logic with respect to constrains. Not implemented yet.
  * @param {*} props 
  */
-function ConstraintContainer(props) {
+function Profile(props) {
+
+    const [allProperties, setAllProperties] = useState([]);
+
+    const getProfileProperties = () => {
+        fetch('/profile_properties', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return Promise.reject(response);
+        })
+        .then((data) => {
+            console.log(data);
+            if (data.ok) {
+                console.log('properties', data.profile_properties);
+                props.dispatchProfile({type:'set', value:data.profile_properties.map((property) => {
+                    return {name:property.name, importance:property.importance_options[0]};
+                })});
+                setAllProperties(data.profile_properties.map((property) => {
+                    return {name:property.name, importanceOptions:property.importance_options};
+                }));
+                console.log('profile', props.profile);
+            } else {
+                return Promise.reject(data.error);
+            }
+        })
+        .catch((error) => {
+            alert('Profile properties load failed!');
+            console.warn('Profile properties load failed!', error);
+        });
+    }
+
+    useEffect(() => {
+        getProfileProperties();
+    }, []);
+
+    
+
+    const properties = allProperties.map((property, index) => {
+        let importanceLabel;
+        let importance;
+        if (index < props.profile.length) {
+            importance = property.importanceOptions.indexOf(props.profile[index].importance);
+            importanceLabel = props.profile[index].importance;
+        } else {
+            importance = property.importanceOptions[0];
+            importanceLabel = 0;
+        }
+        return {name:property.name, importance:importance, importanceLabel:importanceLabel, importanceOptions:property.importanceOptions}
+    }).filter((property) => {
+        return property.importanceOptions.length > 1;
+    }).map((property) => {
+        return <ProfileProperty name={property.name} importance={property.importance} importanceLabel={property.importanceLabel}
+            importanceOptions={property.importanceOptions} dispatchProfile={props.dispatchProfile} ></ProfileProperty>
+    });
+
     return (
-        <div className="ConstraintContainer" onFocus={() => {} /* props.setCurrentPoint(-1) */}>
-            <Constraint></Constraint>
-            <Constraint></Constraint>
+        <div className="Profile" onFocus={() => {} /* props.setCurrentPoint(-1) */}>
+            {properties}
         </div>
     );
 }
 
 /**
- * Not yet implemented.
  * @param {*} props 
  */
-function Constraint(props) {
+function ProfileProperty(props) {
+    const [initial, ...rest] = props.name;
+    const name = [initial.toUpperCase(), ...rest].join('');
+
+    const onChange = (e) => {
+        props.dispatchProfile({type:'update', value:{name:props.name, importance:props.importanceOptions[e.target.value]}});
+    }
     return (
-        <div className="Constraint">
-            <input type="range" min="0" max="10"></input>
-            <Button>constraint placeholder...</Button>
+        <div className="ProfileProperty">
+            <Form>
+            <Form.Group controlId={name}>
+                <Form.Label>{name} importance {props.importanceLabel}%</Form.Label>
+                <Form.Control type='range' min='0' max={props.importanceOptions.length - 1} value={props.importance} onChange={onChange} step='1' />
+            </Form.Group>
+            </Form>
         </div>
     );
 }
