@@ -31,6 +31,9 @@ work_mem 16MB
 maintenance_work_mem 128MB
 wal_buffers = 1MB
 
+Stylesheet:
+necessary to set y_0=0 in line 3 to y_0=0.0!!
+
 
 \copy (select uid, from_node, to_node, length, contracted_vertex from abc) to '/home/hrubyk/projects/maps/backend/build/graph.csv' with csv
 
