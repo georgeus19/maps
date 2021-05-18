@@ -131,6 +131,20 @@ public:
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
 
+class InvalidArgumentException : public std::exception {
+    std::string message_;
+public:
+    InvalidArgumentException();
+    InvalidArgumentException(const std::string & message);
+    InvalidArgumentException(std::string && message);
+    InvalidArgumentException(const InvalidArgumentException & other) = default;
+    InvalidArgumentException(InvalidArgumentException && other) = default;
+    InvalidArgumentException & operator=(const InvalidArgumentException & other) = default;
+    InvalidArgumentException & operator=(InvalidArgumentException && other) = default;
+    ~InvalidArgumentException() = default;
+
+    const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
+};
 
 }
 

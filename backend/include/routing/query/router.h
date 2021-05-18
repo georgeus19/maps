@@ -31,8 +31,8 @@ namespace query {
 template <typename Setup>
 class Router {
 public:
-    Router(typename Setup::Graph& graph, const std::string& graph_table_name) 
-        : base_graph_(graph), base_graph_max_vertex_id_(graph.GetMaxVertexId()), base_graph_max_edge_id_(graph.GetMaxEdgeId()) {}
+    Router(typename Setup::Graph&& graph, const std::string& graph_table_name) 
+        : base_graph_(std::move(graph)), base_graph_max_vertex_id_(base_graph_.GetMaxVertexId()), base_graph_max_edge_id_(base_graph_.GetMaxEdgeId()) {}
 
     std::string CalculateShortestRoute(const std::string& table_name, utility::Point source, utility::Point target) {
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {

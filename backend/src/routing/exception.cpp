@@ -77,6 +77,15 @@ const char* ParseException::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW 
     return message_.c_str();
 }
 
+InvalidArgumentException::InvalidArgumentException() : message_("Invalid value accessed.") {}
+
+InvalidArgumentException::InvalidArgumentException(const string & message) : message_(message) {}
+
+InvalidArgumentException::InvalidArgumentException(std::string && message) : message_(move(message)) {}
+
+const char* InvalidArgumentException::what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW {
+    return message_.c_str();
+}
 
 
 }
