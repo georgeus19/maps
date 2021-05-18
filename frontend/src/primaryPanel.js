@@ -96,34 +96,11 @@ function Header(props) {
  * @param {*} props 
  */
 function RoutingTab(props) {
-    return (
-        <div className="Tab">
-            <PointContainer 
-                currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
-                pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
-                route={props.route} setRoute={props.setRoute}
-                profile={props.profile}
-            ></PointContainer>
-            <Profile
-                profile={props.profile} dispatchProfile={props.dispatchProfile}
-                currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
-            ></Profile>
-        </div>
-    );
-}
-
-/**
- * Component `PointContainer` provides functionality for defining a route.
- * User can fill in selects/ inputs to search for a point (startpoint, endpoint).
- * User can add more points that make a route.
- * @param {*} props 
- */
-function PointContainer(props) {
     /**
      * Sends a request to server to calculate the best route based on `points`.
      * @param {Array of pairs} points [[lon, lat], ...] 
      */
-    function findRoute(coordinates, profile) {
+     function findRoute(coordinates, profile) {
         let coordinatesPairs = [];
         for (let i = 0; i < coordinates.length - 1; i++) {
             coordinatesPairs.push([coordinates[i], coordinates[i + 1]]);
@@ -194,8 +171,32 @@ function PointContainer(props) {
             props.setRoute({data:[], key:props.route.key < 0 ? 1 : -1});
         }
 
-    }, [props.pathPoints]);
+    }, [props.pathPoints, props.profile]);
 
+    return (
+        <div className="Tab">
+            <PointContainer 
+                currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
+                pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
+                route={props.route} setRoute={props.setRoute}
+                profile={props.profile}
+            ></PointContainer>
+            <Profile
+                profile={props.profile} dispatchProfile={props.dispatchProfile}
+                currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
+            ></Profile>
+        </div>
+    );
+}
+
+/**
+ * Component `PointContainer` provides functionality for defining a route.
+ * User can fill in selects/ inputs to search for a point (startpoint, endpoint).
+ * User can add more points that make a route.
+ * @param {*} props 
+ */
+function PointContainer(props) {
+    
     // Create an array of `PathPoint` where between all adjacent ones is placed AddPoint.
     // -> `PathPoint`,`AddPoint`,`PathPoint`, ...
     let points=[];  
