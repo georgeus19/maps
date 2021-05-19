@@ -65,7 +65,7 @@ public:
         std::string geojson_array = d.GetRouteCoordinates(route, setup.get_edges_table_name());
         std::cout << "GetRouteCoordinates" << std::endl;
 
-        std::string final_array = "[" + first_edge_geometry + geojson_array + "," + last_edge_geometry + "]";
+        std::string final_array = "[" + first_edge_geometry + "," + geojson_array + last_edge_geometry + "]";
         std::cout << "Routing done." << std::endl;
         return final_array;
     }

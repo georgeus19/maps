@@ -9,6 +9,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Camera, Search, PlusSquare, PlusCircle, Trash2 } from 'react-feather';
 import { point } from 'leaflet';
 import { Range } from 'react-range';
+var FileSaver = require('file-saver');
+var togpx = require('togpx');
 
 const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
 
@@ -62,7 +64,9 @@ function PrimaryPanel(props) {
             profile={profile} dispatchProfile={dispatchProfile}
         ></RoutingTab>;
     } else if (props.currentTab === TabEnum.exportTab) {
-        tab = <ExportTab setCurrentPoint={props.setCurrentPoint}></ExportTab>;
+        tab = <ExportTab setCurrentPoint={props.setCurrentPoint}
+            route={props.route}
+        ></ExportTab>;
     }
 
     return (    
@@ -134,7 +138,23 @@ function RoutingTab(props) {
                 });
         }))
         .then((routes) => {
-            const joinedRoute = routes.flat(1);
+            console.log("routes.flat(); ", routes.flat(1));
+            const unordered_coordinates = routes.flat(1);
+            const equals = (a, b) => { const eps = 0.00001; return (a + eps >= b) && (a - eps <= b)};
+            for (let i = 0; i < unordered_coordinates.length - 1; i++) {
+                const formerCoordinates = unordered_coordinates[i].coordinates[c[i].coordinates.length-1];
+                const latterCoordinates = unordered_coordinates[i+1].coordinates[0];
+                if (!equals(formerCoordinates[0], latterCoordinates[0]) || !equals(formerCoordinates[1], latterCoordinates[1])) {
+                    unordered_coordinates[i+1].coordinates = unordered_coordinates[i+1].coordinates.reverse();
+                }
+            }
+            const coordinates = unordered_coordinates.map((linestring) => {
+                return linestring.coordinates;
+            }).flat(1);
+            const joinedRoute = {
+                'type': 'LineString',
+                'coordinates': coordinates
+            };
             props.setRoute({data:joinedRoute, key:props.route.key < 0 ? 1 : -1});
             console.log("routes ", routes);
             console.log("joinedRoute ", joinedRoute);
@@ -458,34 +478,7 @@ function ExportTab(props) {
 
     return (
         <div className="Tab">
-            <ExportContainer/>
-            <ImportContainer/>
-        </div>
-    );
-}
-
-/**
- * Not yet implemented.
- * @param {*} props 
- */
-function ImportContainer(props) {
-    return (
-        <div className="ExportContainer">
-            <p>Import path:</p>
-            <Import></Import>
-
-        </div>
-    );
-}
-
-/**
- * Not yet implemented.
- * @param {*} props 
- */
-function Import(props) {
-    return (
-        <div>
-            <FormControl></FormControl>
+            <ExportContainer route={props.route} />
         </div>
     );
 }
@@ -498,7 +491,7 @@ function ExportContainer(props) {
     return (
         <div className="ExportContainer"> 
             <p>Export path:</p>
-            <Export></Export>
+            <ExportButton route={props.route} ></ExportButton>
         </div>
     );
 }
@@ -507,10 +500,27 @@ function ExportContainer(props) {
  * Not yet implemented.
  * @param {*} props 
  */
-function Export(props) {
+function ExportButton(props) {
+    const exportRoute = () => {
+        // const features = props.route.data.map((linestring) => {
+        //     return {
+        //         'type': 'Feature',
+        //         'geometry': linestring
+        //     };
+        // });
+        // const geojson = {
+        //     'type': 'FeatureCollection',
+        //     'features': features
+        // };
+        console.log('route', props.route.data);
+        const gpx = togpx(props.route.data);
+        console.log('gpx', gpx);
+        var blob = new Blob([gpx], {type: "text/plain;charset=utf-8"});
+        FileSaver.saveAs(blob, "route.gpx");
+    };
     return (
         <div>
-            <Button>Export</Button>
+            <Button onClick={exportRoute} >Export</Button>
         </div>
     );
 }

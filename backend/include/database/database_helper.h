@@ -245,7 +245,7 @@ private:
 template <typename Edge>
 std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const std::string & table_name) {
 
-    std::string sql_start = " SELECT ST_AsGeoJSON(geog) " \
+    std::string sql_start = " SELECT uid, ST_AsGeoJSON(geog) " \
                             " FROM " + table_name + " WHERE ";
     // Define fold function for std::accumulate.
     auto fold = [](std::string a, Edge e) {
@@ -261,13 +261,21 @@ std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const 
     pqxx::nontransaction n(connection_);
     pqxx::result result{n.exec(complete_sql)};
 
-    // Get all GeoJSON geometries in one string separated by comma.
-    auto comma_fold = [](std::string a, pqxx::result::const_iterator it) {
-        return std::move(a) + ',' + it[0].as<std::string>();
-    };
-    std::string geojson_list_start = "";
-    std::string geojson_list_result = std::accumulate(result.begin(), result.end(), geojson_list_start, comma_fold);
-    return geojson_list_result;
+    std::unordered_map<uint64_t, std::string> geometries{};
+    for(auto it = result.begin(); it != result.end(); ++it) {
+        geometries.emplace(it[0].as<uint64_t>(), it[1].as<std::string>());
+    }
+    std::string geojson = "";
+    for(auto&& edge : edges) {
+        auto&& nh = geometries.extract(edge.get_uid());
+        if (!nh.empty()) {
+            geojson += std::move(nh.mapped());
+            geojson += ",";
+        } else {
+            std::cout << edge.get_uid() << " not found in czedges but is part of routing result." << std::endl;
+        }
+    }
+    return geojson;
 }
 
 /**

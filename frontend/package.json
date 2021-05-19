@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^7.1.2",
     "bootstrap": "^4.5.0",
     "carto": "^1.2.0",
+    "file-saver": "^2.0.5",
     "formik": "^2.1.5",
     "gulp": "^4.0.2",
     "gulp-inline-source": "^4.0.0",
@@ -26,7 +27,8 @@
     "react-scripts": "3.4.1",
     "react-select": "^3.1.0",
     "react-select-input": "^1.0.5",
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "togpx": "^0.5.4"
   },
   "scripts": {
     "start": "react-scripts start",

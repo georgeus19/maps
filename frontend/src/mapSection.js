@@ -259,8 +259,8 @@ function MapContainer(props) {
             attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
         /> 
         {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1, false)}
-        {props.currentTab === TabEnum.routeTab && routeMarkers}
-        {props.currentTab === TabEnum.routeTab && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
+        {(props.currentTab === TabEnum.routeTab || props.currentTab === TabEnum.exportTab) && routeMarkers}
+        {(props.currentTab === TabEnum.routeTab || props.currentTab === TabEnum.exportTab) && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
     </Map>;
     // (
        /*/  Map using tiles from osm server.
