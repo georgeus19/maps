@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import './searchInput.css';
+import './primaryPanel.css'
 import Select from "react-select";
 import AsyncSelect from "react-select/async"
 import Dropdown from 'react-bootstrap/Dropdown'
@@ -98,24 +99,22 @@ function SearchInput(props) {
     }
 
     return (
-        <div className="SearchInput">
             <Select 
+                className="SearchInput"
                 defaultValue=""
-                className="Select"
                 menuIsOpen={menuOpen}
                 onFocus={() => {props.handleClick();  }}
                 onChange={handleOnChange}
                 options={placeOptions}
                 inputValue={props.text}
+                placeholder={props.placeholder}
                 // value={{value:props.text, label:props.text}}
                 filterOption={() => true} // Always show all options.
                 onInputChange={handleInputChange}
+                onClick={(e) => {e.target.select();}}
              />
-            {props.children}
-            <Button onClick={() => { setSearch(!search); /*fetchPlaces(props.text) */}}><Search/></Button>
-            
-        </div>
     );
 }
+//<Button className="GreenButton" onClick={() => { setSearch(!search); /*fetchPlaces(props.text) */}}><Search/></Button>
 
 export default SearchInput;

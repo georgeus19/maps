@@ -1,13 +1,13 @@
 .SearchInput {
-    padding: 1%;
-    display: flex;
-    flex-direction: row;
-    width:100%;
+    /* padding: 5px; */
+    /* display: flex; */
+    /* flex-direction: row; */
+    /* box-sizing: border-box; */
+    width: 300px;
+    /* max-width: 300px; */
 }
 
-.Select{
-    width: 70%;
-    max-width: 300px;
-    font-size: 13px;
-    /* background: var(--bground); */
+.SearchContainer > .SearchInput {
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -43,7 +43,7 @@ function MapContainer(props) {
      * Represents current view of the map editor. It is used to change the view of the
      * map editor to have newly created point in the center of the map editor.
      */
-    const [viewport, setViewport] = useState({center:[49.7315809334801,13.384550088168409], zoom:13});
+    const [viewport, setViewport] = useState({center:[49.7315809334801,13.384550088168409], zoom:10});
 
     /**
      * Represents marker element for search point from the search tab.
@@ -164,35 +164,14 @@ function MapContainer(props) {
             }
         }
         console.log("distances ", distances);
-        
-
 
         console.log("index of moved marker: ", minIndex);
-        // props.setCurrentPoint(minIndex);
         if (minDistance === Number.MAX_VALUE) {
             console.log("SOMETHING DID NOT PAN OUT WITH DRAGGED MARKER: ", e);
         }
         setPoint(to.lng, to.lat, minIndex);
         
     }
-
-    // function handleRouteMarkerDragstart(e) {
-    //     let index = 0;
-    //     let found = false;
-
-    //     props.pathPoints.filter((point) => {           
-    //         if (e.target._latlng.lat === point.latLon[0] && e.target._latlng.lng === point.latLon[1]) {
-    //             found = true;
-    //             return true;
-    //         } 
-    //         if (found === false) {
-    //             ++index;
-    //         }
-    //     });
-        
-    //     setDraggedRouteMarker(index);
-    // }
-
 
     /**
      * Create a marker element with predefined `markerIcon`. 

@@ -3,8 +3,7 @@
 .PrimaryPanel {
     box-sizing: border-box;
     text-align: center;
-    width: 20%;
-    /* background-color: var(--bground); */
+    width: 420px;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -16,17 +15,16 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    /* background-color: var(--bground); */
     height: 100%;
-    overflow:scroll;
+    overflow:auto;
     
   }
 
 .PointContainer {
+    margin-top: 30px;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    /* background-color: var(--bground); */
     flex-direction: column;
     width: 100%;
 }
@@ -36,81 +34,104 @@
     width: 100%;
     display: flex;
     flex-direction: row;
-    /* background-color: var(--bground); */
 }
 
 .PathPoint {
-    padding: 1%;
+    padding: 5px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: row;
-    width: 100%;
-    /* background:var(--bground); */
+    /* background-color: aqua; */
+    width: 360px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.ConstraintContainer {
+.PathPoint Button {
+    width: 50px;
+}
+
+.Profile {
+    margin-top: 30px;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    /* background-color: var(--bground); */
     flex-direction: column;
 }
 
-.Constraint {
-    padding: 1%;
+.ProfileProperty {
+    width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.GreenButton {
+    background-color: yellowgreen;
+    box-sizing: border-box;
+    border-color: yellowgreen;
+    color:dimgray;
+    outline: none;
+    box-shadow:none
+}
+
+.GreenButton:focus {
+    background-color: yellowgreen;
+    border-color: yellowgreen;
+    color: dimgray;
+    outline: none;
+    box-shadow:none
+}
+
+.GreenButton:hover {
+    background-color: #29ac07;
+    color: dimgray;
+    outline: none;
+    box-shadow:none
+}
+
+.GreenButton:active {
+    background-color:coral;
+    outline: none;
+}
+
+.Label {
+    color: dimgray;
 }
 
 .HeaderOption{
     height: 48px;
+    padding: 5px;
     display: inline-block;
     white-space: nowrap;
+    box-sizing: border-box;
     border: none;
-    color: #6b7580;
     padding: 0;
-    /* background-color: #edeb5a; */
     text-decoration: none;
-    width: 33.33%;
+    width: 140px;
     position: relative;
     margin: 0;
 }
-
-.HeaderOption.active {
-    color: #fff;
-    background: #29ac07;
-    position: relative;
-}
-
-.HeaderOption:hover {background-color: #3e8e41}
-
 
 .ImportContainer {
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    /* background-color: var(--bground); */
     flex-direction: column;
-}
-
-.Import {
-    padding: 1%;
 }
 
 .ExportContainer {
+    margin-top: 30px;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    /* background-color: var(--bground); */
     flex-direction: column;
 }
 
-.Export {
-    padding: 1%;
-}
-
 .SearchContainer {
+    margin-top: 30px;
     text-align: center;
     box-sizing: border-box;
     display: flex;
-    /* background-color: var(--bground); */
     flex-direction: column;
 }
 

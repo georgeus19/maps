@@ -84,11 +84,12 @@ function PrimaryPanel(props) {
  * @param {*} props 
  */
 function Header(props) {
+
     return (
         <div className="Header" onClick={() => {} /* props.setCurrentPoint(-1) */ }>
-            <Button className="HeaderOption" onClick={() => props.setTab(TabEnum.searchTab)}>Search</Button>
-            <Button className="HeaderOption" onClick={() => props.setTab(TabEnum.routeTab)}>Route</Button>
-            <Button className="HeaderOption" onClick={() => props.setTab(TabEnum.exportTab)}>Import/ Export</Button>
+            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.searchTab ? 'selected' : ''}`} onClick={() => props.setTab(TabEnum.searchTab)}>Search</Button>
+            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.routeTab ? 'selected' : ''}`} onClick={() => props.setTab(TabEnum.routeTab)}>Route</Button>
+            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.exportTab ? 'selected' : ''}`} onClick={() => props.setTab(TabEnum.exportTab)}>Export</Button>
         </div>
     )
 }
@@ -142,7 +143,7 @@ function RoutingTab(props) {
             const unordered_coordinates = routes.flat(1);
             const equals = (a, b) => { const eps = 0.00001; return (a + eps >= b) && (a - eps <= b)};
             for (let i = 0; i < unordered_coordinates.length - 1; i++) {
-                const formerCoordinates = unordered_coordinates[i].coordinates[c[i].coordinates.length-1];
+                const formerCoordinates = unordered_coordinates[i].coordinates[unordered_coordinates[i].coordinates.length - 1];
                 const latterCoordinates = unordered_coordinates[i+1].coordinates[0];
                 if (!equals(formerCoordinates[0], latterCoordinates[0]) || !equals(formerCoordinates[1], latterCoordinates[1])) {
                     unordered_coordinates[i+1].coordinates = unordered_coordinates[i+1].coordinates.reverse();
@@ -234,7 +235,6 @@ function PointContainer(props) {
     console.log(props.pathPoints.length);
     return (
         <div className="PointContainer" >
-            <p>Select path points:</p>
             {points}
         </div>
             
@@ -279,6 +279,22 @@ function PathPoint(props) {
         setText(props.pointName);
     }, [props.pointName]);
 
+    let placeholder;
+    if (props.index === 0) {
+        placeholder = 'Enter route start...';
+    } else if (props.index === props.pointCount - 1) {
+        placeholder = 'Enter route end...';
+    } else {
+        placeholder = 'Enter route point...'
+    }
+
+    const trashHandleClick = (e) => {
+        props.dispatchPoints({type:'delete', index:props.index});
+        if (props.pointCount <= 2) {
+            props.dispatchPoints({type:'insert', value:{name:'', latLon:[null, null]}, index:props.index});
+        } 
+    }
+
     return(
         <div className="PathPoint">
             <SearchInput 
@@ -287,12 +303,13 @@ function PathPoint(props) {
                 showOnMap={(place) => showOnMap(place)}
                 text={text} setText={setText}
                 handleClick={() => props.setCurrentPoint(props.index)}
+                placeholder={placeholder}
             >
-                  {props.pointCount > 2 && <Button onClick={(e) => props.dispatchPoints({type:'delete', index:props.index})}>
-                  <Trash2/>
-                  </Button>}
             
             </SearchInput>
+            <Button className="GreenButton" onClick={trashHandleClick}>
+                <Trash2/>
+            </Button>
         </div>
     );
 }
@@ -304,7 +321,7 @@ function PathPoint(props) {
 function AddPoint(props) {
     return(
         <div className="AddPoint" onClick={() => {} /* props.setCurrentPoint(-1) */}>
-            <Button  onClick={() => {
+            <Button className="GreenButton" onClick={() => {
                 props.dispatchPoints({type:'insert', value:{name:'', latLon:[null, null]}, index:props.nextPointIndex});
                 props.setCurrentPoint(props.nextPointIndex);
              }}><PlusSquare/></Button>
@@ -399,7 +416,7 @@ function ProfileProperty(props) {
         <div className="ProfileProperty">
             <Form>
             <Form.Group controlId={name}>
-                <Form.Label>{name} importance {props.importanceLabel}%</Form.Label>
+                <Form.Label className="Label">{name} importance {props.importanceLabel}%</Form.Label>
                 <Form.Control type='range' min='0' max={props.importanceOptions.length - 1} value={props.importance} onChange={onChange} step='1' />
             </Form.Group>
             </Form>
@@ -456,15 +473,18 @@ function SearchContainer(props) {
     function showOnMap(place) {
         props.dispatchSearchPoint({type:'render', place:place.value});
     }
+
+    const placeholder = 'Select place to search...'
+
     return (
         <div className="SearchContainer">
-            <p>Search map:</p>
             <SearchInput
                 searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
                 selectedPlace={props.searchPoint.address} setSelectedPlace={(t) => {}}
                 showOnMap={(place) => showOnMap(place)}
                 text={text} setText={setText}
                 handleClick={() => {}}
+                placeholder={placeholder}
             ></SearchInput>
         </div>
     );
@@ -490,7 +510,6 @@ function ExportTab(props) {
 function ExportContainer(props) {
     return (
         <div className="ExportContainer"> 
-            <p>Export path:</p>
             <ExportButton route={props.route} ></ExportButton>
         </div>
     );
@@ -502,16 +521,6 @@ function ExportContainer(props) {
  */
 function ExportButton(props) {
     const exportRoute = () => {
-        // const features = props.route.data.map((linestring) => {
-        //     return {
-        //         'type': 'Feature',
-        //         'geometry': linestring
-        //     };
-        // });
-        // const geojson = {
-        //     'type': 'FeatureCollection',
-        //     'features': features
-        // };
         console.log('route', props.route.data);
         const gpx = togpx(props.route.data);
         console.log('gpx', gpx);
@@ -520,7 +529,7 @@ function ExportButton(props) {
     };
     return (
         <div>
-            <Button onClick={exportRoute} >Export</Button>
+            <Button className="GreenButton" onClick={exportRoute} >Export route</Button>
         </div>
     );
 }
