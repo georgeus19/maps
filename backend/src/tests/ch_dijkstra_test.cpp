@@ -11,7 +11,6 @@
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
 #include "routing/bidirectional_graph.h"
-#include "routing/basic_edge_endpoint_handler.h"
 #include "routing/preprocessing/ch_dijkstra.h"
 #include "tests/graph_test.h"
 #include "routing/vertices/ch_vertex.h"

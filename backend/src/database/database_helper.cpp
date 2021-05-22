@@ -153,7 +153,7 @@ LIMIT 1
 SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(segments.geog), (segments.geog), adjacent.seg_len, max_uid.uid
 FROM segments, closest_edge as e, max_uid,  adjacent
 	*/
-vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string &table_name, DbGraph* db_graph) {
+vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string& table_name, DbGraph* db_graph) {
 	string point = MakeGeographyPoint(p);
 	/*
 		* First compute closest edge to `point` by fast finding (compare bounding rectangles)

@@ -1,5 +1,5 @@
 #include "crow/crow_all.h"
-#include "routing/query/module.h"
+#include "routing/query/setup.h"
 #include "utility/point.h"
 #include "routing/query/router.h"
 #include "routing/configuration_parser.h"

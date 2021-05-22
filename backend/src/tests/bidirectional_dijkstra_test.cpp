@@ -9,12 +9,10 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/vertices/contraction_search_vertex.h"
 #include "routing/query/bidirectional_dijkstra.h"
-#include "routing/preprocessing/graph_contractor.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
-#include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
 #include "routing/edges/ch_search_edge.h"
 #include "routing/ch_search_graph.h"
@@ -30,7 +28,6 @@ using namespace std;
 using namespace routing;
 using namespace database;
 using namespace query;
-using namespace preprocessing;
 // using namespace testing;
 // using G = BidirectionalGraph<AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>>;
 using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;

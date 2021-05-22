@@ -11,6 +11,7 @@
 #include <cassert>
 #include <limits>
 #include <memory>
+#include <functional>
 
 namespace routing {
 namespace query {
@@ -51,7 +52,7 @@ private:
     /**
      * Graph where dijkstra's algorithm is used.
      */
-    G & g_;
+    G& g_;
     using UnorderedMap = tsl::robin_map<unsigned_id_type, VertexRoutingProperties>;
     UnorderedMap forward_touched_vertices_;
     UnorderedMap backward_touched_vertices_;

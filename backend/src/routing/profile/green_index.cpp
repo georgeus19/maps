@@ -35,7 +35,7 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 			"	edges.uid, "
 			"    SUM( "
 			"        ST_Area(ST_Intersection(edges.geom, green.way)) / ST_Area(edges.geom) "
-			"    ) AS green_fraction "
+			"    ) AS green_value "
 			"FROM  "
 			"( "
 			"	SELECT uid, ST_Buffer(ST_Transform(geog::geometry, 3857), 30) as geom "
@@ -50,7 +50,7 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_index_table) {
     // edge_green_values_.assign(max_uid + 1, GreenValue{});
     std::string sql = 
-            "SELECT uid, COALESCE(green_fraction, 0) "
+            "SELECT uid, COALESCE(green_value, 0) "
             "FROM " + green_index_table + "; ";
     auto&& load = [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
@@ -71,7 +71,7 @@ void GreenIndex::Normalize(double scale_max) {
             }
             
             // The lower, the better green index in routing so it is necessary to flip it.
-            // The create query gives green_fraction the higher, the better.
+            // The create query gives green_value the higher, the better.
             green_value.value = 1 - green_value.value;
 
             // The value should be within [0, scale_max].

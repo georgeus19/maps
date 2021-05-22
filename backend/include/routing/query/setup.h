@@ -1,5 +1,5 @@
-#ifndef BACKEND_QUERY_MAIN_H
-#define BACKEND_QUERY_MAIN_H
+#ifndef ROUTING_QUERY_SETUP_H
+#define ROUTING_QUERY_SETUP_H
 
 #include "routing/routing_graph.h"
 #include "routing/adjacency_list_graph.h"
@@ -14,7 +14,9 @@
 #include "routing/endpoint_handler.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/query/bidirectional_dijkstra.h"
-#include "routing/basic_edge_endpoint_handler.h"
+#include "routing/query/endpoint_edges_creator.h"
+#include "routing/query/endpoint_algorithm_policy.h"
+#include "routing/query/edge_range_policy.h"
 #include "routing/edges/ch_search_edge.h"
 #include "routing/vertices/contraction_search_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
@@ -83,19 +85,20 @@ public:
     using Graph = CHSearchGraph<Vertex, Edge>;
     using DbGraph = database::CHDbGraph;
     using Algorithm = BidirectionalDijkstra<RoutingGraph<Graph>>;
+    
 
-    struct RouteEndpoints {
-        RouteEndpoints(unsigned_id_type s, unsigned_id_type t) : source(s), target(t) {}
-        unsigned_id_type source;
-        unsigned_id_type target;
-    };
-
-    CHSetup(database::DatabaseHelper& d, const std::string& edges_table_name) : d_(d), edges_table_name_(edges_table_name) {
-        edges_.reserve(10);
-    } 
+    CHSetup(database::DatabaseHelper& d) : d_(d) {} 
     
     DbGraph CreateDbGraph() {
         return DbGraph{};
+    }
+
+    EndpointEdgesCreator<Edge> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<Edge>{d, db_graph};
+    }
+
+    EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>> CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
+        return EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>>{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
     }
 
     static Graph CreateGraph(const std::string& graph_table_name) {
@@ -109,55 +112,8 @@ public:
         return search_graph;
     }
 
-    RouteEndpoints AddRouteEndpoints(RoutingGraph<Graph>& routing_graph, utility::Point source, utility::Point target,
-        unsigned_id_type free_vertex_id, unsigned_id_type free_edge_id) {
-        unsigned_id_type source_vertex_id = free_vertex_id;
-        source_endpoint_handler_ = BasicEdgeEndpointHandler<Edge>{&db_graph_, source_vertex_id, free_edge_id};
-        auto&& start_edges = source_endpoint_handler_.CalculateEndpointEdges(source, edges_table_name_, d_);
-        auto source_end_it = edges_.begin();
-        for(auto&& edge : start_edges) {
-            if (source_vertex_id == edge.get_from()) {
-                edges_.push_back(edge);
-                ++source_end_it;
-            }
-        }
-        Vertex source_vertex{source_vertex_id, EdgeRange{edges_.begin(), source_end_it}, 0}; 
-        routing_graph.AddVertex(std::move(source_vertex));
-        unsigned_id_type target_vertex_id = source_vertex_id + 1;
-        free_edge_id += start_edges.size();
-        target_endpoint_handler_ = BasicEdgeEndpointHandler<Edge>{&db_graph_, target_vertex_id, free_edge_id};
-        auto&& target_edges = target_endpoint_handler_.CalculateEndpointEdges(target, edges_table_name_, d_);
-        for(auto&& edge : target_edges) {
-            if (target_vertex_id == edge.get_from()) {
-                edge.SetBackward();
-                edges_.push_back(edge);
-            }
-        }
-        std::cout << "edges_.size() = " << edges_.size() << std::endl;
-        Vertex target_vertex{target_vertex_id, EdgeRange{source_end_it, edges_.end()}, 0}; 
-        routing_graph.AddVertex(std::move(target_vertex));
-        return RouteEndpoints{source_vertex_id, target_vertex_id};
-    }
-
-    BasicEdgeEndpointHandler<Edge>& get_source_endpoint_handler() {
-        return source_endpoint_handler_;
-    }
-
-    BasicEdgeEndpointHandler<Edge>& get_target_endpoint_handler() {
-        return target_endpoint_handler_;
-    }
-
-    const std::string& get_edges_table_name() {
-        return edges_table_name_;
-    }
-
 private: 
     database::DatabaseHelper& d_;
-    DbGraph db_graph_;
-    std::string edges_table_name_;
-    std::vector<Edge> edges_;
-    BasicEdgeEndpointHandler<Edge> source_endpoint_handler_;
-    BasicEdgeEndpointHandler<Edge> target_endpoint_handler_;
 };
 
 
@@ -165,4 +121,4 @@ private:
 }
 }
 
-#endif //BACKEND_QUERY_MAIN_H
+#endif //ROUTING_QUERY_SETUP_H

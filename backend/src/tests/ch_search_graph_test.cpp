@@ -14,7 +14,6 @@
 #include "database/database_helper.h"
 #include "utility/point.h"
 #include "routing/endpoint_handler.h"
-#include "routing/basic_edge_endpoint_handler.h"
 #include "tests/graph_test.h"
 #include "routing/edges/ch_search_edge.h"
 #include "routing/ch_search_graph.h"
