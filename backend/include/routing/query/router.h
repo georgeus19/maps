@@ -43,9 +43,10 @@ public:
         RoutingGraph<typename Setup::Graph> routing_graph{base_graph_};
         auto&& db_graph = setup.CreateDbGraph();
 
-        EndpointsCreator<EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<typename Setup::Graph>, EdgeRangePolicyVectorIterator<typename Setup::Edge>>,
-            EndpointEdgesCreator<typename Setup::Edge>> endpoints_creator{setup.CreateEndpointAlgorithmPolicy(routing_graph),
-            setup.CreateEndpointEdgesCreator(d, &db_graph)};
+        EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::Edge>> endpoints_creator{
+            setup.CreateEndpointAlgorithmPolicy(routing_graph),
+            setup.CreateEndpointEdgesCreator(d, &db_graph)
+        };
         unsigned_id_type source_vertex_id = base_graph_max_vertex_id_ + 1;
         unsigned_id_type target_vertex_id = base_graph_max_vertex_id_ + 2;
         endpoints_creator.AddSourceEndpoint(table_name, source_vertex_id, source);
@@ -65,8 +66,7 @@ public:
 
 
     std::string GetRouteGeometry(database::DatabaseHelper& d, const std::string& table_name,
-        EndpointsCreator<EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<typename Setup::Graph>,
-        EdgeRangePolicyVectorIterator<typename Setup::Edge>>, EndpointEdgesCreator<typename Setup::Edge>>& endpoints_creator,
+        EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::Edge>>& endpoints_creator,
         std::vector<typename Setup::Algorithm::Edge>& route) {
         auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route[0].get_uid());
         auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route[route.size() - 1].get_uid());

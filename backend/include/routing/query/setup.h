@@ -85,7 +85,7 @@ public:
     using Graph = CHSearchGraph<Vertex, Edge>;
     using DbGraph = database::CHDbGraph;
     using Algorithm = BidirectionalDijkstra<RoutingGraph<Graph>>;
-    
+    using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>>;
 
     CHSetup(database::DatabaseHelper& d) : d_(d) {} 
     
@@ -97,8 +97,8 @@ public:
         return EndpointEdgesCreator<Edge>{d, db_graph};
     }
 
-    EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>> CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
-        return EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>>{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
+    EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
+        return EndpointAlgorithmPolicy{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
     }
 
     static Graph CreateGraph(const std::string& graph_table_name) {
