@@ -1,16 +1,19 @@
-#ifndef BACKEND_GRAPH_GENERATOR_H
-#define BACKEND_GRAPH_GENERATOR_H
-#include "osm_parser/link_counter.h"
-#include <osmium/io/any_input.hpp>
+#ifndef OSM_PARSER_GRAPH_GENERATOR_H
+#define OSM_PARSER_GRAPH_GENERATOR_H
 
+#include "osm_parser/link_counter.h"
 #include "osm_parser/writer.h"
 #include "osm_parser/edge.h"
-#include <osmium/io/any_output.hpp>
-#include <string>
+#include "osm_parser/constants.h"
+#include "osm_parser/highway_filter.h"
 
+#include <string>
 #include <iostream>
+#include <unordered_set>
 #include <fstream>
 
+#include <osmium/io/any_input.hpp>
+#include <osmium/io/any_output.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/way.hpp>
@@ -41,7 +44,7 @@ namespace osm_parser {
          * This field contains for each node a number of how many ways it is part of.
          * So if the number is greater than one it is an intersection.
          */
-        index_type &node_links_;
+        index_type& node_links_;
 
         /**
          * Osmium factory used to create wkt or wkb format geometries from lon lat coordinates.
@@ -53,7 +56,7 @@ namespace osm_parser {
          * Writer writes each way (resp. its parts=edges) to a file with its geometry, etc...
          * It generates sql script that can be used to load edges to db.
          */
-        IWriter &writer_;
+        Writer* writer_;
 
         /**
          * Name of db table which should be created to hold the data.
@@ -62,16 +65,22 @@ namespace osm_parser {
         std::string table_name_;
 
         /**
+         * Responsible for filtering highways.
+         */
+        HighwayFilter* highway_filter_;
+        
+        /**
          * Field that is incremented for each new edge.
          * It is a source of unique ids for edges.
          */
         uint64_t id_counter_;
 
+
         using const_nodelist_iterator = osmium::WayNodeList::const_iterator;
 
     public:
-        GraphGenerator(index_type &node_links, const GeomFactory &factory, IWriter &w, const std::string &table_name)
-                : node_links_(node_links), factory_{factory}, writer_{w}, table_name_{table_name}, id_counter_(5) {}
+        GraphGenerator(index_type& node_links, const GeomFactory& factory, Writer* w, const std::string& table_name, HighwayFilter* hf)
+                : node_links_(node_links), factory_{factory}, writer_{w}, table_name_{table_name}, highway_filter_(hf), id_counter_(5) {}
 
         /**
          * Handles operation for current read way.
@@ -89,14 +98,20 @@ namespace osm_parser {
         void way(const osmium::Way &way) {
             auto && tags = way.tags();
             // Skip all ways that are not roads.
-            if (tags.get_value_by_key("highway") == nullptr) {
+            const char* hw = tags.get_value_by_key(Constants::Tags::kHighway);
+            if (!hw) {
+                return;
+            }
+            std::string highway{hw};
+            if (highway_filter_->FilterHighway(tags)) {
                 return;
             }
 
             bool undirected = true;
-            auto && oneway_value = tags.get_value_by_key("oneway");
-            if (oneway_value == "yes" || oneway_value == "true" || oneway_value == "1") {
-                undirected = false;
+            const char* oneway_value = tags.get_value_by_key(Constants::Tags::kOneway);
+            if (oneway_value) {
+                std::string ov{oneway_value};
+                undirected = !(ov == Constants::OnewayValues::kYes || ov == Constants::OnewayValues::kTrue || ov == Constants::OnewayValues::k1);
             }
 
             const osmium::WayNodeList &nodes = way.nodes();
@@ -121,7 +136,7 @@ namespace osm_parser {
 
                 bool is_intersection = value > 1 && value != osmium::index::empty_value<size_t>();
                 if (is_intersection) {
-                    Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), second->positive_ref(), undirected};
+                    Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), second->positive_ref(), undirected, highway};
 
                     // `second` iterator points directly to the last point
                     // of the segment. Create iterator `to` which right is
@@ -147,7 +162,7 @@ namespace osm_parser {
                 // which points directly before `second`.
                 const_nodelist_iterator last_point = second;
                 --last_point;
-                Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), last_point->positive_ref(), undirected};
+                Edge edge{way.positive_id(), ++id_counter_, first->positive_ref(), last_point->positive_ref(), undirected, highway};
                 SaveEdge(first, second, edge);
             }
             first = second;
@@ -170,7 +185,7 @@ namespace osm_parser {
             if (linestring != "") {
                 edge.set_geography(std::move(linestring));
                 // Write sql command to insert row.
-                writer_.WriteEdge(table_name_, edge);
+                writer_->WriteEdge(table_name_, edge);
             }
         }
 
@@ -192,4 +207,4 @@ namespace osm_parser {
         }
     };
 }
-#endif //BACKEND_GRAPH_GENERATOR_H
+#endif //OSM_PARSER_GRAPH_GENERATOR_H

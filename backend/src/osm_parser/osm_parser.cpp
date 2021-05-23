@@ -13,11 +13,15 @@
  */
 #include "osm_parser/link_counter.h"
 #include "osm_parser/graph_generator.h"
-#include <osmium/io/any_input.hpp>
-#include <osmium/io/any_output.hpp>
+#include "osm_parser/writer.h"
+#include "osm_parser/bicycle_highway_filter.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
+
+#include <osmium/io/any_input.hpp>
+#include <osmium/io/any_output.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/way.hpp>
@@ -87,8 +91,9 @@ namespace osm_parser {
         CopyWriter writer{output_sql_path, output_data_path};
         writer.WriteInitSql(table_name);
 
-        GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, writer, table_name};
-        //GraphGenerator<osmium::geom::WKBFactory<>> graph_generator_handler{node_index, factoryWKB, writer, table_name};
+        BycicleHighwayFilter highway_filter{};
+
+        GraphGenerator<osmium::geom::WKTFactory<>> graph_generator_handler{node_index, factoryWKT, &writer, table_name, &highway_filter};
 
         // Location handler enables to read lon lat coordinates of nodes referenced by ways.
         osmium::apply(reader, location_handler, graph_generator_handler);

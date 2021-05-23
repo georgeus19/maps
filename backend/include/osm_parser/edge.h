@@ -61,11 +61,13 @@ namespace osm_parser {
 
         bool undirected_;
 
-        Edge(unsigned_id_type osm_id, uint64_t uid, std::string &&geography, unsigned_id_type from, unsigned_id_type to, bool undirected);
+        std::string highway_;
 
-        Edge(unsigned_id_type osm_id, uint64_t uid_, const std::string & geography, unsigned_id_type from, unsigned_id_type to, bool undirected);
+        Edge(unsigned_id_type osm_id, uint64_t uid, std::string &&geography, unsigned_id_type from, unsigned_id_type to, bool undirected, const std::string& highway);
 
-        Edge(unsigned_id_type osm_id, uint64_t uid_, unsigned_id_type from, unsigned_id_type to, bool undirected);
+        Edge(unsigned_id_type osm_id, uint64_t uid_, const std::string& geography, unsigned_id_type from, unsigned_id_type to, bool undirected, const std::string& highway);
+
+        Edge(unsigned_id_type osm_id, uint64_t uid_, unsigned_id_type from, unsigned_id_type to, bool undirected, const std::string& highway);
 
         /**
          * Provide casts to string since it is the main use case of this class.
@@ -83,6 +85,8 @@ namespace osm_parser {
         std::string get_to() const;
 
         std::string get_undirected() const;
+
+        const std::string& get_highway() const;
 
     };
 }

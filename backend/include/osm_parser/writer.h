@@ -24,7 +24,7 @@ namespace osm_parser {
  * over the edgelist based on the geometries and adding length
  * column as well as counting lengths for edges.
  */
-class IWriter {
+class Writer {
 public:
     /**
      * Write any sql script initialization before edges are written to a file.
@@ -46,7 +46,7 @@ public:
      */
     virtual void WriteFinishSql(const std::string& table_name) = 0;
 
-    virtual ~IWriter() {}
+    virtual ~Writer() {}
 };
 
 /**
@@ -54,7 +54,7 @@ public:
  * COPY to load edge data to db.
  *
  */
-class CopyWriter : public IWriter {
+class CopyWriter : public Writer {
     /**
      * Ofstream used to write sql script to a file.
      */
