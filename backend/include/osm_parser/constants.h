@@ -9,7 +9,6 @@ struct Constants{
 
     struct Tags{
         static inline const char* kHighway = "highway";
-        static inline const char* kFootway = "footway";
         static inline const char* kOneway = "oneway";
     };
 
@@ -32,11 +31,12 @@ struct Constants{
         static inline const std::string kBridleway = "bridleway";
         static inline const std::string kPath = "path";
         static inline const std::string kCycleway = "cycleway";
-    };
-
-    struct FootwayValues{
-        static inline const std::string kSidewalk = "sidewalk";
+        static inline const std::string kMiniRoundabout = "mini_roundabout";
         static inline const std::string kCrossing = "crossing";
+        static inline const std::string kTurningLoop = "turning_loop";
+        static inline const std::string kTurningCircle = "turning_circle";
+         	
+        // static inline const std::string kMotorwayJunction = "motorway_junction";
     };
 
     struct OnewayValues{

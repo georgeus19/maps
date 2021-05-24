@@ -22,37 +22,37 @@ public:
 BycicleHighwayFilter::BycicleHighwayFilter() {}
 
 bool BycicleHighwayFilter::FilterHighway(const osmium::TagList& tags) {
-        std::string highway{tags.get_value_by_key(Constants::Tags::kHighway)};
-        std::unordered_set<std::string> bicycle_eligible_highway_values{
-            Constants::HighwayValues::kPrimary,
-            Constants::HighwayValues::kSecondary,
-            Constants::HighwayValues::kTertiary,
-            Constants::HighwayValues::kUnclassified,
-            Constants::HighwayValues::kResidential,
-            Constants::HighwayValues::kPrimaryLink,
-            Constants::HighwayValues::kSecondaryLink,
-            Constants::HighwayValues::kTertiaryLink,
-            Constants::HighwayValues::kLivingStreet,
-            Constants::HighwayValues::kService,
-            Constants::HighwayValues::kPedestrian,
-            Constants::HighwayValues::kTrack,
-            Constants::HighwayValues::kFootway,
-            Constants::HighwayValues::kBridleway,
-            Constants::HighwayValues::kPath,
-            Constants::HighwayValues::kCycleway
-        };
+    bool filter_highway = false;
+    std::string highway{tags.get_value_by_key(Constants::Tags::kHighway)};
+    std::unordered_set<std::string> bicycle_eligible_highway_values{
+        Constants::HighwayValues::kPrimary,
+        Constants::HighwayValues::kSecondary,
+        Constants::HighwayValues::kTertiary,
+        Constants::HighwayValues::kUnclassified,
+        Constants::HighwayValues::kResidential,
+        Constants::HighwayValues::kPrimaryLink,
+        Constants::HighwayValues::kSecondaryLink,
+        Constants::HighwayValues::kTertiaryLink,
+        Constants::HighwayValues::kLivingStreet,
+        Constants::HighwayValues::kService,
+        Constants::HighwayValues::kPedestrian,
+        Constants::HighwayValues::kTrack,
+        Constants::HighwayValues::kFootway,
+        Constants::HighwayValues::kBridleway,
+        Constants::HighwayValues::kPath,
+        Constants::HighwayValues::kCycleway,
+        Constants::HighwayValues::kMiniRoundabout,
+        Constants::HighwayValues::kCrossing,
+        Constants::HighwayValues::kTurningLoop,
+        Constants::HighwayValues::kTurningCircle
+    };
 
-        if (bicycle_eligible_highway_values.find(highway) == bicycle_eligible_highway_values.end()) {
-            return true;
-        }
-
-        const char* footway = tags.get_value_by_key(Constants::Tags::kFootway);
-        if (footway && highway == Constants::HighwayValues::kFootway && std::string{footway} == Constants::FootwayValues::kSidewalk) {
-            return true;
-        }
-
-        return false;
+    if (bicycle_eligible_highway_values.find(highway) == bicycle_eligible_highway_values.end()) {
+        filter_highway = true;
     }
+
+    return filter_highway;
+}
 
 
 }
