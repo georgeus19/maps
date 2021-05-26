@@ -15,8 +15,6 @@
 
 #include "database/database_helper.h"
 
-
-
 #include <functional>
 
 namespace routing{

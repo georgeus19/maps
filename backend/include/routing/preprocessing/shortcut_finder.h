@@ -44,6 +44,7 @@ private:
     Graph& g_;
     ContractionParameters parameters_;
     CHDijkstra<Graph> dijkstra_;
+    unsigned_id_type temporary_edge_id_counter_;
 
     double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
 
@@ -55,7 +56,7 @@ private:
 
 template <typename Graph>
 ShortcutFinder<Graph>::ShortcutFinder(Graph& g, const ContractionParameters& p) :
-    g_(g), parameters_(p), dijkstra_(g) {}
+    g_(g), parameters_(p), dijkstra_(g), temporary_edge_id_counter_(1) {}
 
 template <typename Graph>
 std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindShortcuts(Vertex& vertex) {
@@ -99,7 +100,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
-            shortcuts.emplace_back(0, source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
+            shortcuts.emplace_back(++temporary_edge_id_counter_, source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
         }
     });
 
