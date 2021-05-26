@@ -88,14 +88,14 @@ Configuration ConfigurationParser::Parse() {
                 std::string base_graph_table = algorithm_config.at(Constants::Input::kBaseGraphTable).as_string();
                 auto&& param = algorithm_config.at(Constants::Input::TableNames::kParameters).as_table();
 
-                return std::make_unique<AlgorithmConfig>(CHConfig{
+                return std::make_unique<CHConfig>(
                     std::move(name),
                     std::move(base_graph_table),
                     static_cast<size_t>(param.at(Constants::Input::Preprocessing::kHopCount).as_integer()),
                     static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kEdgeDifference).as_integer()),
                     static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kDeletedNeighbours).as_integer()),
                     static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kSpaceSize).as_integer())
-                });
+                );
             }
         }
     };

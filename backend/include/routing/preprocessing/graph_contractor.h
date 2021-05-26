@@ -1,5 +1,5 @@
-#ifndef BACKEND_GRAPH_CONTRACTOR_H
-#define BACKEND_GRAPH_CONTRACTOR_H
+#ifndef BACKEND_PREPROCESSING_GRAPH_CONTRACTOR_H
+#define BACKEND_PREPROCESSING_GRAPH_CONTRACTOR_H
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/contraction_parameters.h"
@@ -17,8 +17,12 @@ class GraphContractor {
     using Edge = Graph::Edge;
     using Vertex = Graph::Vertex;
 public:
-    using PriorityQueue = std::priority_queue<std::pair<double, unsigned_id_type>, std::vector<std::pair<double, unsigned_id_type>>,  std::greater<std::pair<double, unsigned_id_type>>>;
-    GraphContractor<Graph>(Graph& g, const ContractionParameters& parameters);
+    using PriorityQueue = std::priority_queue<
+        std::pair<double, unsigned_id_type>,
+        std::vector<std::pair<double, unsigned_id_type>>,
+        std::greater<std::pair<double, unsigned_id_type>>
+    >;
+    GraphContractor<Graph>(Graph& g, const ContractionParameters& parameters, unsigned_id_type free_edge_id);
 
     void ContractGraph();
 
@@ -31,6 +35,7 @@ private:
     Graph & g_;
     ShortcutFinder<Graph> shortcut_finder_;
     VertexMeasures<Graph> vertex_measures_;
+    unsigned_id_type free_edge_id_;
     unsigned_id_type free_ordering_rank_;
 
     void AddShortcuts(std::vector<Edge>&& shortcuts);
@@ -39,8 +44,8 @@ private:
 };
 
 template <typename Graph>
-GraphContractor<Graph>::GraphContractor(Graph &g, const ContractionParameters& parameters)
-    : g_(g), shortcut_finder_(g, parameters), vertex_measures_(g, parameters), free_ordering_rank_(1) {}
+GraphContractor<Graph>::GraphContractor(Graph &g, const ContractionParameters& parameters, unsigned_id_type free_edge_id)
+    : g_(g), shortcut_finder_(g, parameters), vertex_measures_(g, parameters), free_edge_id_(free_edge_id), free_ordering_rank_(1) {}
 
 template <typename Graph>
 void GraphContractor<Graph>::ContractGraph() {
@@ -128,6 +133,7 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
 template <typename Graph>
 void GraphContractor<Graph>::AddShortcuts(std::vector<Edge>&& shortcuts) {
     for(auto&& edge : shortcuts) {
+        edge.set_uid(++free_edge_id_);
         g_.AddEdge(std::move(edge));
     }
 }
@@ -155,4 +161,4 @@ double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
 
 }
 }
-#endif //BACKEND_GRAPH_CONTRACTOR_H
+#endif //BACKEND_PREPROCESSING_GRAPH_CONTRACTOR_H

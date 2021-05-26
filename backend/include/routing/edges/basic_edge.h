@@ -20,6 +20,10 @@ public:
         return uid_;
     }
 
+    inline void set_uid(unsigned_id_type uid) {
+        uid_ = uid;
+    }
+
     inline unsigned_id_type get_from() const {
         return from_;
     }

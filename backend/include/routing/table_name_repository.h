@@ -12,13 +12,15 @@ class TableNameRepository{
 public:
     TableNameRepository(const std::string& base_graph_table_name, const std::string& algorithm_name);
 
-    std::string GetVerticesTable(const profile::Profile& profile);
+    std::string GetBaseTableName() const;
 
-    std::string GetVerticesTable(const std::string& profile_name);
+    std::string GetVerticesTable(const profile::Profile& profile) const;
 
-    std::string GetEdgesTable(const profile::Profile& profile);
+    std::string GetVerticesTable(const std::string& profile_name) const;
 
-    std::string GetEdgesTable(const std::string& profile_name);
+    std::string GetEdgesTable(const profile::Profile& profile) const;
+
+    std::string GetEdgesTable(const std::string& profile_name) const;
 
 private:
     std::string base_graph_table_name_;
@@ -28,19 +30,23 @@ private:
 TableNameRepository::TableNameRepository(const std::string& base_graph_table_name, const std::string& algorithm_name)
     : base_graph_table_name_(base_graph_table_name), algorithm_name_(algorithm_name) {}
 
-std::string TableNameRepository::GetVerticesTable(const profile::Profile& profile) {
+std::string TableNameRepository::GetBaseTableName() const {
+    return base_graph_table_name_;
+}
+
+std::string TableNameRepository::GetVerticesTable(const profile::Profile& profile) const {
     return GetVerticesTable(profile.GetName());
 }
 
-std::string TableNameRepository::GetVerticesTable(const std::string& profile_name) {
+std::string TableNameRepository::GetVerticesTable(const std::string& profile_name) const {
     return GetEdgesTable(profile_name) + "_vertices";
 }
 
-std::string TableNameRepository::GetEdgesTable(const profile::Profile& profile) {
+std::string TableNameRepository::GetEdgesTable(const profile::Profile& profile) const {
     return GetEdgesTable(profile.GetName());
 }
 
-std::string TableNameRepository::GetEdgesTable(const std::string& profile_name) {
+std::string TableNameRepository::GetEdgesTable(const std::string& profile_name) const {
     return algorithm_name_ + base_graph_table_name_ + profile_name;
 }
 

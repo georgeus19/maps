@@ -99,7 +99,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
-            shortcuts.emplace_back(parameters_.NextFreeEdgeId(), source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
+            shortcuts.emplace_back(0, source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
         }
     });
 

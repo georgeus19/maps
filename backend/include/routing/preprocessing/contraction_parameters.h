@@ -11,17 +11,8 @@ namespace routing {
 namespace preprocessing {
 
 class ContractionParameters {
-    unsigned_id_type free_edge_id_;
-    size_t hop_count_;
-    int32_t edge_difference_coefficient_;
-    int32_t deleted_neighbours_coefficient_;
-    int32_t space_size_coefficient_;
-    
-
 public:
-    ContractionParameters(unsigned_id_type free_edge_id, size_t hc, int32_t edc, int32_t dnc, int32_t ssc);
-
-    unsigned_id_type NextFreeEdgeId();
+    ContractionParameters(size_t hc, int32_t edc, int32_t dnc, int32_t ssc);
 
     size_t get_hop_count() const;
 
@@ -30,16 +21,17 @@ public:
     int32_t get_deleted_neighbours_coefficient() const;
 
     int32_t get_space_size_coefficient() const;
+
+private:
+    size_t hop_count_;
+    int32_t edge_difference_coefficient_;
+    int32_t deleted_neighbours_coefficient_;
+    int32_t space_size_coefficient_;
 };
 
-inline ContractionParameters::ContractionParameters(unsigned_id_type free_edge_id, size_t hc, int32_t edc, int32_t dnc, int32_t ssc) :
-    free_edge_id_(free_edge_id), hop_count_(hc), edge_difference_coefficient_(edc),
+inline ContractionParameters::ContractionParameters(size_t hc, int32_t edc, int32_t dnc, int32_t ssc) :
+    hop_count_(hc), edge_difference_coefficient_(edc),
     deleted_neighbours_coefficient_(dnc), space_size_coefficient_(ssc) {}
-
-inline unsigned_id_type ContractionParameters::NextFreeEdgeId() {
-    ++free_edge_id_;
-    return ++free_edge_id_;
-}
 
 inline size_t ContractionParameters::get_hop_count() const {
     return hop_count_;

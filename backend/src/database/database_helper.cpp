@@ -5,25 +5,27 @@ namespace database {
 
 DatabaseHelper::DatabaseHelper(const string & db_name, const string & user, const string & password,
 	const string & host_address, const string & port) : db_name_(db_name),user_(user), password_(password),
-		host_address_(host_address),port_(port), connection_("dbname = " + db_name_ + " user = " + user_ +
-		" password = " + password_ + " hostaddr = " + host_address_ + " port = " + port_) {}
+		host_address_(host_address),port_(port), connection_(std::make_unique<pqxx::connection>("dbname = " + db_name_ + " user = " + user_ +
+		" password = " + password_ + " hostaddr = " + host_address_ + " port = " + port_)) {}
 
 DatabaseHelper::~DatabaseHelper() {
-	connection_.disconnect();
+	if (connection_) {
+		connection_->disconnect();
+	}
 }
 
 bool DatabaseHelper::IsDbOpen() {
-	return connection_.is_open();
+	return connection_->is_open();
 }
 
 void DatabaseHelper::RunTransactional(const std::string& sql) {
-	pqxx::work w(connection_);
+	pqxx::work w(*connection_);
 	w.exec(sql);
 	w.commit();
 }
 
 void DatabaseHelper::RunNontransactional(const std::string& sql, const std::function<void(const DbRow&)> f) {
-	pqxx::nontransaction n{connection_};
+	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(sql)};
 
 	for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
@@ -83,7 +85,7 @@ std::unique_ptr<DbEdgeIterator> DatabaseHelper::FindClosestEdge(utility::Point p
 									"), " \
 									"4326)) " \
 								"FROM closest_edge "; \
-	pqxx::nontransaction n{connection_};
+	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(closest_edge_sql)};
 	return db_graph->GetEdgeIterator(result.begin(), result.end());
 }
@@ -220,7 +222,7 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 					"SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(segments.geog), ST_AsGeoJSON(segments.geog), adjacent.seg_len, max_uid.uid  " \
 					"  FROM segments, closest_edge as e, max_uid,  adjacent " ;
 
-	pqxx::nontransaction n{connection_};
+	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(sql)};
 
 	std::vector<DbRow> result_rows{};
@@ -236,7 +238,7 @@ bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
 						"ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS contracted_vertex bigint; " \
 						"UPDATE " + table_name + " set shortcut = false; " \
 						"UPDATE " + table_name + " set contracted_vertex = 0; ";
-	pqxx::work w(connection_);
+	pqxx::work w(*connection_);
 	w.exec(sql);
 	w.commit();
 	} catch (const std::exception& e) {
@@ -248,21 +250,21 @@ bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
 
 uint64_t DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
 	std::string sql = "select max(uid) from " + table_name + ";";
-	pqxx::nontransaction n{connection_};
+	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(sql)};
 	return (result.begin())[0].as<uint64_t>();
 }
 
 void DatabaseHelper::DropGeographyIndex(const std::string& table_name) {
 	std::string sql = "DROP INDEX IF EXISTS " + GetGeographyIndexName(table_name);
-	pqxx::work w(connection_);
+	pqxx::work w(*connection_);
 	w.exec(sql);
 	w.commit();
 }
 
 void DatabaseHelper::CreateGeographyIndex(const std::string& table_name) {
 	std::string sql = "CREATE INDEX IF NOT EXISTS " + GetGeographyIndexName(table_name) + " ON " + table_name + " USING GIST (geog);";
-	pqxx::work w(connection_);
+	pqxx::work w(*connection_);
 	w.exec(sql);
 	w.commit();
 }
@@ -272,7 +274,7 @@ void DatabaseHelper::CreateGraphTable(const std::string& graph_table_name, const
 					
 	std::string create_table_sql = db_graph->GetCreateGraphTable(graph_table_name, new_table_name);
 	std::string sql = drop_table_sql + create_table_sql;
-	pqxx::work w(connection_);
+	pqxx::work w(*connection_);
 	w.exec(sql);
 	w.commit();
 }

@@ -1,28 +1,15 @@
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/ch_preprocessing_edge.h"
-
-#include "routing/edge_ranges/vector_edge_range.h"
-
 #include "routing/table_name_repository.h"
-#include "routing/algorithm.h"
-#include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "routing/configuration_parser.h"
-#include "routing/adjacency_list_graph.h"
-#include "routing/bidirectional_graph.h"
 #include "routing/constants.h"
 
-#include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
-#include "routing/vertices/ch_vertex.h"
-
-#include "routing/preprocessing/vertex_measures.h"
-#include "routing/preprocessing/graph_contractor.h"
+#include "routing/preprocessing/algorithm_preprocessor.h"
+#include "routing/preprocessing/ch_preprocessor.h"
+#include "routing/preprocessing/contraction_parameters.h"
 
 #include "routing/profile/profile_generator.h"
 #include "routing/profile/profile.h"
-
-#include "utility/point.h"
 
 #include "database/database_helper.h"
 
@@ -32,9 +19,9 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <memory>
 #include <unordered_map>
 #include <iostream>
-#include "pqxx/except.hxx"
 
 using namespace std;
 using namespace database;
@@ -42,39 +29,66 @@ using namespace routing;
 using namespace preprocessing;
 using namespace profile;
 
+static void RunAlgorithmPreprocessing(const std::string& config_path);
 static void CreateIndicies(const std::string& path);
-static void RunCHPreprocessing(Configuration&& cfg);
+static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, double scale_max);
 static void PrintHelp();
 
-int main(int argc, const char ** argv) {
+// Run options.
+const std::string kCreateIndex = "--create-index";
+const std::string kAlgorithmPreprocessing = "--algorithm";
+
+int main(int argc, const char** argv) {
     if (argc != 3) {
         PrintHelp();
         return 1;
     }
+    std::unordered_map<std::string, std::function<void()>> run_options{
+        {kCreateIndex, [=](){
+            CreateIndicies(argv[2]);
+        }},
+        {kAlgorithmPreprocessing, [=](){
+            RunAlgorithmPreprocessing(argv[2]);
+        }}
+    };
 
     try {
-        if (std::string{argv[1]} == "--create-index") {
-            CreateIndicies(argv[2]);
-            return 0;
-        }
-
-        if (std::string{argv[1]} == "--algorithm") {
-            std::unordered_map<std::string, std::function<void(Configuration&&)>> algorithms{
-                {"ch", RunCHPreprocessing}
-            };
-            std::string config_path = argv[2];
-            ConfigurationParser parser{config_path};
-            auto&& cfg = parser.Parse();
-            algorithms[cfg.algorithm->name](std::move(cfg));
-            return 0;
-        }
+        auto&& it = run_options.find(argv[1]);
+        if (it != run_options.end()) {
+            it->second();
+        } else {
+            throw InvalidArgumentException("Invalid first argument - no " + std::string{argv[1]} + " program run option found.");
+        }    
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
+        PrintHelp();
         return 1;
     }
-    PrintHelp();
-    return 1;
+    return 0;
+}
 
+static void RunAlgorithmPreprocessing(const std::string& config_path) {
+    ConfigurationParser parser{config_path};
+    auto&& cfg = parser.Parse();
+    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
+    auto&& profiles = GenerateProfiles(d, cfg, 100);
+    std::unordered_map<std::string, std::function<std::unique_ptr<AlgorithmPreprocessor>(Configuration&&)>> algorithms{
+        {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration&& cfg){
+            CHConfig* ch_config = static_cast<CHConfig*>(cfg.algorithm.get());
+            TableNameRepository name_rep{cfg.algorithm->base_graph_table, cfg.algorithm->name};
+            ContractionParameters parameters{
+                ch_config->hop_count,
+                ch_config->edge_difference_coefficient,
+                ch_config->deleted_neighbours_coefficient,
+                ch_config->space_size_coefficient
+            };
+            return std::make_unique<CHPreprocessor>(std::move(d), std::move(name_rep), std::move(parameters));
+        }}
+    };
+    std::unique_ptr<AlgorithmPreprocessor> alg = algorithms[cfg.algorithm->name](std::move(cfg));
+    for(auto&& profile : profiles) {
+        alg->RunPreprocessing(profile);
+    }
 }
 
 static void CreateIndicies(const std::string& path) {
@@ -97,12 +111,13 @@ static void CreateIndicies(const std::string& path) {
     };
     for(auto&& index : toml::find<toml::array>(data, Constants::Input::TableNames::kIndicies)) {
         std::string name = toml::find<std::string>(index, Constants::Input::kName);
-        if (!indicies.contains(name)) {
+        auto&& it = indicies.find(name);
+        if (it != indicies.end()) {
+            it->second(index);
+            std::cout << "Index " << name << " created." << std::endl;
+        } else {
             std::cout << "No index " << name << " exists." << std::endl;
-            continue;
         }
-        indicies[name](index);
-        std::cout << "Index " << name << " created." << std::endl;
     }
 }
 
@@ -113,39 +128,6 @@ static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configu
         gen.AddIndex(std::move(prop.index), std::move(prop.options));
     }
     return gen.Generate();
-}
-
-static void RunCHPreprocessing(Configuration&& cfg) {
-    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    TableNameRepository name_rep{cfg.algorithm->base_graph_table, cfg.algorithm->name};
-    for(auto&& profile : GenerateProfiles(d, cfg, 100)) {
-        std::cout << "Load graph from " << cfg.algorithm->base_graph_table << "." << std::endl;
-        using Graph = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
-        Graph g{};
-        database::UnpreprocessedDbGraph unpreprocessed_db_graph{};
-        d.LoadFullGraph<Graph>(cfg.algorithm->base_graph_table, g, &unpreprocessed_db_graph);
-        std::cout << "Profile: " << profile.GetName() << std::endl;
-        profile.Set(g);
-        std::cout << "Vertices: " << g.GetVertexCount() << std::endl;
-        std::cout << "Edges before contraction: " << g.GetEdgeCount() << std::endl;
-        std::string ch_edges_table{name_rep.GetEdgesTable(profile)};
-        std::string ch_vertex_table{name_rep.GetVerticesTable(profile)};
-        ContractionParameters parameters{g.GetMaxEdgeId() + 1, 5, 190, 120, 0};
-        GraphContractor<Graph> c{g, parameters};
-        c.ContractGraph();
-        std::cout << "Contraction done." << std::endl;
-        std::cout << "Edges after contraction: " << g.GetEdgeCount() << std::endl;
-        database::CHDbGraph ch_db_graph{};
-        d.CreateGraphTable(cfg.algorithm->base_graph_table, ch_edges_table, &ch_db_graph);
-        d.DropGeographyIndex(ch_edges_table);
-        std::cout << "Geography index dropped." << std::endl;
-        d.AddShortcuts(ch_edges_table, g);
-        std::cout << "Shortcuts added to " + ch_edges_table << "."<< std::endl;
-        d.CreateGeographyIndex(ch_edges_table);
-        std::cout << "Geography index restored." << std::endl;
-        d.AddVertexOrdering(ch_vertex_table, g);
-        std::cout << "Vertex ordering saved to " << ch_vertex_table << "." << std::endl;
-    }
 }
 
 static void PrintHelp() {

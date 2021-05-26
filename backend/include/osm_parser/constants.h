@@ -12,8 +12,6 @@ struct Constants{
         static inline const char* kOneway = "oneway";
     };
 
-
-
     struct HighwayValues{
         static inline const std::string kPrimary = "primary";
         static inline const std::string kSecondary = "secondary";
@@ -35,7 +33,6 @@ struct Constants{
         static inline const std::string kCrossing = "crossing";
         static inline const std::string kTurningLoop = "turning_loop";
         static inline const std::string kTurningCircle = "turning_circle";
-         	
         // static inline const std::string kMotorwayJunction = "motorway_junction";
     };
 
@@ -44,8 +41,6 @@ struct Constants{
         static inline const std::string kTrue = "true";
         static inline const std::string k1 = "1";
     };
-
-
 
 };
 

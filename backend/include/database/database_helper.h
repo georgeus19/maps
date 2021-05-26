@@ -10,6 +10,7 @@
 #include <fstream>
 #include <exception>
 #include <functional>
+#include <memory>
 #include <utility>
 #include "utility/point.h"
 #include <filesystem>
@@ -53,42 +54,16 @@ public:
  * to connect to db directly.
  */
 class DatabaseHelper {
-private:
-    /**
-     * Database name.
-     */
-    std::string db_name_;
-
-    /**
-     * User name that it is connected to db under.
-     */
-    std::string user_;
-
-    /**
-     * User password to db.
-     */
-    std::string password_;
-
-    /**
-     * Host address of the db server.
-     */
-    std::string host_address_;
-
-    /**
-     * Port of the database server.
-     */
-    std::string port_;
-
-    /**
-     * Connection to certain database. It is possible to
-     * execute queries on the database through it (-> read/write data).
-     */
-    pqxx::connection connection_;
 
 public:
     DatabaseHelper(const std::string& db_name, const std::string& user, const std::string& password,
                     const std::string& host_address, const std::string& port);
 
+
+    DatabaseHelper(const DatabaseHelper& other) = delete;
+    DatabaseHelper(DatabaseHelper&& other) = default;
+    DatabaseHelper& operator=(const DatabaseHelper& other) = delete;
+    DatabaseHelper& operator=(DatabaseHelper&& other) = default;
     ~DatabaseHelper();
 
     /**
@@ -234,9 +209,39 @@ public:
     void LoadAdditionalVertexProperties(const std::string& vertices_table, Graph&g);  
 
 private:
-    
+    /**
+     * Database name.
+     */
+    std::string db_name_;
+
+    /**
+     * User name that it is connected to db under.
+     */
+    std::string user_;
+
+    /**
+     * User password to db.
+     */
+    std::string password_;
+
+    /**
+     * Host address of the db server.
+     */
+    std::string host_address_;
+
+    /**
+     * Port of the database server.
+     */
+    std::string port_;
+
+    /**
+     * Connection to certain database. It is possible to
+     * execute queries on the database through it (-> read/write data).
+     */
+    std::unique_ptr<pqxx::connection> connection_;
+
     template <typename Graph>
-    void LoadGraph(const std::string & sql, Graph & graph, DbGraph* db_graph);
+    void LoadGraph(const std::string& sql, Graph& graph, DbGraph* db_graph);
 
     std::string GetGeographyIndexName(const std::string& table_name);
 
@@ -258,7 +263,7 @@ std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const 
     std::string sql_end = " ;";
     std::string complete_sql = sql_start + cond + sql_end;
 
-    pqxx::nontransaction n(connection_);
+    pqxx::nontransaction n(*connection_);
     pqxx::result result{n.exec(complete_sql)};
 
     std::unordered_map<uint64_t, std::string> geometries{};
@@ -364,7 +369,7 @@ std::vector<DbRow> DatabaseHelper::CalculateEdgeSegments(const std::string & edg
                     "    ST_AsGeoJSON(segment), "
                     "    ST_AsGeoJSON(next_edge.geog) " \
                     "FROM segments, next_edge "; \
-    pqxx::nontransaction n{connection_};
+    pqxx::nontransaction n{*connection_};
     pqxx::result result{n.exec(sql)};
 
     std::vector<DbRow> result_rows{};
@@ -413,7 +418,7 @@ void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
         return forward_or_twoway && edge.IsShortcut() && twoway_condition;
     });
 
-    pqxx::work w(connection_);
+    pqxx::work w(*connection_);
     w.exec(sql);
     w.commit();
 }
@@ -431,7 +436,7 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     CsvConvertor convertor{data_path};
     convertor.SaveVertexOrdering(graph);
     std::string sql = drop_table_sql + create_table_sql + " " + copy_sql;
-    pqxx::work w(connection_);
+    pqxx::work w(*connection_);
     w.exec(sql);
     w.commit();
 }
@@ -446,7 +451,7 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
 //     });
 //     where_condition += " ";
 //     std::string sql = select_sql + where_condition;
-//     pqxx::nontransaction n{connection_};
+//     pqxx::nontransaction n{*connection_};
 //     pqxx::result result{n.exec(sql)};
 //     for (auto&& it = result.begin(); it != result.end(); ++it) {
 //         uint64_t vertex_id = it[0].as<uint64_t>();
@@ -458,7 +463,7 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
 template <typename Graph>
 void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_table, Graph& g) {
     std::string sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
-    pqxx::nontransaction n{connection_};
+    pqxx::nontransaction n{*connection_};
     pqxx::result result{n.exec(sql)};
     for (auto&& it = result.begin(); it != result.end(); ++it) {
         uint64_t vertex_id = it[0].as<uint64_t>();
@@ -469,7 +474,7 @@ void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_
 
 template <typename Graph>
 void DatabaseHelper::LoadGraph(const std::string& sql, Graph& graph, DbGraph* db_graph) {
-    pqxx::nontransaction n{connection_};
+    pqxx::nontransaction n{*connection_};
     pqxx::result result{n.exec(sql)};
     
     for (std::unique_ptr<DbEdgeIterator> it = db_graph->GetEdgeIterator(result.begin(), result.end()); !(it->IsEnd()); it->Inc()) {
