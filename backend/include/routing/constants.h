@@ -8,48 +8,48 @@ namespace routing {
 struct Constants{
     struct Input{
         struct TableNames{
-            static const std::string kDatabase;
-            static const std::string kAlgorithm;
-            static const std::string kParameters;
-            static const std::string kProfileProperties;
-            static const std::string kIndicies;
+            static inline const std::string kDatabase = "database";
+            static inline const std::string kAlgorithm = "algorithm";
+            static inline const std::string kParameters = "parameters";
+            static inline const std::string kProfileProperties = "profile_properties";
+            static inline const std::string kIndicies = "indicies";
         };
 
         struct Preprocessing {
-            static const std::string kHopCount;
-            static const std::string kEdgeDifference;
-            static const std::string kDeletedNeighbours;
-            static const std::string kSpaceSize;
+            static inline const std::string kHopCount = "hop_count";
+            static inline const std::string kEdgeDifference = "edge_difference";
+            static inline const std::string kDeletedNeighbours = "deleted_neighbours";
+            static inline const std::string kSpaceSize = "space_size";
         };
 
         struct Database{
-            static const std::string kName;
-            static const std::string kUser;
-            static const std::string kPassword;
-            static const std::string kHost;
-            static const std::string kPort;
+            static inline const std::string kName = "name";
+            static inline const std::string kUser = "user";
+            static inline const std::string kPassword = "password";
+            static inline const std::string kHost = "host";
+            static inline const std::string kPort = "port";
         };
 
-        static const std::string kName;
-        static const std::string kTableName;
-        static const std::string kImportance;
-        static const std::string kBaseGraphTable;
+        static inline const std::string kName = "name";
+        static inline const std::string kTableName = "table_name";
+        static inline const std::string kImportance = "importance";
+        static inline const std::string kBaseGraphTable = "base_graph_table";
 
         struct Indicies{
-            static const std::string kEdgesTable;
-            static const std::string kPolygonTable;
-            static const std::string kIndexTable;
+            static inline const std::string kEdgesTable = "edges_table";
+            static inline const std::string kPolygonTable = "polygon_table";
+            static inline const std::string kIndexTable = "index_table";
         };
 
     };
 
     struct AlgorithmNames{
-        static const std::string kContractionHierarchies;
+        static inline const std::string kContractionHierarchies = "ch";
     };
 
     struct IndexNames{
-        static const std::string kGreenIndex;
-        static const std::string kLengthIndex;
+        static inline const std::string kGreenIndex = "green";
+        static inline const std::string kLengthIndex = "length";
     };
 };
 
