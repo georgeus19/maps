@@ -11,7 +11,6 @@
 #include "routing/exception.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "robin_hood/robin_hood.h"
 #include "tsl/robin_map.h"
 #include "tsl/robin_set.h"

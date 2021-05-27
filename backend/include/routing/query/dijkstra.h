@@ -1,9 +1,8 @@
-#ifndef BACKEND_DIJKSTRA_H
-#define BACKEND_DIJKSTRA_H
+#ifndef ROUTING_QUERY_DIJKSTRA_H
+#define ROUTING_QUERY_DIJKSTRA_H
 #include <vector>
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/exception.h"
 #include <queue>
 #include <algorithm>
@@ -174,4 +173,4 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
 
 }
 }
-#endif //BACKEND_DIJKSTRA_H
+#endif //ROUTING_QUERY_DIJKSTRA_H

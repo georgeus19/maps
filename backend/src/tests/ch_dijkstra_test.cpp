@@ -4,12 +4,10 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
-#include "routing/endpoint_handler.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/preprocessing/ch_dijkstra.h"
 #include "tests/graph_test.h"
@@ -25,7 +23,6 @@ using namespace preprocessing;
 
 using namespace database;
 // using namespace testing;
-// using G = AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>;
 using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
 
 class CHDijkstraTest : public testing::Test {

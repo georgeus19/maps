@@ -10,7 +10,6 @@
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/exception.h"
 #include "routing/adjacency_list_graph.h"
 #include <set>

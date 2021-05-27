@@ -1,5 +1,5 @@
-#ifndef BACKEND_QUERY_ROUTER_H
-#define BACKEND_QUERY_ROUTER_H
+#ifndef ROUTING_QUERY_ROUTER_H
+#define ROUTING_QUERY_ROUTER_H
 
 #include "routing/routing_graph.h"
 #include "routing/adjacency_list_graph.h"
@@ -11,11 +11,9 @@
 #include "database/db_graph.h"
 #include "database/db_edge_iterator.h"
 #include "utility/point.h"
-#include "routing/endpoint_handler.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/query/bidirectional_dijkstra.h"
 #include "routing/edges/ch_search_edge.h"
-#include "routing/vertices/contraction_search_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/ch_search_graph.h"
@@ -87,4 +85,4 @@ private:
 }
 }
 
-#endif //BACKEND_QUERY_ROUTER_H
+#endif //ROUTING_QUERY_ROUTER_H

@@ -3,7 +3,6 @@
 #include <string>
 #include "database/db_edge_iterator.h"
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/min_edge.h"
 #include <iostream>
 
 namespace routing {

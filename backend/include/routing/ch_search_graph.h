@@ -1,5 +1,5 @@
-#ifndef BACKEND_ROUTING_CH_SEARCH_GRAPH_H
-#define BACKEND_ROUTING_CH_SEARCH_GRAPH_H
+#ifndef ROUTING_CH_SEARCH_GRAPH_H
+#define ROUTING_CH_SEARCH_GRAPH_H
 #include <unordered_map>
 #include <vector>
 #include <utility>
@@ -10,7 +10,6 @@
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/exception.h"
 #include <set>
 #include <vector>
@@ -198,4 +197,4 @@ bool CHSearchGraph<V, E>::IsToHigherOrderingRank(Graph& graph, const typename Gr
 
 }
 
-#endif //BACKEND_ROUTING_CH_SEARCH_GRAPH_H
+#endif //ROUTING_CH_SEARCH_GRAPH_H

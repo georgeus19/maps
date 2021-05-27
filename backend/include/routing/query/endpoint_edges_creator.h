@@ -3,7 +3,6 @@
 
 #include "routing/edges/basic_edge.h"
 #include "routing/exception.h"
-#include "routing/endpoint_handler.h"
 
 #include "database/database_helper.h"
 #include "database/db_graph.h"

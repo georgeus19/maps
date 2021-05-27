@@ -1,10 +1,10 @@
-#ifndef BACKEND_ALGORITHM_H
-#define BACKEND_ALGORITHM_H
+#ifndef ROUTING_ALGORITHM_H
+#define ROUTING_ALGORITHM_H
 #include "routing/edges/basic_edge.h"
-#include <vector>
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
                                    
+#include <vector>
+
 namespace routing {
 
     /**
@@ -49,4 +49,4 @@ namespace routing {
     };
 
 }
-#endif //BACKEND_ALGORITHM_H
+#endif //ROUTING_ALGORITHM_H

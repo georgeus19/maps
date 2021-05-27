@@ -1,15 +1,13 @@
-#ifndef GRAPH_TEST_H
-#define GRAPH_TEST_H
+#ifndef TESTS_GRAPH_TEST_H
+#define TESTS_GRAPH_TEST_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
-#include "routing/endpoint_handler.h"
 #include "routing/edges/ch_preprocessing_edge.h"
 #include "routing/edges/ch_search_edge.h"
 
@@ -187,4 +185,4 @@ void TestBidirectedSearchGraph(G& graph) {
 }
 
 
-#endif // GRAPH_TEST_H
+#endif // TESTS_GRAPH_TEST_H

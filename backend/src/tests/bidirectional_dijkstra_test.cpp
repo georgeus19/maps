@@ -4,19 +4,15 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/query/dijkstra.h"
 #include "routing/bidirectional_graph.h"
-#include "routing/vertices/contraction_search_vertex.h"
 #include "routing/query/bidirectional_dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
-#include "routing/endpoint_handler.h"
 #include "tests/graph_test.h"
 #include "routing/edges/ch_search_edge.h"
 #include "routing/ch_search_graph.h"
-#include "routing/vertices/ch_search_vertex.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
@@ -29,9 +25,7 @@ using namespace routing;
 using namespace database;
 using namespace query;
 // using namespace testing;
-// using G = BidirectionalGraph<AdjacencyListGraph<ContractionSearchVertex<CHSearchEdge>, CHSearchEdge>>;
 using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
-// using SearchGraph = CHSearchGraph<CHSearchVertex<CHSearchEdge, typename std::vector<CHSearchEdge>::iterator>, CHSearchEdge>;
 using SearchGraph = CHSearchGraph<CHVertex<CHSearchEdge, IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>>, CHSearchEdge>;
 
 class BidirectionalDijkstraTests : public testing::Test {

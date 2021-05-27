@@ -1,5 +1,5 @@
-#ifndef BACKEND_ROUTING_GRAPH_H
-#define BACKEND_ROUTING_GRAPH_H
+#ifndef ROUTING_QUERY_ROUTING_GRAPH_H
+#define ROUTING_QUERY_ROUTING_GRAPH_H
 #include <unordered_map>
 #include <vector>
 #include <utility>
@@ -10,7 +10,6 @@
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/exception.h"
 #include <set>
 #include <vector>
@@ -68,4 +67,4 @@ inline typename Graph::Vertex& RoutingGraph<Graph>::GetVertex(unsigned_id_type i
 
 }
 
-#endif //BACKEND_ROUTING_GRAPH_H
+#endif //ROUTING_QUERY_ROUTING_GRAPH_H

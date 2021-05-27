@@ -5,12 +5,10 @@
 #include "routing/edges/ch_preprocessing_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
-#include "routing/vertices/contraction_vertex.h"
 #include "routing/query/dijkstra.h"
 #include "routing/exception.h"
 #include "database/database_helper.h"
 #include "utility/point.h"
-#include "routing/endpoint_handler.h"
 #include "tests/graph_test.h"
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/preprocessing/graph_contractor.h"
@@ -33,7 +31,6 @@ using namespace query;
 using namespace database;
 using namespace preprocessing;
 
-// using G = BidirectionalGraph<AdjacencyListGraph<ContractionVertex<CHPreprocessingEdge>, CHPreprocessingEdge>>;
 using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
 void Print(const std::vector<CHPreprocessingEdge>& edges, const std::string& name);
 

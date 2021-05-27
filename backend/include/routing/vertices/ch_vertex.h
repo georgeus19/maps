@@ -1,7 +1,6 @@
 #ifndef BACKEND_CH_VERTEX_H
 #define BACKEND_CH_VERTEX_H
 #include "routing/edges/basic_edge.h"
-#include "routing/vertices/edge_range_vertex.h"
 #include <vector>
 #include <limits>
 #include <functional>
