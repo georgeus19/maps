@@ -70,7 +70,7 @@ class GraphContractorLazyUpdateTests : public testing::Test {
 };
 
 TEST_F(GraphContractorLazyUpdateTests, GraphContractorLazyUpdateTest) {
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
+    GraphContractor<G> contractor{g_, ContractionParameters{5, 1, 1, 0}, 11};
     std::vector<ExpectedVertexProperties> expected{ ExpectedVertexProperties{2, -2} };
     GraphContractor<G>::PriorityQueue q{};
     q.emplace(-4, 2);

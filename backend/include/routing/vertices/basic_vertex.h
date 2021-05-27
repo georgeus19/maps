@@ -27,6 +27,10 @@ public:
         return edges_;
     }
 
+    inline void set_edges(EdgeRange&& edges) {
+        edges_ = std::move(edges);
+    }
+
     BasicVertex();
     BasicVertex(unsigned_id_type osm_id, EdgeRange&& edges);
 

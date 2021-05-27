@@ -60,7 +60,7 @@ TEST_P(GraphContractorSimpleEdgesTests, SimpleCHPreprocessingEdgesTest) {
 
     CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
+    GraphContractor<G> contractor{g_, ContractionParameters{5, 1, 1, 0}, 11};
    
     ContractVertex(g_, contractor, 4);
     std::cout << "After contraction." << std::endl;
@@ -118,7 +118,7 @@ TEST_P(GraphContractorSimpleBackwardEdgesTests, SimpleContractionBackwardEdgesTe
 
     CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachBackwardEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
+    GraphContractor<G> contractor{g_, ContractionParameters{5, 1, 1, 0}, 11};
 
     ContractVertex(g_, contractor, 4);
    
@@ -163,7 +163,7 @@ TEST_P(GraphContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
 
     CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
+    GraphContractor<G> contractor{g_, ContractionParameters{5, 1, 1, 0}, 11};
 
     ContractVertex(g_, contractor, 4);
     std::cout << "After first contraction." << std::endl;
@@ -198,7 +198,7 @@ TEST(GraphContractorContractionPriority, BasicGraphPriority) {
         std::make_pair(-3, 6)
     };
 
-    GraphContractor<G> contractor(g,  ContractionParameters{11, 5, 1, 1, 0});
+    GraphContractor<G> contractor(g,  ContractionParameters{5, 1, 1, 0}, 11);
     auto&& q = contractor.CalculateContractionPriority();
 
     std::vector<std::pair<double, unsigned_id_type>> actual_priorities{};
@@ -259,7 +259,7 @@ TEST_P(GraphContractorTwowayEdgesTests, TwowayEdgesTest) {
 
     CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
+    GraphContractor<G> contractor{g_, ContractionParameters{5, 1, 1, 0}, 11};
    
     contractor.ContractVertex(g_.GetVertex(4));
     std::cout << "After contraction." << std::endl;
@@ -322,7 +322,7 @@ TEST_P(GraphContractorTwowayBakwardEdgesTests, TwowayBackwardEdgesTest) {
 
     CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>> tested_vertex = g_.GetVertex(tested_vertex_id);
     tested_vertex.ForEachBackwardEdge([](CHPreprocessingEdge& e){ e.Print(); });
-    GraphContractor<G> contractor{g_, ContractionParameters{11, 5, 1, 1, 0}};
+    GraphContractor<G> contractor{g_, ContractionParameters{5, 1, 1, 0}, 11};
 
     ContractVertex(g_, contractor, 4);
    

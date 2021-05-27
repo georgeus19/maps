@@ -34,12 +34,11 @@ public:
     Router(typename Setup::Graph&& graph, const std::string& graph_table_name) 
         : base_graph_(std::move(graph)), base_graph_max_vertex_id_(base_graph_.GetMaxVertexId()), base_graph_max_edge_id_(base_graph_.GetMaxEdgeId()) {}
 
-    std::string CalculateShortestRoute(const std::string& table_name, utility::Point source, utility::Point target) {
+    std::string CalculateShortestRoute(database::DatabaseHelper& d, const std::string& table_name, utility::Point source, utility::Point target) {
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
             throw RouteNotFoundException("Start and end point are the same.");
         }
-        database::DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
-        Setup setup{d};
+        Setup setup{};
         RoutingGraph<typename Setup::Graph> routing_graph{base_graph_};
         auto&& db_graph = setup.CreateDbGraph();
 
@@ -64,7 +63,6 @@ public:
         return GetRouteGeometry(d, table_name, endpoints_creator, res);
     }
 
-
     std::string GetRouteGeometry(database::DatabaseHelper& d, const std::string& table_name,
         EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::Edge>>& endpoints_creator,
         std::vector<typename Setup::Algorithm::Edge>& route) {
@@ -78,7 +76,6 @@ public:
         std::cout << "Routing done." << std::endl;
         return final_array;
     }
-
 
 private:
     typename Setup::Graph base_graph_;

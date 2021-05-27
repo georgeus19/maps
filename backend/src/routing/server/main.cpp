@@ -26,6 +26,16 @@ static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg, double
     return gen.Generate();
 }
 
+template <typename Setup>
+static void GetRouters(Configuration& cfg, std::unordered_map<std::string, Router<Setup>>& routers, const TableNameRepository& rep) {
+    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
+    for(auto&& profile : GenerateProfiles(cfg, 100)) {
+        auto&& g = Setup::CreateGraph(d, rep.GetEdgesTable(profile));
+        std::cout << " Loading " << rep.GetEdgesTable(profile) << std::endl;
+        routers.emplace(profile.GetName(), Router<Setup>{std::move(g), rep.GetEdgesTable(profile)});
+    }
+}
+
 int main(int argc, const char ** argv) {
     if (argc != 2) {
         std::cout << "Arguments: config_path" << std::endl;
@@ -34,18 +44,14 @@ int main(int argc, const char ** argv) {
     crow::SimpleApp app;
     ConfigurationParser parser{config_path};
     auto&& cfg = parser.Parse();
-    using Setup = CHSetup;
+    using Setup = DijkstraSetup;
     std::unordered_set<std::string> index_names{};
     for(auto&& prop : cfg.profile_properties) {
         index_names.insert(prop.index->GetName());
     }
     std::unordered_map<std::string, Router<Setup>> routers{};
     TableNameRepository rep{cfg.algorithm->base_graph_table, cfg.algorithm->name};
-    for(auto&& profile : GenerateProfiles(cfg, 100)) {
-        auto&& g = Setup::CreateGraph(rep.GetEdgesTable(profile));
-        std::cout << " Loading " << rep.GetEdgesTable(profile) << std::endl;
-        routers.emplace(profile.GetName(), Router<Setup>{std::move(g), rep.GetEdgesTable(profile)});
-    }
+    GetRouters<Setup>(cfg, routers, rep);
 
     CROW_ROUTE(app, "/route")([&](const crow::request& req) {
             crow::json::wvalue response;
@@ -76,7 +82,8 @@ int main(int argc, const char ** argv) {
                 auto&& it = routers.find(profile_name);
                 if (it != routers.end()) {
                     std::cout << "table_name " << table_name << std::endl;
-                    auto&& result = it->second.CalculateShortestRoute(table_name, source, target);
+                    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
+                    auto&& result = it->second.CalculateShortestRoute(d, table_name, source, target);
                     response["route"] = result; 
                     response["ok"] = "true";
                 } else {

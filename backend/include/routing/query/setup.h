@@ -25,54 +25,43 @@
 #include "routing/routing_graph.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
 
+#include "routing/table_name_repository.h"
+
 #include <string>
 
 namespace routing {
 namespace query {
 
-/**
- * Info to connect to the database with a routing graph.
- */
-const std::string kDbName = "gis";
-const std::string kUser = "postgres";
-const std::string kPassword = "wtz2trln";
-const std::string kHostAddress = "127.0.0.1";
-const std::string kPort = "5432";
+class DijkstraSetup {
+public:
+    using Edge = BasicEdge;
+    using EdgeRange = VectorEdgeRange<Edge>;
+    using Vertex = BasicVertex<Edge, EdgeRange>;
+    using DbGraph = database::UnpreprocessedDbGraph;
 
-// class DijkstraSetup {
-// public:
-//     using Edge = BasicEdge;
-//     using Vertex = BasicVertex<Edge, VectorEdgeRange<Edge>>;
-//     using Graph = AdjacencyListGraph<Vertex, Edge>;
-//     using DbGraph = database::UnpreprocessedDbGraph;
-//     using Algorithm = Dijkstra<Graph>;
+    using Graph = AdjacencyListGraph<Vertex, Edge>;
+    using Algorithm = Dijkstra<RoutingGraph<Graph>>;
+    using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyDijkstra<RoutingGraph<Graph>, EdgeRangePolicyVector<Edge>>;
 
-//     DijkstraSetup(database::DatabaseHelper& d) : d_(d) {} 
+    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
+        Graph g{};
+        DbGraph db_graph{};
+        d.LoadFullGraph<Graph>(graph_table_name, g, &db_graph);
+        return g;
+    }
 
-//     Graph CreateGraph(const std::string& graph_table_name) {
-//         Graph g{};
-//         DbGraph db_graph{};
-//         d_.LoadFullGraph<Graph>(graph_table_name, g, &db_graph);
-//         return g;
-//     }
+    EndpointEdgesCreator<Edge> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<Edge>{d, db_graph};
+    }
 
-//     DbGraph CreateDbGraph() {
-//         return DbGraph{};
-//     }
+    EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
+        return EndpointAlgorithmPolicy{routing_graph, EdgeRangePolicyVector<Edge>{}};
+    }
 
-//     BasicEdgeEndpointHandler<Edge>& get_source_endpoint_handler() {
-//         return source_endpoint_handler_;
-//     }
-
-//     BasicEdgeEndpointHandler<Edge>& get_target_endpoint_handler() {
-//         return target_endpoint_handler_;
-//     }
-
-// private:
-//     database::DatabaseHelper& d_;
-//     BasicEdgeEndpointHandler<Edge> source_endpoint_handler_;
-//     BasicEdgeEndpointHandler<Edge> target_endpoint_handler_;
-// };
+    DbGraph CreateDbGraph() {
+        return DbGraph{};
+    }
+};
 
 class CHSetup {
 public:
@@ -87,8 +76,16 @@ public:
     using Algorithm = BidirectionalDijkstra<RoutingGraph<Graph>>;
     using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>>;
 
-    CHSetup(database::DatabaseHelper& d) : d_(d) {} 
-    
+    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
+        TemporaryGraph g{};
+        DbGraph db_graph{};
+        d.LoadFullGraph<TemporaryGraph>(graph_table_name, g, &db_graph);
+        d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
+        Graph search_graph{};
+        search_graph.Load(g);
+        return search_graph;
+    }
+
     DbGraph CreateDbGraph() {
         return DbGraph{};
     }
@@ -100,25 +97,10 @@ public:
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
         return EndpointAlgorithmPolicy{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
     }
-
-    static Graph CreateGraph(const std::string& graph_table_name) {
-        TemporaryGraph g{};
-        database::DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
-        DbGraph db_graph{};
-        d.LoadFullGraph<TemporaryGraph>(graph_table_name, g, &db_graph);
-        d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
-        Graph search_graph{};
-        search_graph.Load(g);
-        return search_graph;
-    }
-
-private: 
-    database::DatabaseHelper& d_;
 };
 
 
 
 }
 }
-
 #endif //ROUTING_QUERY_SETUP_H

@@ -8,6 +8,8 @@ port = "5432"
 [algorithm]
 name = "ch"
 base_graph_table = "czedges"
+[algorithm.query]
+type = "multiple_profiles"
 [algorithm.parameters]
 hop_count = 5
 edge_difference = 190

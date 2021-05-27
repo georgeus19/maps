@@ -25,6 +25,7 @@
 #include "routing/edge_ranges/iterator_edge_range.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/vertices/ch_vertex.h"
+#include "routing/configuration_parser.h"
 
 using namespace std;
 using namespace routing;
@@ -71,8 +72,8 @@ void PrintMemoryUsage() {
     cout << "VM: " << vm << "; RSS: " << rss << endl;
 }
 
-void LoadGraph(G& g) {
-    database::DatabaseHelper d{kDbName, kUser, kPassword, kHostAddress, kPort};
+void LoadGraph(DatabaseHelper& d, G& g) {
+    
     CHDbGraph db_graph{};
     std::cout << "Database helper init (ctor): " << std::endl;
     PrintMemoryUsage();
@@ -89,19 +90,22 @@ void LoadGraph(G& g) {
 }
 
 
-void LoadImmutableGraph(SearchGraph& gi) {
+void LoadImmutableGraph(DatabaseHelper& d, SearchGraph& gi) {
     G g{};
-    LoadGraph(g);
+    LoadGraph(d, g);
     gi.Load(g);
     std::cout << "Search graph load: " << std::endl;
     PrintMemoryUsage();
     G gg{};
-    LoadGraph(gg);
+    LoadGraph(d, gg);
     std::cout << "Normal and immutable graph in memory: " << std::endl;
     PrintMemoryUsage();
 }
 
 int main(int argc, const char ** argv) {
+    ConfigurationParser parser{argv[1]};
+    auto&& cfg = parser.Parse();
+    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
     std::cout <<  "std::vector<CHSearchEdge>::iterator " << sizeof(std::vector<CHSearchEdge>::iterator) << std::endl;
     std::cout << "CHSearchVertex<CHSearchEdge, std::vector<CHSearchEdge>::iterator> " << sizeof(CHSearchVertex<CHSearchEdge, std::vector<CHSearchEdge>::iterator>) << std::endl;
     std::cout << "ContractionSearchVertex<CHSearchEdge> " << sizeof(ContractionSearchVertex<CHSearchEdge>) << std::endl;
@@ -110,8 +114,8 @@ int main(int argc, const char ** argv) {
     // G g{};
     SearchGraph g{};
     PrintMemoryUsage();
-    // LoadGraph(g);
-    LoadImmutableGraph(g);
+    // LoadGraph(d, g);
+    LoadImmutableGraph(d, g);
     std::cout << "vertex size: " << sizeof(ContractionSearchVertex<CHSearchEdge>) << std::endl;
     std::cout << "vertex count: " << g.GetVertexCount() << std::endl;
     std::cout << "edge size: " << sizeof(CHSearchEdge) << std::endl;

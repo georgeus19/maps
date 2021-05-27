@@ -1,5 +1,5 @@
-#ifndef ROUTING_QUERY_GRAPH_POLICY_H
-#define ROUTING_QUERY_GRAPH_POLICY_H
+#ifndef ROUTING_QUERY_ENDPOINT_ALGORITHM_POLICY_H
+#define ROUTING_QUERY_ENDPOINT_ALGORITHM_POLICY_H
 
 #include <functional>
 
@@ -34,9 +34,43 @@ private:
     EdgeRangePolicy edge_range_policy_;
 };
 
+template <typename Graph, typename EdgeRangePolicy>
+class EndpointAlgorithmPolicyDijkstra{
+public:
+
+    EndpointAlgorithmPolicyDijkstra(Graph& graph, const EdgeRangePolicy& ers)
+        : graph_(std::ref(graph)), edge_range_policy_(ers) {}
+
+    EndpointAlgorithmPolicyDijkstra(Graph& graph, EdgeRangePolicy&& ers)
+        : graph_(std::ref(graph)), edge_range_policy_(std::move(ers)) {}
+
+    void AddSource(std::vector<typename Graph::Edge>&& edges, unsigned_id_type source_id) {
+        typename Graph::Vertex source_vertex{source_id, edge_range_policy_.CreateEdgeRange(std::move(edges))}; 
+        graph_.get().AddVertex(std::move(source_vertex));
+    }
+
+    void AddTarget(std::vector<typename Graph::Edge>&& edges, unsigned_id_type target_id) {
+         for(auto&& edge : edges) {
+            edge.Reverse();
+            auto&& immutable_neighbour = graph_.get().GetVertex(edge.get_from());
+            std::vector<typename Graph::Edge> neighbour_edges{};
+            neighbour_edges.insert(neighbour_edges.end(), immutable_neighbour.get_edges().begin(), immutable_neighbour.get_edges().end());
+            neighbour_edges.push_back(std::move(edge));
+            typename Graph::Vertex neighbour{immutable_neighbour.get_osm_id(), edge_range_policy_.CreateEdgeRange(std::move(neighbour_edges))};
+            graph_.get().AddVertex(std::move(neighbour));
+        }
+        typename Graph::Vertex target_vertex{target_id, edge_range_policy_.CreateEdgeRange(std::vector<typename Graph::Edge>{})}; 
+        graph_.get().AddVertex(std::move(target_vertex));
+    }
+
+private:
+    std::reference_wrapper<Graph> graph_;
+    EdgeRangePolicy edge_range_policy_;
+};
+
 
 
 }
 }
 
-#endif // ROUTING_QUERY_GRAPH_POLICY_H
+#endif // ROUTING_QUERY_ENDPOINT_ALGORITHM_POLICY_H
