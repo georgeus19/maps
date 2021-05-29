@@ -27,19 +27,9 @@ function SearchInput(props) {
     const [placeSuggestions, setPlaceSuggestions] = useState([]);
 
     /**
-     * Specifies if dropdown menu should be open or not.
-     */
-    const [menuOpen, setMenuOpen] = useState(false);
-
-    /**
      * Fetch possible location that match user input if `search` is true.
      */
     useEffect(() => {
-        //if (search === false) {
-        //    console.log("NO fetch.");
-        //    return;
-        //}
-        //setSearch(false);
         if (props.text === '') {
             return;
         }
@@ -47,7 +37,6 @@ function SearchInput(props) {
             .then((places) => {
                 if (places.length !== 0) {
                     setPlaceSuggestions(places);
-                    setMenuOpen(true);
                 }
             })
             .catch((error) => {
@@ -70,7 +59,6 @@ function SearchInput(props) {
             onClick={() => { 
                 console.log("PLACE!");
                 props.setSelectedPlace(suggestion); 
-                props.showOnMap(suggestion);
                 props.setText(suggestion.label);
                 setPlaceSuggestions([]);
             }}>
@@ -84,7 +72,7 @@ function SearchInput(props) {
         <div className="SearchInput">
             <input 
                 placeholder={props.placeholder} 
-                onChange={(e) => {console.log("e", e); props.setText(e.target.value); setSearch(!search); }} 
+                onChange={(e) => {props.setText(e.target.value); setSearch(!search); }} 
                 value={props.text}
                 onClick={(e) => {props.onClick(); e.stopPropagation();}}
             >
@@ -95,6 +83,5 @@ function SearchInput(props) {
         </div>
     );
 }
-//<Button className="GreenButton" onClick={() => { setSearch(!search); /*fetchPlaces(props.text) */}}><Search/></Button>
 
 export default SearchInput;

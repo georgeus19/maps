@@ -256,12 +256,6 @@ function PathPoint(props) {
     const [text, setText] = useState('');
 
     /**
-     * Printing to map is handled in `MapSection` so nothing is done here.
-     * @param {*} place 
-     */
-    function showOnMap(place) {}
-
-    /**
      * Callback to `SearchInput`. Is called when user selects option from dropdown menu
      * to update `pathPoints`(array of points that make a route.).
      * @param {*} place {label:..., value:...}
@@ -300,7 +294,6 @@ function PathPoint(props) {
             <SearchInput 
                 searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
                 selectedPlace={props.pointName} setSelectedPlace={(place) => handleSelect(place)}
-                showOnMap={(place) => showOnMap(place)}
                 text={text} setText={setText}
                 onClick={() => props.setCurrentPoint(props.index)}
                 placeholder={placeholder}
