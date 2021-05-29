@@ -59,10 +59,10 @@ function SearchInput(props) {
             onClick={() => { 
                 console.log("PLACE!");
                 props.setSelectedPlace(suggestion); 
-                props.setText(suggestion.label);
+                props.setText(suggestion.name);
                 setPlaceSuggestions([]);
             }}>
-                {suggestion.label}
+                {suggestion.name}
             </div>
     }).filter((suggestion, index) => { return index < 5; });
 

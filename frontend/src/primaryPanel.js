@@ -111,6 +111,7 @@ function RoutingTab(props) {
             coordinatesPairs.push([coordinates[i], coordinates[i + 1]]);
         }
         Promise.all(coordinatesPairs.map((pair) => {
+            console.log("fetch", '/route?coordinates=' + JSON.stringify(pair) + '&profile=' + JSON.stringify(profile));
             return fetch('/route?coordinates=' + JSON.stringify(pair) + '&profile=' + JSON.stringify(profile), {
                     method: 'GET',
                     headers: {
@@ -263,7 +264,7 @@ function PathPoint(props) {
     function handleSelect(place) {
         console.log('PLACE: ', place);
         props.setCurrentPoint(props.index);
-        props.dispatchPoints({type:'update', value:{name:place.label, latLon:[place.value.lat, place.value.lon]}, index:props.index})
+        props.dispatchPoints({type:'update', value:{name:place.name, latLon:place.latLon}, index:props.index})
     }
 
     /**

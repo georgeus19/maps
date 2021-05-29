@@ -30,7 +30,7 @@ export function findPossiblePlaces(placeName) {
                 if (adr.country) {
                     displayName += adr.country + ', ';
                 }
-                return { value:obj, label:obj.display_name };
+                return { latLon:[parseFloat(obj.lat), parseFloat(obj.lon)], name:obj.display_name };
             });
         });
 };
