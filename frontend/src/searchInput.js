@@ -24,7 +24,7 @@ function SearchInput(props) {
     /**
      * Represents option in dropdown menu that user can select from.
      */
-    const [placeOptions, setPlaceOptions] = useState([]);
+    const [placeSuggestions, setPlaceSuggestions] = useState([]);
 
     /**
      * Specifies if dropdown menu should be open or not.
@@ -45,8 +45,10 @@ function SearchInput(props) {
         }
         findPossiblePlaces(props.text)
             .then((places) => {
-                setPlaceOptions(places);
-                setMenuOpen(true);
+                if (places.length !== 0) {
+                    setPlaceSuggestions(places);
+                    setMenuOpen(true);
+                }
             })
             .catch((error) => {
                 console.warn('Error occured with respect to searching possible places.', error);
@@ -58,61 +60,39 @@ function SearchInput(props) {
      */
     useEffect(() => {
         if (props.text === '' || props.text === null) {
-            setPlaceOptions([]);
+            setPlaceSuggestions([]);
         } 
     }, [props.text])
 
-    /**
-     * Handle input change - happens on each user's key stroke.
-     * @param {string} value string value of new value of user input.
-     * @param {*} param1 Object with action.
-     */
-    function handleInputChange(value, {action}) {
-        console.log("Input change:", action, value);
-        switch (action) {
-            case 'input-change':
-                props.setText(value);
-                setSearch(!search);
-                break;
-            case 'input-blur':
-                break;
+    const suggestions = placeSuggestions.map((suggestion) => {
+        return <div 
+            className="Suggestion"
+            onClick={() => { 
+                console.log("PLACE!");
+                props.setSelectedPlace(suggestion); 
+                props.showOnMap(suggestion);
+                props.setText(suggestion.label);
+                setPlaceSuggestions([]);
+            }}>
+                {suggestion.label}
+            </div>
+    }).filter((suggestion, index) => { return index < 5; });
 
-            case 'menu-close':
-                setMenuOpen(false);
-                break;
-            case 'set-value':
-                // props.setText(value);
-                break;
-            default:
-                break;
-        }
-    }
+    console.log('suggestions', suggestions);
 
-    /**
-     * Handle that triggers when user selects an option from dropdown menu.
-     * @param {string} place Value of selected option (=location) - {label:..., value:...}
-     * @param {*} param1 Object with action.
-     */
-    function handleOnChange(place, {action}) {
-        props.setSelectedPlace(place); 
-        props.showOnMap(place);
-    }
+    return ( 
+        <div className="SearchInput">
+            <input 
+                placeholder={props.placeholder} 
+                onChange={(e) => {console.log("e", e); props.setText(e.target.value); setSearch(!search); }} 
 
-    return (
-            <Select 
-                className="SearchInput"
-                defaultValue=""
-                menuIsOpen={menuOpen}
-                onFocus={() => {props.handleClick();  }}
-                onChange={handleOnChange}
-                options={placeOptions}
-                inputValue={props.text}
-                placeholder={props.placeholder}
-                // value={{value:props.text, label:props.text}}
-                filterOption={() => true} // Always show all options.
-                onInputChange={handleInputChange}
-                onClick={(e) => {e.target.select();}}
-             />
+                value={props.text}
+                onFocus={() => props.onFocus()} >
+            </input>
+            <div className="Suggestions">
+                {suggestions}
+            </div>
+        </div>
     );
 }
 //<Button className="GreenButton" onClick={() => { setSearch(!search); /*fetchPlaces(props.text) */}}><Search/></Button>

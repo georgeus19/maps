@@ -1,13 +1,59 @@
-.SearchInput {
-    /* padding: 5px; */
-    /* display: flex; */
-    /* flex-direction: row; */
-    /* box-sizing: border-box; */
-    width: 300px;
-    /* max-width: 300px; */
-}
-
 .SearchContainer > .SearchInput {
     margin-left: auto;
     margin-right: auto;
+}
+
+.SearchInput{
+    width: 300px;
+    position: relative;
+    height: 40px;
+}
+
+.SearchInput input{
+    z-index: 10;
+    width: 300px;
+    padding: 5px;
+    height: 40px;
+}
+
+.Suggestions{
+    background-color: aqua;
+    width: 300px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+}
+
+.Suggestion{
+    width: 300px;
+    background-color: rgb(233, 245, 215);
+    z-index: 10;
+    /* overflow:hidden; */
+    font-size: 15px;
+    border-style: groove;
+    border:1px groove dimgray;
+    /* white-space: nowrap; */
+    /* text-overflow: ellipsis; */
+}
+
+.Suggestion:hover{
+    background-color: rgb(226, 238, 209);
+    /* overflow: visible; */
+    z-index: 20;
+}
+
+.Suggestions, .Suggestion{
+    display: none;
+    /* visibility: hidden; */
+}
+
+.SearchInput:hover .Suggestions, .SearchInput:hover .Suggestion{
+    display: block;
+    /* visibility: visible; */
+}
+
+.SearchInput:focus-within .Suggestions, .SearchInput:focus-within .Suggestion{
+    display: block;
+    /* visibility: visible; */
 }

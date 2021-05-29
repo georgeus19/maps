@@ -44,7 +44,7 @@ int main(int argc, const char ** argv) {
     crow::SimpleApp app;
     ConfigurationParser parser{config_path};
     auto&& cfg = parser.Parse();
-    using Setup = DijkstraSetup;
+    using Setup = CHSetup;
     std::unordered_set<std::string> index_names{};
     for(auto&& prop : cfg.profile_properties) {
         index_names.insert(prop.index->GetName());
