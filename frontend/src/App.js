@@ -48,7 +48,7 @@ function App() {
 	
 
 	return (
-    	<div className="App">
+    	<div className="App" onClick={() => {setCurrentPoint(-1);}}>
         	<MapSection 
 				currentPoint={currentPoint} setCurrentPoint={setCurrentPoint}
 				pathPoints={pathPoints} dispatchPoints={dispatchPoints}

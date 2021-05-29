@@ -85,9 +85,9 @@ function SearchInput(props) {
             <input 
                 placeholder={props.placeholder} 
                 onChange={(e) => {console.log("e", e); props.setText(e.target.value); setSearch(!search); }} 
-
                 value={props.text}
-                onFocus={() => props.onFocus()} >
+                onClick={(e) => {props.onClick(); e.stopPropagation();}}
+            >
             </input>
             <div className="Suggestions">
                 {suggestions}

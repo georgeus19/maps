@@ -302,7 +302,7 @@ function PathPoint(props) {
                 selectedPlace={props.pointName} setSelectedPlace={(place) => handleSelect(place)}
                 showOnMap={(place) => showOnMap(place)}
                 text={text} setText={setText}
-                onFocus={() => props.setCurrentPoint(props.index)}
+                onClick={() => props.setCurrentPoint(props.index)}
                 placeholder={placeholder}
             >
             
