@@ -27,7 +27,7 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 			"	'bare_rock', 'scree', 'shingle', 'sand', 'mud', 'water', 'wetland', 'glacier', 'bay', 'cape', 'strait', 'beach', 'coastline', "
 			"	'reef', 'spring', 'hot_spring', 'geyser', 'peak', 'dune', 'hill', 'volcano', 'valley', 'ridge', 'arete', 'cliff', 'saddle', "
 			"	'isthmus', 'peninsula', 'rock', 'stone', 'sinkhole', 'cave_entrance') "
-			"	OR p.landuse IN ('farmland', 'forest', 'meadow', 'orchard', 'vineyard', 'basin', 'grass', 'village_green', 'recreation_ground', 'allotments') "
+			"	OR p.landuse IN ('farmland', 'forest', 'meadow', 'orchard', 'vineyard', 'basin', 'grass', 'plant_nursery', 'village_green', 'recreation_ground', 'allotments', 'cemetery') "
             "   OR p.leisure in ('disc_golf_course', 'dog_park', 'golf_course', 'garden', 'park', 'pitch', 'beach_resort'); "
 			"CREATE INDEX " + green_places_table_index + " ON " + green_places_table + " USING GIST (way); "
 			"CREATE TABLE " + green_index_table + " AS  "
