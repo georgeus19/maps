@@ -140,31 +140,44 @@ function RoutingTab(props) {
                 });
         }))
         .then((routes) => {
-            console.log("routes.flat(); ", routes.flat(1));
-            const unordered_coordinates = routes.flat(1);
-            const equals = (a, b) => { const eps = 0.00001; return (a + eps >= b) && (a - eps <= b)};
-            for (let i = 0; i < unordered_coordinates.length - 1; i++) {
-                const formerCoordinates = unordered_coordinates[i].coordinates[unordered_coordinates[i].coordinates.length - 1];
-                const latterCoordinates = unordered_coordinates[i+1].coordinates[0];
-                if (!equals(formerCoordinates[0], latterCoordinates[0]) || !equals(formerCoordinates[1], latterCoordinates[1])) {
-                    unordered_coordinates[i+1].coordinates = unordered_coordinates[i+1].coordinates.reverse();
-                }
-            }
-            const coordinates = unordered_coordinates.map((linestring) => {
-                return linestring.coordinates;
-            }).flat(1);
             const joinedRoute = {
                 'type': 'LineString',
-                'coordinates': coordinates
+                'coordinates': mergeRoutes(routes)
             };
             props.setRoute({data:joinedRoute, key:props.route.key < 0 ? 1 : -1});
-            console.log("routes ", routes);
-            console.log("joinedRoute ", joinedRoute);
+            // console.log("routes ", routes);
+            // console.log("joinedRoute ", joinedRoute);
         })
         .catch((error) => {
             alert("Invalid path.");
             console.warn('Error occured with respect to routing.', error);
         });
+    }
+
+    function mergeRoutes(routes) {
+        const unordered_coordinates = routes.flat(1).map((linestring) => {
+            return linestring.coordinates;
+        });
+        const equals = (a, b) => { const eps = 0.00001; return (a + eps >= b) && (a - eps <= b)};
+        const coordinatesEqual = (former, latter) => {
+            return equals(former[0], latter[0]) && equals(former[1], latter[1]); 
+        };
+        if (unordered_coordinates.length > 1) {
+            const former = unordered_coordinates[0];
+            const latter = unordered_coordinates[1];
+            if (coordinatesEqual(former[0], latter[0])
+                || coordinatesEqual(former[0], latter[latter.length - 1])) {
+                    unordered_coordinates[0] = former.reverse();
+            }
+        }
+        for (let i = 0; i < unordered_coordinates.length - 1; i++) {
+            const former = unordered_coordinates[i]; 
+            const latter = unordered_coordinates[i + 1];
+            if (!coordinatesEqual(former[former.length - 1], latter[0])) {
+                unordered_coordinates[i + 1] = latter.reverse();
+            }
+        }
+        return unordered_coordinates.flat(1);
     }
 
     /**
