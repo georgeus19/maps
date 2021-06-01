@@ -164,21 +164,10 @@ public:
     std::string GetRouteCoordinates(std::vector<Edge> & edges, const std::string & table_name);
 
     /**
-     * Add edges to `graph` that are within `radius` from `center`.
-     * @tparam Graph Routing graph class type.
-     * @param center Center of the area edges are loaded to graph from.
-     * @param radius How close a edge must be from `center` to be loaded to graph.
-     * @param table_name Name of table where to look for edges.
-     * @param graph Graph the edges are loaded into.
-     */
-    template <typename Graph>
-    void LoadGraph(utility::Point center, std::string radius, const std::string & table_name, Graph & graph, DbGraph* db_graph);
-
-    /**
      * Load the entire graph from the database table (edgelist)
      */
-    template <typename Graph>
-    void LoadFullGraph(const std::string & table_name, Graph & graph, DbGraph* db_graph);
+    template <typename Graph, typename EdgeFactory>
+    void LoadGraphEdges(const std::string& table_name, Graph& graph, DbGraph* db_graph, EdgeFactory& edge_factory);
 
     /**
      * Add columns to edge list table which consider shortcut edges.
@@ -239,9 +228,6 @@ private:
      * execute queries on the database through it (-> read/write data).
      */
     std::unique_ptr<pqxx::connection> connection_;
-
-    template <typename Graph>
-    void LoadGraph(const std::string& sql, Graph& graph, DbGraph* db_graph);
 
     std::string GetGeographyIndexName(const std::string& table_name);
 
@@ -387,19 +373,16 @@ from czedges as e where ST_DWithin('SRID=4326;POINT(13.393348750000001 49.723055
                                 0.7 * ST_Distance('SRID=4326;POINT(13.3998825 49.7230553)'::geography,
                                     'SRID=4326;POINT(13.3868150 49.7282850)'::geography));
     */
-template <typename Graph>
-void DatabaseHelper::LoadGraph(utility::Point center, std::string radius, const std::string& table_name, Graph& graph, DbGraph* db_graph) {
-    // Select all edges within the `radius` of center.
-    std::string load_graph_sql = db_graph->GetEdgeSelect() + 
-                        "from " + table_name + " as e " \
-                        "where ST_DWithin('SRID=4326;" + MakeSTPoint(center) + "'::geography, e.geog, " + radius + ") ";
-    LoadGraph(load_graph_sql, graph, db_graph);
-}
-
-template <typename Graph>
-void DatabaseHelper::LoadFullGraph(const std::string& table_name, Graph& graph, DbGraph* db_graph) {
-    std::string load_graph_sql = db_graph->GetEdgeSelect() + " FROM " + table_name + ";";
-    LoadGraph(load_graph_sql, graph, db_graph);
+template <typename Graph, typename EdgeFactory>
+void DatabaseHelper::LoadGraphEdges(const std::string& table_name, Graph& graph, DbGraph* db_graph, EdgeFactory& edge_factory) {
+    std::string sql = db_graph->GetEdgeSelect() + " FROM " + table_name + ";";
+    
+    pqxx::nontransaction n{*connection_};
+    pqxx::result result{n.exec(sql)};
+    
+     for (std::unique_ptr<DbEdgeIterator> it = db_graph->GetEdgeIterator(result.begin(), result.end()); !(it->IsEnd()); it->Inc()) {
+        graph.AddEdge(edge_factory.Create(*it));
+    }
 }
 
 
@@ -469,16 +452,6 @@ void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_
         uint64_t vertex_id = it[0].as<uint64_t>();
         auto&& vertex = g.GetVertex(vertex_id);
         vertex.set_ordering_rank(it[1].as<uint64_t>());
-    }
-}
-
-template <typename Graph>
-void DatabaseHelper::LoadGraph(const std::string& sql, Graph& graph, DbGraph* db_graph) {
-    pqxx::nontransaction n{*connection_};
-    pqxx::result result{n.exec(sql)};
-    
-    for (std::unique_ptr<DbEdgeIterator> it = db_graph->GetEdgeIterator(result.begin(), result.end()); !(it->IsEnd()); it->Inc()) {
-        graph.AddEdge(typename Graph::Edge{it.get()});
     }
 }
 

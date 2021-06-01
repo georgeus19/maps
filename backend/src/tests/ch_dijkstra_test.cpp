@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
+#include "routing/edges/length_source.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -13,7 +14,6 @@
 #include "tests/graph_test.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
-
 #include <string>
 #include <vector>
 using namespace std;
@@ -23,7 +23,8 @@ using namespace preprocessing;
 
 using namespace database;
 // using namespace testing;
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
 
 class CHDijkstraTest : public testing::Test {
     protected:

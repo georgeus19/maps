@@ -18,7 +18,7 @@ public:
 
     virtual void Normalize(double max) = 0;
 
-    virtual double Get(unsigned_id_type uid) = 0;
+    virtual double Get(unsigned_id_type uid) const = 0;
 
     virtual std::string GetName() const = 0;
 };

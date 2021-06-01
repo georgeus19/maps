@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/ch_preprocessing_edge.h"
+
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -15,6 +15,8 @@
 #include "routing/preprocessing/graph_contractor.h"
 #include "utility/point.h"
 #include "routing/query/router.h"
+#include "routing/edges/length_source.h"
+
 #include <string>
 #include <vector>
 #include <tuple>

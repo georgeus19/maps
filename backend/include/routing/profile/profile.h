@@ -33,6 +33,7 @@ public:
 
     std::string GetName() const;
 
+    double GetLength(unsigned_id_type uid) const;
 private:
     double scale_max_;
     std::vector<Property> properties_;
@@ -51,7 +52,6 @@ private:
         ~Property() = default;
     };
 
-    double GetLength(unsigned_id_type uid);
 };
 
 template <typename Graph>

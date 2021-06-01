@@ -16,12 +16,14 @@
 #include "routing/query/endpoint_edges_creator.h"
 #include "routing/query/endpoint_algorithm_policy.h"
 #include "routing/query/edge_range_policy.h"
-#include "routing/edges/ch_search_edge.h"
+#include "routing/edges/ch_edge.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/ch_search_graph.h"
 #include "routing/routing_graph.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
+#include "routing/edges/length_source.h"
+#include "routing/edge_factory.h"
 
 #include "routing/table_name_repository.h"
 
@@ -32,7 +34,7 @@ namespace query {
 
 class DijkstraSetup {
 public:
-    using Edge = BasicEdge;
+    using Edge = BasicEdge<NumberLengthSource>;
     using EdgeRange = VectorEdgeRange<Edge>;
     using Vertex = BasicVertex<Edge, EdgeRange>;
     using DbGraph = database::UnpreprocessedDbGraph;
@@ -44,7 +46,8 @@ public:
     static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
         Graph g{};
         DbGraph db_graph{};
-        d.LoadFullGraph<Graph>(graph_table_name, g, &db_graph);
+        BasicNumberEdgeFactory edge_factory{};
+        d.LoadGraphEdges<Graph>(graph_table_name, g, &db_graph, edge_factory);
         return g;
     }
 
@@ -63,7 +66,7 @@ public:
 
 class CHSetup {
 public:
-    using Edge = CHSearchEdge;
+    using Edge = CHEdge<NumberLengthSource>;
     using EdgeIterator = std::vector<Edge>::iterator;
     using EdgeRange = IteratorEdgeRange<Edge, EdgeIterator>;
     using Vertex = CHVertex<Edge, EdgeRange>;
@@ -77,7 +80,8 @@ public:
     static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
         TemporaryGraph g{};
         DbGraph db_graph{};
-        d.LoadFullGraph<TemporaryGraph>(graph_table_name, g, &db_graph);
+        CHNumberEdgeFactory edge_factory{};
+        d.LoadGraphEdges<TemporaryGraph>(graph_table_name, g, &db_graph, edge_factory);
         d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
         Graph search_graph{};
         search_graph.Load(g);

@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/ch_preprocessing_edge.h"
+
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -17,6 +17,7 @@
 #include "routing/query/bidirectional_dijkstra.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/edges/length_source.h"
 
 #include <string>
 #include <vector>
@@ -29,7 +30,8 @@ using namespace database;
 using namespace query;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
 
 struct VertexMeasuresTest {
     int32_t edge_difference;
@@ -73,7 +75,7 @@ class VertexContractionMeasuresTests : public testing::TestWithParam<VertexMeasu
 };
 
 INSTANTIATE_TEST_CASE_P(
-    SimpleCHPreprocessingEdgesTestParameters, 
+    SimpleCHEdgesTestParameters, 
     VertexContractionMeasuresTests,
     ::testing::Values(
         VertexMeasuresTestParameters{VertexMeasuresTest{-2, 0, -2}, 1, std::vector<unsigned_id_type>{}, ContractionParameters{5, 1, 1, 0}},

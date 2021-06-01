@@ -12,6 +12,7 @@
 #include "tests/graph_test.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/edges/length_source.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -19,7 +20,8 @@ using namespace routing;
 using namespace query;
 using namespace database;
 // using namespace testing;
-using G = AdjacencyListGraph<BasicVertex<BasicEdge, VectorEdgeRange<BasicEdge>>, BasicEdge>;
+using Edge = BasicEdge<NumberLengthSource>;
+using G = AdjacencyListGraph<BasicVertex<Edge, VectorEdgeRange<Edge>>, Edge>;
 
 class DijkstraTest : public testing::Test {
     protected:
@@ -39,7 +41,7 @@ TEST_F(DijkstraTest, ExistingPath) {
     }
 
     vector<Dijkstra<G>::Edge> expected_path{
-        BasicEdge{1, 1, 3, 2}, BasicEdge{3, 3, 4, 3}, BasicEdge{5, 4, 5, 2}, BasicEdge{7, 5, 6, 2}
+        Edge{1, 1, 3, 2}, Edge{3, 3, 4, 3}, Edge{5, 4, 5, 2}, Edge{7, 5, 6, 2}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -55,7 +57,7 @@ TEST_F(DijkstraTest, RunTwiceExistingPath) {
     }
 
     vector<Dijkstra<G>::Edge> expected_path{
-        BasicEdge{1, 1, 3, 2}, BasicEdge{3, 3, 4, 3}, BasicEdge{5, 4, 5, 2}, BasicEdge{7, 5, 6, 2}
+        Edge{1, 1, 3, 2}, Edge{3, 3, 4, 3}, Edge{5, 4, 5, 2}, Edge{7, 5, 6, 2}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -64,9 +66,9 @@ TEST_F(DijkstraTest, RunTwiceExistingPath) {
 TEST_F(DijkstraTest, LimitedSearch) {
     // Dijkstra<G> dijkstra{g_};
     // double max_cost = 4; // Shortest path found to vertices 1, 2, 3, 4.
-    // dijkstra.Run(1, [=](BasicVertex<BasicEdge>* v) { 
+    // dijkstra.Run(1, [=](BasicVertex<Edge>* v) { 
     //         return v->get_cost() > max_cost;
-    //     }, [](BasicVertex<BasicEdge>*) { return false; });
+    //     }, [](BasicVertex<Edge>*) { return false; });
     // EXPECT_EQ(dijkstra.GetPathLength(1), 0);
     // EXPECT_EQ(dijkstra.GetPathLength(2), 2);
     // EXPECT_EQ(dijkstra.GetPathLength(3), 2);

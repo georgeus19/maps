@@ -80,7 +80,7 @@ void GreenIndex::Normalize(double scale_max) {
     }
 }
 
-double GreenIndex::Get(unsigned_id_type uid) {
+double GreenIndex::Get(unsigned_id_type uid) const {
     assert(uid < edge_green_values_.size());
     GreenValue gv = edge_green_values_[uid];
     if (gv.valid) {

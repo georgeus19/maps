@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/ch_preprocessing_edge.h"
+
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -19,6 +19,7 @@
 #include "routing/preprocessing/shortcut_filter.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/edges/length_source.h"
 
 #include <string>
 #include <vector>
@@ -31,10 +32,11 @@ using namespace query;
 using namespace database;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
-void Print(const std::vector<CHPreprocessingEdge>& edges, const std::string& name);
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
+void Print(const std::vector<Edge>& edges, const std::string& name);
 
-void Print(const std::vector<CHPreprocessingEdge>& edges, const std::string& name) {
+void Print(const std::vector<Edge>& edges, const std::string& name) {
     std::cout << name << " :" << std::endl;
     for(auto&& edge : edges) {
         edge.Print();
@@ -43,10 +45,10 @@ void Print(const std::vector<CHPreprocessingEdge>& edges, const std::string& nam
 
 
 struct FilterShortcutsParameter {
-    std::vector<CHPreprocessingEdge> input_shortcuts;
-    std::vector<CHPreprocessingEdge> expected_shortcuts;
+    std::vector<Edge> input_shortcuts;
+    std::vector<Edge> expected_shortcuts;
 
-    FilterShortcutsParameter(const std::vector<CHPreprocessingEdge>& is, const std::vector<CHPreprocessingEdge>& es) :
+    FilterShortcutsParameter(const std::vector<Edge>& is, const std::vector<Edge>& es) :
         input_shortcuts(is), expected_shortcuts(es) {}
 };
 
@@ -64,24 +66,24 @@ INSTANTIATE_TEST_CASE_P(
     ShortcutFilterFilterShortcutsTests,
     ::testing::Values(
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 4, 1}},
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 4, 1}}
+            std::vector<Edge>{Edge{10, 1, 4, 1}},
+            std::vector<Edge>{Edge{10, 1, 4, 1}}
         },
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}},
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}}
+            std::vector<Edge>{Edge{10, 1, 3, 1}, Edge{11, 1, 4, 1}},
+            std::vector<Edge>{Edge{10, 1, 3, 1}, Edge{11, 1, 4, 1}}
         },
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 6, 1}, CHPreprocessingEdge{11, 1, 4, 1}, CHPreprocessingEdge{12, 1, 6, 2}},
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 6, 1}, CHPreprocessingEdge{11, 1, 4, 1}}
+            std::vector<Edge>{Edge{10, 1, 6, 1}, Edge{11, 1, 4, 1}, Edge{12, 1, 6, 2}},
+            std::vector<Edge>{Edge{10, 1, 6, 1}, Edge{11, 1, 4, 1}}
         },
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}, CHPreprocessingEdge{12, 1, 3, 1}},
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 3, 1}, CHPreprocessingEdge{11, 1, 4, 1}}
+            std::vector<Edge>{Edge{10, 1, 3, 1}, Edge{11, 1, 4, 1}, Edge{12, 1, 3, 1}},
+            std::vector<Edge>{Edge{10, 1, 3, 1}, Edge{11, 1, 4, 1}}
         },
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 6, 4}, CHPreprocessingEdge{11, 1, 3, 2}, CHPreprocessingEdge{12, 1, 6, 3}},
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{11, 1, 3, 2}, CHPreprocessingEdge{12, 1, 6, 3}}
+            std::vector<Edge>{Edge{10, 1, 6, 4}, Edge{11, 1, 3, 2}, Edge{12, 1, 6, 3}},
+            std::vector<Edge>{Edge{11, 1, 3, 2}, Edge{12, 1, 6, 3}}
         }
     )
 );
@@ -112,20 +114,20 @@ INSTANTIATE_TEST_CASE_P(
     ShortcutFilterTwowayEdgeMergeTests,
     ::testing::Values(
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{
-                CHPreprocessingEdge{10, 1, 4, 1, CHPreprocessingEdge::EdgeType::forward},
-                CHPreprocessingEdge{10, 4, 1, 1, CHPreprocessingEdge::EdgeType::forward}
+            std::vector<Edge>{
+                Edge{10, 1, 4, 1, Edge::EdgeType::forward},
+                Edge{10, 4, 1, 1, Edge::EdgeType::forward}
             },
-            std::vector<CHPreprocessingEdge>{CHPreprocessingEdge{10, 1, 4, 1, CHPreprocessingEdge::EdgeType::twoway}}
+            std::vector<Edge>{Edge{10, 1, 4, 1, Edge::EdgeType::twoway}}
         },
         FilterShortcutsParameter{ 
-            std::vector<CHPreprocessingEdge>{
-                CHPreprocessingEdge{10, 1, 4, 3, CHPreprocessingEdge::EdgeType::forward},
-                CHPreprocessingEdge{10, 4, 1, 1, CHPreprocessingEdge::EdgeType::forward}
+            std::vector<Edge>{
+                Edge{10, 1, 4, 3, Edge::EdgeType::forward},
+                Edge{10, 4, 1, 1, Edge::EdgeType::forward}
             },
-            std::vector<CHPreprocessingEdge>{
-                CHPreprocessingEdge{10, 1, 4, 3, CHPreprocessingEdge::EdgeType::forward},
-                CHPreprocessingEdge{10, 4, 1, 1, CHPreprocessingEdge::EdgeType::forward}
+            std::vector<Edge>{
+                Edge{10, 1, 4, 3, Edge::EdgeType::forward},
+                Edge{10, 4, 1, 1, Edge::EdgeType::forward}
             }
         }
     )

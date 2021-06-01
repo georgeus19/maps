@@ -4,12 +4,15 @@
 #include "routing/preprocessing/algorithm_preprocessor.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/preprocessing/graph_contractor.h"
-#include "routing/edges/ch_preprocessing_edge.h"
+
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/adjacency_list_graph.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/table_name_repository.h"
+#include "routing/edges/length_source.h"
+#include "routing/graph_factory.h"
+#include "routing/edge_factory.h"
 
 #include "routing/profile/profile.h"
 
@@ -21,7 +24,8 @@ namespace routing{
 namespace preprocessing{
 
 class CHPreprocessor : public AlgorithmPreprocessor{
-    using Graph = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
+    using Edge = CHEdge<NumberLengthSource>;
+    using Graph = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
 public:
 
     CHPreprocessor(database::DatabaseHelper&& d, TableNameRepository&& table_names, ContractionParameters&& parameters)
@@ -47,7 +51,8 @@ private:
         std::cout << "Load graph from " << table_names_.GetBaseTableName() << "." << std::endl;
         Graph g{};
         database::UnpreprocessedDbGraph unpreprocessed_db_graph{};
-        d_.LoadFullGraph<Graph>(table_names_.GetBaseTableName(), g, &unpreprocessed_db_graph);
+        CHNumberEdgeFactory edge_factory{};
+        d_.LoadGraphEdges<Graph>(table_names_.GetBaseTableName(), g, &unpreprocessed_db_graph, edge_factory);
         std::cout << "Profile: " << profile.GetName() << std::endl;
         profile.Set(g);
         return g;

@@ -11,12 +11,12 @@
 #include "database/database_helper.h"
 #include "utility/point.h"
 #include "tests/graph_test.h"
-#include "routing/edges/ch_search_edge.h"
+#include "routing/edges/ch_edge.h"
 #include "routing/ch_search_graph.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
-
+#include "routing/edges/length_source.h"
 #include <string>
 #include <vector>
 
@@ -25,8 +25,9 @@ using namespace routing;
 using namespace database;
 using namespace query;
 // using namespace testing;
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
-using SearchGraph = CHSearchGraph<CHVertex<CHSearchEdge, IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>>, CHSearchEdge>;
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
+using SearchGraph = CHSearchGraph<CHVertex<Edge, IteratorEdgeRange<Edge, std::vector<Edge>::iterator>>, Edge>;
 
 class BidirectionalDijkstraTests : public testing::Test {
     protected:
@@ -48,10 +49,10 @@ TEST_F(BidirectionalDijkstraTests, ExistingPathWithShortcuts) {
     }
 
     vector<Dijkstra<SearchGraph>::Edge> expected_path {
-        CHSearchEdge{1, 1, 3, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 3, 4, 3, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{5, 4, 5, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{7, 5, 6, 2, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 3, 2, Edge::EdgeType::backward},
+        Edge{1, 3, 4, 3, Edge::EdgeType::forward},
+        Edge{5, 4, 5, 2, Edge::EdgeType::backward},
+        Edge{7, 5, 6, 2, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -77,9 +78,9 @@ TEST(BidirectionalDijkstraTestsNotFixture, ExistingPathWithoutShortcuts) {
     }
 
     vector<Dijkstra<G>::Edge> expected_path {
-        CHSearchEdge{1, 1, 4, 5, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{5, 4, 5, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{7, 5, 6, 2, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 4, 5, Edge::EdgeType::forward},
+        Edge{5, 4, 5, 2, Edge::EdgeType::backward},
+        Edge{7, 5, 6, 2, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -87,12 +88,12 @@ TEST(BidirectionalDijkstraTestsNotFixture, ExistingPathWithoutShortcuts) {
 
 TEST(BidirectionalDijkstraTestsNotFixture, IngoreDeadQueueMembers) {
     G g{};
-    g.AddEdge(std::move(routing::CHSearchEdge{0, 1, 5, 20}));
+    g.AddEdge(std::move(Edge{0, 1, 5, 20}));
 
-    g.AddEdge(std::move(routing::CHSearchEdge{1, 2, 3, 4}));
-    g.AddEdge(std::move(routing::CHSearchEdge{2, 2, 4, 1}));
+    g.AddEdge(std::move(Edge{1, 2, 3, 4}));
+    g.AddEdge(std::move(Edge{2, 2, 4, 1}));
 
-    g.AddEdge(std::move(routing::CHSearchEdge{3, 4, 3, 2}));
+    g.AddEdge(std::move(Edge{3, 4, 3, 2}));
     g.GetVertex(1).set_ordering_rank(1);
     g.GetVertex(2).set_ordering_rank(3);
     g.GetVertex(3).set_ordering_rank(5);
@@ -116,15 +117,15 @@ TEST(BidirectionalDijkstraTestsNotFixture, PathGraph) {
     }
 
     vector<Dijkstra<SearchGraph>::Edge> expected_path {
-        CHSearchEdge{1, 1, 2, 1, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 2, 3, 2, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 3, 4, 3, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 4, 5, 4, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 5, 6, 5, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 6, 7, 4, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 7, 8, 3, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 8, 9, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 9, 10, 1, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 2, 1, Edge::EdgeType::forward},
+        Edge{1, 2, 3, 2, Edge::EdgeType::forward},
+        Edge{1, 3, 4, 3, Edge::EdgeType::forward},
+        Edge{1, 4, 5, 4, Edge::EdgeType::forward},
+        Edge{1, 5, 6, 5, Edge::EdgeType::forward},
+        Edge{1, 6, 7, 4, Edge::EdgeType::backward},
+        Edge{1, 7, 8, 3, Edge::EdgeType::backward},
+        Edge{1, 8, 9, 2, Edge::EdgeType::backward},
+        Edge{1, 9, 10, 1, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -144,15 +145,15 @@ TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraph) {
     }
 
     vector<Dijkstra<SearchGraph>::Edge> expected_path {
-        CHSearchEdge{1, 1, 2, 1, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 2, 3, 2, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 3, 4, 3, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 4, 5, 4, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 5, 6, 5, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 6, 7, 4, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 7, 8, 3, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 8, 9, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 9, 10, 1, CHSearchEdge::EdgeType::forward}
+        Edge{1, 1, 2, 1, Edge::EdgeType::backward},
+        Edge{1, 2, 3, 2, Edge::EdgeType::forward},
+        Edge{1, 3, 4, 3, Edge::EdgeType::forward},
+        Edge{1, 4, 5, 4, Edge::EdgeType::forward},
+        Edge{1, 5, 6, 5, Edge::EdgeType::backward},
+        Edge{1, 6, 7, 4, Edge::EdgeType::backward},
+        Edge{1, 7, 8, 3, Edge::EdgeType::backward},
+        Edge{1, 8, 9, 2, Edge::EdgeType::backward},
+        Edge{1, 9, 10, 1, Edge::EdgeType::forward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -179,12 +180,12 @@ TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraphRightForwardRecursio
     }
 
     vector<Dijkstra<SearchGraph>::Edge> expected_path {
-        CHSearchEdge{1, 4, 5, 4, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 5, 6, 5, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 6, 7, 4, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 7, 8, 3, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 8, 9, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 9, 10, 1, CHSearchEdge::EdgeType::forward}
+        Edge{1, 4, 5, 4, Edge::EdgeType::forward},
+        Edge{1, 5, 6, 5, Edge::EdgeType::backward},
+        Edge{1, 6, 7, 4, Edge::EdgeType::backward},
+        Edge{1, 7, 8, 3, Edge::EdgeType::backward},
+        Edge{1, 8, 9, 2, Edge::EdgeType::backward},
+        Edge{1, 9, 10, 1, Edge::EdgeType::forward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -211,12 +212,12 @@ TEST(BidirectionalDijkstraTestsNotFixture, PathShortcutGraphRightBackwardRecursi
     }
 
     vector<Dijkstra<SearchGraph>::Edge> expected_path {
-        CHSearchEdge{1, 1, 2, 1, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 2, 3, 2, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 3, 4, 3, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 4, 5, 4, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 5, 6, 5, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{1, 6, 7, 4, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 2, 1, Edge::EdgeType::backward},
+        Edge{1, 2, 3, 2, Edge::EdgeType::forward},
+        Edge{1, 3, 4, 3, Edge::EdgeType::forward},
+        Edge{1, 4, 5, 4, Edge::EdgeType::forward},
+        Edge{1, 5, 6, 5, Edge::EdgeType::backward},
+        Edge{1, 6, 7, 4, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -236,8 +237,8 @@ TEST(BidirectionalDijkstraTestsNotFixture, GraphWithTwowayEdges) {
     }
 
     vector<Dijkstra<SearchGraph>::Edge> expected_path {
-        CHSearchEdge{1, 1, 3, 3, CHSearchEdge::EdgeType::twoway}, CHSearchEdge{1, 3, 4, 2, CHSearchEdge::EdgeType::twoway},
-        CHSearchEdge{1, 4, 5, 3, CHSearchEdge::EdgeType::twoway}, CHSearchEdge{1, 5, 6, 2, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 3, 3, Edge::EdgeType::twoway}, Edge{1, 3, 4, 2, Edge::EdgeType::twoway},
+        Edge{1, 4, 5, 3, Edge::EdgeType::twoway}, Edge{1, 5, 6, 2, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));

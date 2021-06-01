@@ -25,7 +25,6 @@ add_library(routing ${RoutingGLob} ${RoutingPreprocessingGlob} ${RoutingQueryGlo
 # add_executable(routing_preprocessing ${RoutingGLob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_library(routing_preprocessing ${RoutingGLob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob})
 add_executable(routing_preprocessor ${RoutingGLob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${DatabaseHelperGlob} ${UtilityGlob} ${RoutingProfileGlob})
-add_executable(routing_measurements ${RoutingMeasurementsGlob}) 
 add_executable(routing_server ${RoutingServerGlob})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -109,9 +108,6 @@ link_directories(backend_test /usr/local/lib)
 
 target_link_libraries(tests routing)
 target_link_libraries(tests routing_preprocessing)
-
-target_link_libraries(routing_measurements routing)
-target_link_libraries(routing_measurements routing_preprocessing)
 
 target_link_libraries(routing_server routing)
 target_link_libraries(routing_server pthread boost_system z)

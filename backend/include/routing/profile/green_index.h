@@ -23,7 +23,7 @@ public:
 
     void Normalize(double scale_max) override;
 
-    double Get(unsigned_id_type uid) override;
+    double Get(unsigned_id_type uid) const override;
 
     std::string GetName() const override;
 private:

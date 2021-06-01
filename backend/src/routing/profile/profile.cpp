@@ -26,7 +26,7 @@ std::string Profile::GetName() const {
     return name;
 }
 
-double Profile::GetLength(unsigned_id_type uid) {
+double Profile::GetLength(unsigned_id_type uid) const {
     double length = 0;
     for(auto&& property : properties_) {
         length += static_cast<double>(property.importance) * property.index->Get(uid);

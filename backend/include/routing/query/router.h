@@ -13,7 +13,7 @@
 #include "utility/point.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/query/bidirectional_dijkstra.h"
-#include "routing/edges/ch_search_edge.h"
+#include "routing/edges/ch_edge.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/ch_search_graph.h"

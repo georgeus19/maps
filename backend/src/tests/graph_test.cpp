@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/ch_search_edge.h"
+#include "routing/edges/ch_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -16,6 +16,7 @@
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/ch_vertex.h"
+#include "routing/edges/length_source.h"
 
 #include <string>
 #include <vector>
@@ -26,8 +27,9 @@ using namespace database;
 using namespace query;
 using namespace preprocessing;
 // using namespace testing;
-using Vertex = CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>;
-using G = AdjacencyListGraph<Vertex, CHSearchEdge>;
+using Edge = CHEdge<NumberLengthSource>;
+using Vertex = CHVertex<Edge, VectorEdgeRange<Edge>>;
+using G = AdjacencyListGraph<Vertex, Edge>;
 
 struct GraphForEachEdgeTestsParameter;
 
@@ -53,50 +55,50 @@ INSTANTIATE_TEST_CASE_P(
         GraphForEachEdgeTestsParameter{
             [](G& g){ TestPathGraph(g); },
             std::vector<G::Edge> {
-                CHSearchEdge{0, 1, 2, 1},
-                CHSearchEdge{1, 2, 3, 2},
-                CHSearchEdge{2, 3, 4, 3},
-                CHSearchEdge{3, 4, 5, 4},
-                CHSearchEdge{4, 5, 6, 5},
-                CHSearchEdge{5, 6, 7, 4},
-                CHSearchEdge{6, 7, 8, 3},
-                CHSearchEdge{7, 8, 9, 2},
-                CHSearchEdge{77, 9, 10, 1}
+                Edge{0, 1, 2, 1},
+                Edge{1, 2, 3, 2},
+                Edge{2, 3, 4, 3},
+                Edge{3, 4, 5, 4},
+                Edge{4, 5, 6, 5},
+                Edge{5, 6, 7, 4},
+                Edge{6, 7, 8, 3},
+                Edge{7, 8, 9, 2},
+                Edge{77, 9, 10, 1}
             }
         },
         GraphForEachEdgeTestsParameter{
             [](G& g){ TestBasicReverseGraph(g); },
             std::vector<G::Edge> {
-                CHSearchEdge{0, 1, 2, 2},
-                CHSearchEdge{1, 1, 3, 2},
-                CHSearchEdge{2, 2, 6, 8},
-                CHSearchEdge{3, 3, 4, 3},
-                CHSearchEdge{4, 4, 3, 2},
-                CHSearchEdge{5, 4, 5, 2},
-                CHSearchEdge{6, 5, 4, 4},
-                CHSearchEdge{7, 4, 6, 6},
-                CHSearchEdge{8, 5, 6, 2},
-                CHSearchEdge{9, 6, 5, 3},
-                CHSearchEdge{10, 5, 3, 7}
+                Edge{0, 1, 2, 2},
+                Edge{1, 1, 3, 2},
+                Edge{2, 2, 6, 8},
+                Edge{3, 3, 4, 3},
+                Edge{4, 4, 3, 2},
+                Edge{5, 4, 5, 2},
+                Edge{6, 5, 4, 4},
+                Edge{7, 4, 6, 6},
+                Edge{8, 5, 6, 2},
+                Edge{9, 6, 5, 3},
+                Edge{10, 5, 3, 7}
             }
         },
         GraphForEachEdgeTestsParameter{
             [](G& g){ TestBasicContractedGraph(g); },
             std::vector<G::Edge> {
-                CHSearchEdge{0, 1, 2, 2},
-                CHSearchEdge{1, 1, 3, 2},
-                CHSearchEdge{2, 1, 4, 5, 3},
-                CHSearchEdge{3, 2, 6, 8},
-                CHSearchEdge{4, 2, 5, 11, 6},
-                CHSearchEdge{5, 2, 4, 15, 5},
-                CHSearchEdge{6, 3, 4, 3},
-                CHSearchEdge{7, 4, 3, 2},
-                CHSearchEdge{8, 4, 5, 2},
-                CHSearchEdge{9, 4, 6, 6},
-                CHSearchEdge{10, 5, 4, 4},
-                CHSearchEdge{11, 5, 3, 7},
-                CHSearchEdge{12, 5, 6, 2},
-                CHSearchEdge{13, 6, 5, 3}
+                Edge{0, 1, 2, 2},
+                Edge{1, 1, 3, 2},
+                Edge{2, 1, 4, 5, 3},
+                Edge{3, 2, 6, 8},
+                Edge{4, 2, 5, 11, 6},
+                Edge{5, 2, 4, 15, 5},
+                Edge{6, 3, 4, 3},
+                Edge{7, 4, 3, 2},
+                Edge{8, 4, 5, 2},
+                Edge{9, 4, 6, 6},
+                Edge{10, 5, 4, 4},
+                Edge{11, 5, 3, 7},
+                Edge{12, 5, 6, 2},
+                Edge{13, 6, 5, 3}
             }
         },
         GraphForEachEdgeTestsParameter{
@@ -139,12 +141,12 @@ TEST(GraphTests, ForEachVertexBasicGraphTest) {
     });
 
     std::vector<G::Vertex> expected_vertices{
-        Vertex{1, VectorEdgeRange<CHSearchEdge>{}},
-        Vertex{2, VectorEdgeRange<CHSearchEdge>{}},
-        Vertex{3, VectorEdgeRange<CHSearchEdge>{}},
-        Vertex{4, VectorEdgeRange<CHSearchEdge>{}},
-        Vertex{5, VectorEdgeRange<CHSearchEdge>{}},
-        Vertex{6, VectorEdgeRange<CHSearchEdge>{}}
+        Vertex{1, VectorEdgeRange<Edge>{}},
+        Vertex{2, VectorEdgeRange<Edge>{}},
+        Vertex{3, VectorEdgeRange<Edge>{}},
+        Vertex{4, VectorEdgeRange<Edge>{}},
+        Vertex{5, VectorEdgeRange<Edge>{}},
+        Vertex{6, VectorEdgeRange<Edge>{}}
     };
 
     EXPECT_THAT(actual_vertices, testing::UnorderedElementsAreArray(expected_vertices));

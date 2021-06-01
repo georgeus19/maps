@@ -12,11 +12,12 @@
 #include "database/database_helper.h"
 #include "utility/point.h"
 #include "tests/graph_test.h"
-#include "routing/edges/ch_search_edge.h"
+#include "routing/edges/ch_edge.h"
 #include "routing/ch_search_graph.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
+#include "routing/edges/length_source.h"
 #include "routing/routing_graph.h"
 
 #include <string>
@@ -28,10 +29,11 @@ using namespace database;
 using namespace query;
 using namespace preprocessing;
 // using namespace testing;
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
-using EdgeRange = IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>;
-using SearchVertex = CHVertex<CHSearchEdge, EdgeRange>;
-using SearchGraph = CHSearchGraph<SearchVertex, CHSearchEdge>;
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
+using EdgeRange = IteratorEdgeRange<Edge, std::vector<Edge>::iterator>;
+using SearchVertex = CHVertex<Edge, EdgeRange>;
+using SearchGraph = CHSearchGraph<SearchVertex, Edge>;
 
 TEST(RoutingGraphTests, OverlapVertices) {
     G load_graph;
@@ -59,13 +61,13 @@ TEST(RoutingGraphTests, OverlapVertices) {
 	load_graph.GetVertex(6).set_ordering_rank(11);   
     SearchGraph search_graph{};
     search_graph.Load(load_graph);
-    std::vector<CHSearchEdge> additional_edges{
-        CHSearchEdge{18, 1, 3, 4, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{14, 1, 4, 10, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{13, 1, 3, 2, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{15, 6, 5, 1, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{16, 6, 5, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{17, 6, 4, 20, CHSearchEdge::EdgeType::backward}
+    std::vector<Edge> additional_edges{
+        Edge{18, 1, 3, 4, Edge::EdgeType::forward},
+        Edge{14, 1, 4, 10, Edge::EdgeType::forward},
+        Edge{13, 1, 3, 2, Edge::EdgeType::forward},
+        Edge{15, 6, 5, 1, Edge::EdgeType::backward},
+        Edge{16, 6, 5, 2, Edge::EdgeType::backward},
+        Edge{17, 6, 4, 20, Edge::EdgeType::backward}
     };
     RoutingGraph<SearchGraph> routing_graph{search_graph};
     auto source_begin_it = additional_edges.begin();
@@ -85,10 +87,10 @@ TEST(RoutingGraphTests, OverlapVertices) {
     }
 
     std::vector<Dijkstra<RoutingGraph<SearchGraph>>::Edge> expected_path {
-        CHSearchEdge{1, 1, 3, 2, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 3, 4, 2, CHSearchEdge::EdgeType::twoway},
-        CHSearchEdge{1, 4, 5, 3, CHSearchEdge::EdgeType::twoway},
-        CHSearchEdge{1, 5, 6, 1, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 3, 2, Edge::EdgeType::forward},
+        Edge{1, 3, 4, 2, Edge::EdgeType::twoway},
+        Edge{1, 4, 5, 3, Edge::EdgeType::twoway},
+        Edge{1, 5, 6, 1, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
@@ -114,13 +116,13 @@ TEST(RoutingGraphTests, AdditionalVertices) {
 	load_graph.GetVertex(6).set_ordering_rank(6);   
     SearchGraph search_graph{};
     search_graph.Load(load_graph);
-    std::vector<CHSearchEdge> additional_edges{
-        CHSearchEdge{18, 1, 3, 4, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{13, 1, 3, 3, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{14, 1, 4, 10, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{15, 7, 6, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{16, 7, 6, 6, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{17, 7, 5, 13, CHSearchEdge::EdgeType::backward}
+    std::vector<Edge> additional_edges{
+        Edge{18, 1, 3, 4, Edge::EdgeType::forward},
+        Edge{13, 1, 3, 3, Edge::EdgeType::forward},
+        Edge{14, 1, 4, 10, Edge::EdgeType::forward},
+        Edge{15, 7, 6, 2, Edge::EdgeType::backward},
+        Edge{16, 7, 6, 6, Edge::EdgeType::backward},
+        Edge{17, 7, 5, 13, Edge::EdgeType::backward}
     };
     RoutingGraph<SearchGraph> routing_graph{search_graph};
     auto source_begin_it = additional_edges.begin();
@@ -140,11 +142,11 @@ TEST(RoutingGraphTests, AdditionalVertices) {
     }
 
     std::vector<Dijkstra<RoutingGraph<SearchGraph>>::Edge> expected_path {
-        CHSearchEdge{1, 1, 3, 3, CHSearchEdge::EdgeType::forward},
-        CHSearchEdge{1, 3, 4, 2, CHSearchEdge::EdgeType::twoway},
-        CHSearchEdge{1, 4, 5, 3, CHSearchEdge::EdgeType::twoway},
-        CHSearchEdge{1, 5, 6, 2, CHSearchEdge::EdgeType::backward},
-        CHSearchEdge{15, 6, 7, 2, CHSearchEdge::EdgeType::backward}
+        Edge{1, 1, 3, 3, Edge::EdgeType::forward},
+        Edge{1, 3, 4, 2, Edge::EdgeType::twoway},
+        Edge{1, 4, 5, 3, Edge::EdgeType::twoway},
+        Edge{1, 5, 6, 2, Edge::EdgeType::backward},
+        Edge{15, 6, 7, 2, Edge::EdgeType::backward}
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));

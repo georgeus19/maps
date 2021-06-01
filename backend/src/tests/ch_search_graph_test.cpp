@@ -12,11 +12,12 @@
 #include "database/database_helper.h"
 #include "utility/point.h"
 #include "tests/graph_test.h"
-#include "routing/edges/ch_search_edge.h"
+#include "routing/edges/ch_edge.h"
 #include "routing/ch_search_graph.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
+#include "routing/edges/length_source.h"
 
 #include <string>
 #include <vector>
@@ -26,15 +27,16 @@ using namespace routing;
 using namespace database;
 using namespace query;
 using namespace preprocessing;
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHSearchEdge, VectorEdgeRange<CHSearchEdge>>, CHSearchEdge>>;
-using SearchGraph = CHSearchGraph<CHVertex<CHSearchEdge, IteratorEdgeRange<CHSearchEdge, std::vector<CHSearchEdge>::iterator>>, CHSearchEdge>;
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
+using SearchGraph = CHSearchGraph<CHVertex<Edge, IteratorEdgeRange<Edge, std::vector<Edge>::iterator>>, Edge>;
 
 TEST(CHSearchGraphTests, ShortcutsAndBackwardEdges) {
     G g{};
     TestBidirectedSearchGraph(g);
     SearchGraph search_graph{};
     search_graph.Load(g);
-    std::vector<CHSearchEdge> expected{
+    std::vector<Edge> expected{
         typename SearchGraph::Edge{0, 1, 2, 2, SearchGraph::Edge::EdgeType::forward},
         typename SearchGraph::Edge{1, 3, 1, 3, SearchGraph::Edge::EdgeType::twoway},
         typename SearchGraph::Edge{2, 2, 6, 12, SearchGraph::Edge::EdgeType::backward},
@@ -49,7 +51,7 @@ TEST(CHSearchGraphTests, ShortcutsAndBackwardEdges) {
         typename SearchGraph::Edge{11, 5, 2, 10, SearchGraph::Edge::EdgeType::backward},
         typename SearchGraph::Edge{11, 2, 5, 15, SearchGraph::Edge::EdgeType::forward}
     };
-    std::vector<CHSearchEdge> actual{};
+    std::vector<Edge> actual{};
     search_graph.ForEachEdge([&](const typename SearchGraph::Edge& edge) {
         edge.Print();
         actual.push_back(edge);

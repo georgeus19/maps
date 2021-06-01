@@ -45,7 +45,7 @@ void PhysicalLengthIndex::Normalize(double scale_max) {
     }
 }
 
-double PhysicalLengthIndex::Get(unsigned_id_type uid) {
+double PhysicalLengthIndex::Get(unsigned_id_type uid) const {
     assert(uid < edge_length_values_.size());
     LengthValue lv = edge_length_values_[uid];
     if (lv.valid) {

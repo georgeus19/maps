@@ -2,7 +2,6 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
-#include "routing/edges/ch_preprocessing_edge.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -16,6 +15,7 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/edges/length_source.h"
 
 #include <string>
 #include <vector>
@@ -28,7 +28,8 @@ using namespace query;
 using namespace database;
 using namespace preprocessing;
 
-using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<CHPreprocessingEdge, VectorEdgeRange<CHPreprocessingEdge>>, CHPreprocessingEdge>>;
+using Edge = CHEdge<NumberLengthSource>;
+using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
 struct ExpectedVertexProperties;
 std::vector<ExpectedVertexProperties> QueueToVector(GraphContractor<G>::PriorityQueue& q);
 void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name); 
