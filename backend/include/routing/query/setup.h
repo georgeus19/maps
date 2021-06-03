@@ -34,7 +34,9 @@ namespace query {
 
 class DijkstraSetup {
 public:
-    using Edge = BasicEdge<NumberLengthSource>;
+    using EdgeFactory = BasicProfileEdgeFactory;
+    using Edge = EdgeFactory::Edge;
+    using EndpointEdgeFactory = ProfileEndpointEdgeFactory<Edge>;
     using EdgeRange = VectorEdgeRange<Edge>;
     using Vertex = BasicVertex<Edge, EdgeRange>;
     using DbGraph = database::UnpreprocessedDbGraph;
@@ -43,16 +45,18 @@ public:
     using Algorithm = Dijkstra<RoutingGraph<Graph>>;
     using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyDijkstra<RoutingGraph<Graph>, EdgeRangePolicyVector<Edge>>;
 
-    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
+    DijkstraSetup() : endpoint_edges_lengths_() {}
+
+    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name, DynamicLengthSource* length_source) {
         Graph g{};
         DbGraph db_graph{};
-        BasicNumberEdgeFactory edge_factory{};
+        EdgeFactory edge_factory{length_source};
         d.LoadGraphEdges<Graph>(graph_table_name, g, &db_graph, edge_factory);
         return g;
     }
 
-    EndpointEdgesCreator<Edge> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
-        return EndpointEdgesCreator<Edge>{d, db_graph};
+    EndpointEdgesCreator<EndpointEdgeFactory> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<EndpointEdgeFactory>{d, db_graph, EndpointEdgeFactory{&endpoint_edges_lengths_}};
     }
 
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
@@ -62,11 +66,15 @@ public:
     DbGraph CreateDbGraph() {
         return DbGraph{};
     }
+private:
+    EndpointEdgesLengths endpoint_edges_lengths_;
 };
 
 class CHSetup {
 public:
-    using Edge = CHEdge<NumberLengthSource>;
+    using EdgeFactory = CHNumberEdgeFactory;
+    using Edge = EdgeFactory::Edge;
+    using EndpointEdgeFactory = NumberEndpointEdgeFactory<Edge>;
     using EdgeIterator = std::vector<Edge>::iterator;
     using EdgeRange = IteratorEdgeRange<Edge, EdgeIterator>;
     using Vertex = CHVertex<Edge, EdgeRange>;
@@ -92,14 +100,16 @@ public:
         return DbGraph{};
     }
 
-    EndpointEdgesCreator<Edge> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
-        return EndpointEdgesCreator<Edge>{d, db_graph};
+    EndpointEdgesCreator<EndpointEdgeFactory> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<EndpointEdgeFactory>{d, db_graph, EndpointEdgeFactory{}};
     }
 
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
         return EndpointAlgorithmPolicy{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
     }
 };
+
+
 
 
 

@@ -18,6 +18,13 @@ bool DatabaseHelper::IsDbOpen() {
 	return connection_->is_open();
 }
 
+void DatabaseHelper::DisconnectIfOpen() {
+	if (IsDbOpen()) {
+		connection_->disconnect();
+		connection_.reset();
+	}
+}
+
 void DatabaseHelper::RunTransactional(const std::string& sql) {
 	pqxx::work w(*connection_);
 	w.exec(sql);

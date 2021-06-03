@@ -41,8 +41,9 @@ struct ProfileProperty {
 struct AlgorithmConfig {
     std::string name;
     std::string base_graph_table;
+    std::string mode;
 
-    AlgorithmConfig(std::string&& n, std::string&& bgt) : name(std::move(n)), base_graph_table(std::move(bgt)) {}
+    AlgorithmConfig(std::string&& n, std::string&& bgt, std::string&& m) : name(std::move(n)), base_graph_table(std::move(bgt)), mode(std::move(m)) {}
 };
 
 struct CHConfig : public AlgorithmConfig {
@@ -51,8 +52,8 @@ struct CHConfig : public AlgorithmConfig {
     int32_t deleted_neighbours_coefficient;
     int32_t space_size_coefficient;
 
-    CHConfig(std::string&& n, std::string&& bgt, size_t hc, int32_t edc, int32_t dnc, int32_t ssc) 
-        : AlgorithmConfig(std::move(n), std::move(bgt)), hop_count(hc), edge_difference_coefficient(edc), deleted_neighbours_coefficient(dnc),
+    CHConfig(std::string&& n, std::string&& bgt, std::string&&m, size_t hc, int32_t edc, int32_t dnc, int32_t ssc) 
+        : AlgorithmConfig(std::move(n), std::move(bgt), std::move(m)), hop_count(hc), edge_difference_coefficient(edc), deleted_neighbours_coefficient(dnc),
         space_size_coefficient(ssc) {}
 };
 
@@ -86,11 +87,13 @@ Configuration ConfigurationParser::Parse() {
         {Constants::AlgorithmNames::kContractionHierarchies, [](const toml::table& algorithm_config){
                 std::string name = algorithm_config.at(Constants::Input::kName).as_string();
                 std::string base_graph_table = algorithm_config.at(Constants::Input::kBaseGraphTable).as_string();
+                std::string mode = algorithm_config.at(Constants::Input::kMode).as_string();
                 auto&& param = algorithm_config.at(Constants::Input::TableNames::kParameters).as_table();
 
                 return std::make_unique<CHConfig>(
                     std::move(name),
                     std::move(base_graph_table),
+                    std::move(mode),
                     static_cast<size_t>(param.at(Constants::Input::Preprocessing::kHopCount).as_integer()),
                     static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kEdgeDifference).as_integer()),
                     static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kDeletedNeighbours).as_integer()),
@@ -111,7 +114,7 @@ Configuration ConfigurationParser::Parse() {
     
     std::vector<ProfileProperty> profile_properties;
     for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
-         std::unordered_map<std::string, std::function<std::shared_ptr<profile::DataIndex>()>> indicies{
+        std::unordered_map<std::string, std::function<std::shared_ptr<profile::DataIndex>()>> indicies{
             {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
             {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
         };

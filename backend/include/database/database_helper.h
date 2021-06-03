@@ -73,6 +73,8 @@ public:
      */
     bool IsDbOpen();
 
+    void DisconnectIfOpen();
+
     void RunTransactional(const std::string& sql);
 
     void RunNontransactional(const std::string& sql, const std::function<void(const DbRow&)> f);

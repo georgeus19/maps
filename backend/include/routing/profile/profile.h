@@ -18,7 +18,12 @@
 namespace routing{
 namespace profile{
 
-class Profile{
+class IProfile{
+public:
+    virtual double GetLength(unsigned_id_type uid) const = 0;
+};
+
+class Profile : public IProfile{
     struct Property;
 public:
 
@@ -33,7 +38,7 @@ public:
 
     std::string GetName() const;
 
-    double GetLength(unsigned_id_type uid) const;
+    double GetLength(unsigned_id_type uid) const override;
 private:
     double scale_max_;
     std::vector<Property> properties_;

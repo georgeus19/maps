@@ -29,20 +29,27 @@ namespace query {
 template <typename Setup>
 class Router {
 public:
-    Router(typename Setup::Graph&& graph, const std::string& graph_table_name) 
-        : base_graph_(std::move(graph)), base_graph_max_vertex_id_(base_graph_.GetMaxVertexId()), base_graph_max_edge_id_(base_graph_.GetMaxEdgeId()) {}
+    Router() : setup_(), base_graph_(), base_graph_max_vertex_id_(), base_graph_max_edge_id_() {}
+
+    Router(const Setup& setup, typename Setup::Graph&& graph, const std::string& graph_table_name) 
+        : setup_(setup), base_graph_(std::move(graph)), base_graph_max_vertex_id_(base_graph_.GetMaxVertexId()), base_graph_max_edge_id_(base_graph_.GetMaxEdgeId()) {}
+
+    Router(Router&& other)= default;
+    Router(const Router& other) = delete;
+    Router& operator=(Router&& other) = default;
+    Router operator=(const Router& other) = delete;
+    ~Router() = default;
 
     std::string CalculateShortestRoute(database::DatabaseHelper& d, const std::string& table_name, utility::Point source, utility::Point target) {
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
             throw RouteNotFoundException("Start and end point are the same.");
         }
-        Setup setup{};
         RoutingGraph<typename Setup::Graph> routing_graph{base_graph_};
-        auto&& db_graph = setup.CreateDbGraph();
+        auto&& db_graph = setup_.CreateDbGraph();
 
-        EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::Edge>> endpoints_creator{
-            setup.CreateEndpointAlgorithmPolicy(routing_graph),
-            setup.CreateEndpointEdgesCreator(d, &db_graph)
+        EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::EndpointEdgeFactory>> endpoints_creator{
+            setup_.CreateEndpointAlgorithmPolicy(routing_graph),
+            setup_.CreateEndpointEdgesCreator(d, &db_graph)
         };
         unsigned_id_type source_vertex_id = base_graph_max_vertex_id_ + 1;
         unsigned_id_type target_vertex_id = base_graph_max_vertex_id_ + 2;
@@ -62,7 +69,7 @@ public:
     }
 
     std::string GetRouteGeometry(database::DatabaseHelper& d, const std::string& table_name,
-        EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::Edge>>& endpoints_creator,
+        EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::EndpointEdgeFactory>>& endpoints_creator,
         std::vector<typename Setup::Algorithm::Edge>& route) {
         auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route[0].get_uid());
         auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route[route.size() - 1].get_uid());
@@ -76,13 +83,15 @@ public:
     }
 
 private:
+    Setup setup_;
     typename Setup::Graph base_graph_;
     unsigned_id_type base_graph_max_vertex_id_;
     unsigned_id_type base_graph_max_edge_id_;
 };
 
 
-}
-}
 
+
+}
+}
 #endif //ROUTING_QUERY_ROUTER_H

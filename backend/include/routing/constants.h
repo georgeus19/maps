@@ -34,22 +34,28 @@ struct Constants{
         static inline const std::string kTableName = "table_name";
         static inline const std::string kImportance = "importance";
         static inline const std::string kBaseGraphTable = "base_graph_table";
+        static inline const std::string kMode = "mode";
 
         struct Indicies{
             static inline const std::string kEdgesTable = "edges_table";
             static inline const std::string kPolygonTable = "polygon_table";
             static inline const std::string kIndexTable = "index_table";
         };
-
     };
 
     struct AlgorithmNames{
         static inline const std::string kContractionHierarchies = "ch";
+        static inline const std::string kDijkstra = "dijkstra";
     };
 
     struct IndexNames{
         static inline const std::string kGreenIndex = "green";
         static inline const std::string kLengthIndex = "length";
+    };
+
+    struct ModeNames{
+        static inline const std::string kDynamicProfile = "dynamic_profile";
+        static inline const std::string kStaticProfile = "static_profile";
     };
 };
 

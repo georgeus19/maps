@@ -9,13 +9,14 @@
 
 namespace routing{
 
+template <typename LS>
 class EdgeTypeResolver{
 public:
-    static BasicEdge<NumberLengthSource>::EdgeType GetEdgeType(bool undirected) {
+    BasicEdge<LS>::EdgeType GetEdgeType(bool undirected) {
         if (undirected) {
-            return BasicEdge<NumberLengthSource>::EdgeType::twoway;
+            return BasicEdge<LS>::EdgeType::twoway;
         } else {
-            return BasicEdge<NumberLengthSource>::EdgeType::forward;
+            return BasicEdge<LS>::EdgeType::forward;
         }
     }
 };
@@ -29,7 +30,7 @@ public:
     template <typename Input>
     Edge Create(const Input& input) {
         return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), input.GetLength(), 
-            EdgeTypeResolver::GetEdgeType(input.GetUndirected())};
+            EdgeTypeResolver<NumberLengthSource>{}.GetEdgeType(input.GetUndirected())};
     }
 };
 
@@ -42,7 +43,7 @@ public:
     template <typename Input>
     Edge Create(const Input& input) {
         return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), input.GetLength(),
-            EdgeTypeResolver::GetEdgeType(input.GetUndirected()), input.GetContractedVertex()};
+            EdgeTypeResolver<NumberLengthSource>{}.GetEdgeType(input.GetUndirected()), input.GetContractedVertex()};
     }
 };
 
@@ -50,31 +51,59 @@ class BasicProfileEdgeFactory{
 public:
     using Edge = BasicEdge<ProfileLengthSource>; 
 
-    BasicProfileEdgeFactory(std::reference_wrapper<profile::Profile> profile) : profile_(profile) {}
+    BasicProfileEdgeFactory(DynamicLengthSource* profile) : profile_(profile) {}
 
     template <typename Input>
     Edge Create(const Input& input) {
-        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), profile_,
-            EdgeTypeResolver::GetEdgeType(input.GetUndirected()), input.GetContractedVertex()};
+        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{profile_},
+            EdgeTypeResolver<ProfileLengthSource>{}.GetEdgeType(input.GetUndirected())};
     }
 private:
-    std::reference_wrapper<profile::Profile> profile_;
+    DynamicLengthSource* profile_;
 };
-
 
 class CHProfileEdgeFactory{
 public:
     using Edge = CHEdge<ProfileLengthSource>;
 
-    CHProfileEdgeFactory(std::reference_wrapper<profile::Profile> profile) : profile_(profile) {}
+    CHProfileEdgeFactory(DynamicLengthSource* profile) : profile_(profile) {}
 
     template <typename Input>
     Edge Create(const Input& input) {
-        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), profile_,
-            EdgeTypeResolver::GetEdgeType(input.GetUndirected()), input.GetContractedVertex()};
+        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{profile_},
+            EdgeTypeResolver<ProfileLengthSource>{}.GetEdgeType(input.GetUndirected()), input.GetContractedVertex()};
     }
 private:
-    std::reference_wrapper<profile::Profile> profile_;
+    DynamicLengthSource* profile_;
+};
+
+template <typename E>
+class NumberEndpointEdgeFactory{
+public:
+    using Edge = E;
+
+    NumberEndpointEdgeFactory() {}
+
+    template <typename Input>
+    E Create(const Input& input) {
+        return E{input.GetUid(), input.GetFrom(), input.GetTo(), input.GetLength()};
+    }
+};
+
+template <typename E>
+class ProfileEndpointEdgeFactory{
+public:
+    using Edge = E;
+
+    ProfileEndpointEdgeFactory(EndpointEdgesLengths* profile) : profile_(profile) {}
+
+    template <typename Input>
+    E Create(const Input& input) {
+        profile_->AddLength(input.GetUid(), input.GetLength());
+        return E{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{profile_}};
+    }
+private:
+    EndpointEdgesLengths* profile_;
 };
 
 
