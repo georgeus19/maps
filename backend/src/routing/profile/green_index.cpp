@@ -90,7 +90,7 @@ double GreenIndex::Get(unsigned_id_type uid) const {
     }
 }
 
-std::string GreenIndex::GetName() const {
+const std::string& GreenIndex::GetName() const {
     return Constants::IndexNames::kGreenIndex;
 }
 

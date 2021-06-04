@@ -39,6 +39,18 @@ public:
     std::string GetName() const;
 
     double GetLength(unsigned_id_type uid) const override;
+
+    std::shared_ptr<DataIndex> GetIndex(const std::string& name) {
+        auto it = std::find_if(properties_.begin(), properties_.end(), [&](const Property& p){
+            return p.index->GetName() == name;
+        });
+        if (it != properties_.end()) {
+            return it->index;
+        } else {
+            return std::shared_ptr<DataIndex>();
+        }
+    }
+
 private:
     double scale_max_;
     std::vector<Property> properties_;

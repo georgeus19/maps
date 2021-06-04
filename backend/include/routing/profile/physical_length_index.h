@@ -23,7 +23,7 @@ public:
 
     double Get(unsigned_id_type uid) const override;
 
-    std::string GetName() const override;
+    const std::string& GetName() const override;
     
 private:
     struct LengthValue;

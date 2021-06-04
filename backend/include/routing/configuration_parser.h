@@ -100,6 +100,18 @@ Configuration ConfigurationParser::Parse() {
                     static_cast<int32_t>(param.at(Constants::Input::Preprocessing::kSpaceSize).as_integer())
                 );
             }
+        },
+        {Constants::AlgorithmNames::kDijkstra, [](const toml::table& algorithm_config){
+                std::string name = algorithm_config.at(Constants::Input::kName).as_string();
+                std::string base_graph_table = algorithm_config.at(Constants::Input::kBaseGraphTable).as_string();
+                std::string mode = algorithm_config.at(Constants::Input::kMode).as_string();
+
+                return std::make_unique<AlgorithmConfig>(
+                    std::move(name),
+                    std::move(base_graph_table),
+                    std::move(mode)
+                );
+            }
         }
     };
     

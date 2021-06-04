@@ -55,7 +55,7 @@ double PhysicalLengthIndex::Get(unsigned_id_type uid) const {
     }
 }
 
-std::string PhysicalLengthIndex::GetName() const {
+const std::string& PhysicalLengthIndex::GetName() const {
     return Constants::IndexNames::kLengthIndex;
 }
 

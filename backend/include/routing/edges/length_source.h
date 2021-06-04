@@ -60,6 +60,10 @@ public:
         profile_ = std::move(profile);
     }
 
+    profile::Profile& get_profile() {
+        return profile_;
+    }
+
     double GetLength(unsigned_id_type id) const override {
         return profile_.GetLength(id);
     }
