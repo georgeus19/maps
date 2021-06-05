@@ -27,7 +27,7 @@ using namespace database;
 static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg, double scale_max);
 static Profile ParseProfile(const crow::json::rvalue& p);
 template <typename Setup, typename Mode>
-static void RunServer(Configuration& cfg, Mode& mode, const TableNameRepository& rep, const std::string& config_path);
+static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path);
 
 int main(int argc, const char ** argv) {
     if (argc != 2) {
@@ -37,7 +37,6 @@ int main(int argc, const char ** argv) {
     ConfigurationParser parser{config_path};
     auto&& cfg = parser.Parse();
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    TableNameRepository rep{cfg.algorithm->base_graph_table, cfg.algorithm->name};
     
 
     std::unordered_map<std::string, std::function<void()>> run_options{
@@ -45,10 +44,10 @@ int main(int argc, const char ** argv) {
                 Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile,
                 [&](){
                     auto&& profiles = GenerateProfiles(cfg, 100);
-                    DynamicProfileMode<DijkstraSetup> m{d, rep, std::move(profiles[0])};
+                    DynamicProfileMode<DijkstraSetup> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profiles[0])};
                     std::cout << Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
                     d.DisconnectIfOpen();
-                    RunServer<DijkstraSetup, DynamicProfileMode<DijkstraSetup>>(cfg, m, rep, config_path);
+                    RunServer<DijkstraSetup, DynamicProfileMode<DijkstraSetup>>(cfg, m, config_path);
                 }
             },
             {
@@ -56,9 +55,12 @@ int main(int argc, const char ** argv) {
                 [&](){
                     auto&& profiles = GenerateProfiles(cfg, 100);
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
-                    StaticProfileMode<CHSetup> m{d, rep, profiles};
+                    StaticProfileMode<CHSetup> m{};
+                    for(auto&& profile : profiles) {
+                        m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile), profile);
+                    }
                     d.DisconnectIfOpen();
-                    RunServer<CHSetup, StaticProfileMode<CHSetup>>(cfg, m, rep, config_path);
+                    RunServer<CHSetup, StaticProfileMode<CHSetup>>(cfg, m, config_path);
                 }
             }
     };
@@ -79,16 +81,6 @@ static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg, double
         gen.AddIndex(std::move(prop.index), std::move(prop.options));
     }
     return gen.Generate();
-}
-
-template <typename Setup>
-static void GetRouters(Configuration& cfg, std::unordered_map<std::string, Router<Setup>>& routers, const TableNameRepository& rep) {
-    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    for(auto&& profile : GenerateProfiles(cfg, 100)) {
-        auto&& g = Setup::CreateGraph(d, rep.GetEdgesTable(profile));
-        std::cout << " Loading " << rep.GetEdgesTable(profile) << std::endl;
-        routers.emplace(profile.GetName(), Router<Setup>{std::move(g), rep.GetEdgesTable(profile)});
-    }
 }
 
 static Profile ParseProfile(const crow::json::rvalue& p, Profile default_profile) {
@@ -112,7 +104,7 @@ static Profile ParseProfile(const crow::json::rvalue& p, Profile default_profile
 }
 
 template <typename Setup, typename Mode>
-static void RunServer(Configuration& cfg, Mode& mode, const TableNameRepository& rep, const std::string& config_path) {
+static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path) {
     crow::SimpleApp app;
     CROW_ROUTE(app, "/route")([&](const crow::request& req) {
             crow::json::wvalue response;
@@ -130,11 +122,9 @@ static void RunServer(Configuration& cfg, Mode& mode, const TableNameRepository&
                 utility::Point source{coordinates[0]["lon"].d(), coordinates[0]["lat"].d()};
                 utility::Point target{coordinates[1]["lon"].d(), coordinates[1]["lat"].d()};
                 std::cout << req.url_params << std::endl;
-                auto&& table_name = rep.GetEdgesTable(profile);
                 auto&& router = mode.GetRouter(std::move(profile));
-                std::cout << "table_name " << table_name << std::endl;
                 DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-                auto&& result = router.CalculateShortestRoute(d, table_name, source, target);
+                auto&& result = router.CalculateShortestRoute(d, source, target);
                 response["route"] = result; 
                 response["ok"] = "true";
                 

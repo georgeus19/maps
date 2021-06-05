@@ -2,55 +2,74 @@
 #define ROUTING_TABLE_NAME_REPOSITORY_H
 
 #include "routing/profile/profile.h"
+#include "routing/constants.h"
+#include "routing/exception.h"
 
 #include <string>
 #include <vector>
 
 namespace routing{
 
-class TableNameRepository{
+class TableNames{
 public:
-    TableNameRepository(const std::string& base_graph_table_name, const std::string& algorithm_name);
+    TableNames() {}
 
-    std::string GetBaseTableName() const;
+    TableNames(TableNames&& other) = delete;
+    TableNames(const TableNames& other) = delete;
+    TableNames& operator=(TableNames&& other) = delete;
+    TableNames& operator=(const TableNames& other) = delete;
+    ~TableNames() = default;
 
-    std::string GetVerticesTable(const profile::Profile& profile) const;
+    virtual const std::string& GetBaseTableName() const = 0;
 
-    std::string GetVerticesTable(const std::string& profile_name) const;
+    virtual const std::string& GetEdgesTable() const = 0;
 
-    std::string GetEdgesTable(const profile::Profile& profile) const;
-
-    std::string GetEdgesTable(const std::string& profile_name) const;
-
-private:
-    std::string base_graph_table_name_;
-    std::string algorithm_name_;
+    virtual const std::string& GetVerticesTable() const = 0;
 };
 
-TableNameRepository::TableNameRepository(const std::string& base_graph_table_name, const std::string& algorithm_name)
-    : base_graph_table_name_(base_graph_table_name), algorithm_name_(algorithm_name) {}
+class DijkstraTableNames : public TableNames{
+public:
+    DijkstraTableNames(const std::string& base_graph_table) : base_graph_table_(base_graph_table) {}
 
-std::string TableNameRepository::GetBaseTableName() const {
-    return base_graph_table_name_;
-}
+    const std::string& GetBaseTableName() const override {
+        return base_graph_table_;
+    }
 
-std::string TableNameRepository::GetVerticesTable(const profile::Profile& profile) const {
-    return GetVerticesTable(profile.GetName());
-}
+    const std::string& GetEdgesTable() const override {
+        return base_graph_table_;
+    }
 
-std::string TableNameRepository::GetVerticesTable(const std::string& profile_name) const {
-    return GetEdgesTable(profile_name) + "_vertices";
-}
+    const std::string& GetVerticesTable() const override {
+        throw NotImplementedException{"Dijkstra does not have any vertices table!"};
+    }
 
-std::string TableNameRepository::GetEdgesTable(const profile::Profile& profile) const {
-    return GetEdgesTable(profile.GetName());
-}
+private:
+    std::string base_graph_table_;
+};
 
-std::string TableNameRepository::GetEdgesTable(const std::string& profile_name) const {
-    return algorithm_name_ + base_graph_table_name_ + profile_name;
-}
+class CHTableNames : public TableNames{
+public:
+    CHTableNames(const std::string& base_graph_table, const profile::Profile& profile)
+        : base_graph_table_(base_graph_table), edges_table_(Constants::AlgorithmNames::kContractionHierarchies + base_graph_table + profile.GetName()), 
+            vertices_table_(edges_table_ + "vertices_") {}
 
+    const std::string& GetBaseTableName() const override {
+        return base_graph_table_;
+    }
 
+    const std::string& GetEdgesTable() const override {
+        return edges_table_;
+    }
+
+    const std::string& GetVerticesTable() const override {
+        return vertices_table_;
+    }
+
+private:
+    std::string base_graph_table_;
+    std::string edges_table_;
+    std::string vertices_table_;
+};
 
 
 

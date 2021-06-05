@@ -11,7 +11,6 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/table_name_repository.h"
 #include "routing/edges/length_source.h"
-#include "routing/graph_factory.h"
 #include "routing/edge_factory.h"
 
 #include "routing/profile/profile.h"
@@ -28,7 +27,7 @@ class CHPreprocessor : public AlgorithmPreprocessor{
     using Graph = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
 public:
 
-    CHPreprocessor(database::DatabaseHelper&& d, TableNameRepository&& table_names, ContractionParameters&& parameters)
+    CHPreprocessor(database::DatabaseHelper&& d, std::unique_ptr<TableNames>&& table_names, ContractionParameters&& parameters)
         : d_(std::move(d)), table_names_(std::move(table_names)), parameters_(std::move(parameters)) {}
 
     void RunPreprocessing(profile::Profile& profile) override {
@@ -39,30 +38,30 @@ public:
         c.ContractGraph();
         std::cout << "Contraction done." << std::endl;
         std::cout << "Edges after contraction: " << g.GetEdgeCount() << std::endl;
-        Save(g, profile);
+        Save(g);
     }
 
 private:
     database::DatabaseHelper d_;
-    TableNameRepository table_names_;
     ContractionParameters parameters_;
+    std::unique_ptr<TableNames> table_names_;
 
     Graph LoadGraph(profile::Profile& profile) {
-        std::cout << "Load graph from " << table_names_.GetBaseTableName() << "." << std::endl;
+        std::cout << "Load graph from " << table_names_->GetBaseTableName() << "." << std::endl;
         Graph g{};
         database::UnpreprocessedDbGraph unpreprocessed_db_graph{};
         CHNumberEdgeFactory edge_factory{};
-        d_.LoadGraphEdges<Graph>(table_names_.GetBaseTableName(), g, &unpreprocessed_db_graph, edge_factory);
+        d_.LoadGraphEdges<Graph>(table_names_->GetBaseTableName(), g, &unpreprocessed_db_graph, edge_factory);
         std::cout << "Profile: " << profile.GetName() << std::endl;
         profile.Set(g);
         return g;
     }
 
-    void Save(Graph& g, profile::Profile& profile) {
+    void Save(Graph& g) {
         database::CHDbGraph ch_db_graph{};
-        std::string ch_edges_table{table_names_.GetEdgesTable(profile)};
-        std::string ch_vertex_table{table_names_.GetVerticesTable(profile)};
-        d_.CreateGraphTable(table_names_.GetBaseTableName(), ch_edges_table, &ch_db_graph);
+        std::string ch_edges_table{table_names_->GetEdgesTable()};
+        std::string ch_vertex_table{table_names_->GetVerticesTable()};
+        d_.CreateGraphTable(table_names_->GetBaseTableName(), ch_edges_table, &ch_db_graph);
         d_.DropGeographyIndex(ch_edges_table);
         std::cout << "Geography index dropped." << std::endl;
         d_.AddShortcuts(ch_edges_table, g);

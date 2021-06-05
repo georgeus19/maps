@@ -72,21 +72,20 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
     auto&& cfg = parser.Parse();
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
     auto&& profiles = GenerateProfiles(d, cfg, 100);
-    std::unordered_map<std::string, std::function<std::unique_ptr<AlgorithmPreprocessor>(Configuration&&)>> algorithms{
-        {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration&& cfg){
+    std::unordered_map<std::string, std::function<std::unique_ptr<AlgorithmPreprocessor>(Configuration&&, Profile& profile)>> algorithms{
+        {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration&& cfg, Profile& profile){
             CHConfig* ch_config = static_cast<CHConfig*>(cfg.algorithm.get());
-            TableNameRepository name_rep{cfg.algorithm->base_graph_table, cfg.algorithm->name};
             ContractionParameters parameters{
                 ch_config->hop_count,
                 ch_config->edge_difference_coefficient,
                 ch_config->deleted_neighbours_coefficient,
                 ch_config->space_size_coefficient
             };
-            return std::make_unique<CHPreprocessor>(std::move(d), std::move(name_rep), std::move(parameters));
+            return std::make_unique<CHPreprocessor>(std::move(d), std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile), std::move(parameters));
         }}
     };
-    std::unique_ptr<AlgorithmPreprocessor> alg = algorithms[cfg.algorithm->name](std::move(cfg));
     for(auto&& profile : profiles) {
+        std::unique_ptr<AlgorithmPreprocessor> alg = algorithms[cfg.algorithm->name](std::move(cfg), profile);
         alg->RunPreprocessing(profile);
     }
 }

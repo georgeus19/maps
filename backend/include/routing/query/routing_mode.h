@@ -24,13 +24,16 @@ public:
 template<typename Setup>
 class StaticProfileMode : public RoutingMode<Setup>{
 public:
-    StaticProfileMode(database::DatabaseHelper& d, const TableNameRepository& table_names, const std::vector<profile::Profile>& profiles)
-        : routers_(), profile_(profiles[0]) {
-        for(auto&& profile : profiles) {
-            auto&& g = Setup::CreateGraph(d, table_names.GetEdgesTable(profile));
-            std::cout << " Loading " << table_names.GetEdgesTable(profile) << std::endl;
-            routers_.emplace(profile.GetName(), Router<Setup>{Setup{}, std::move(g), table_names.GetEdgesTable(profile)});
-        }
+    StaticProfileMode()
+        : routers_(), profile_(100) {
+    }
+
+    void AddRouter(database::DatabaseHelper& d, std::unique_ptr<TableNames>&& table_names, const profile::Profile& profile) {
+        profile_ = profile;
+        auto&& g = Setup::CreateGraph(d, table_names->GetEdgesTable());
+        std::cout << " Loading " << table_names->GetEdgesTable() << std::endl;
+        routers_.emplace(profile.GetName(), Router<Setup>{Setup{}, std::move(g), std::move(table_names)});
+
     }
 
     profile::Profile& GetDefaultProfile() {
@@ -54,11 +57,11 @@ private:
 template<typename Setup>
 class DynamicProfileMode : public RoutingMode<Setup>{
 public:
-    DynamicProfileMode(database::DatabaseHelper& d, const TableNameRepository& table_names, profile::Profile&& profile)
+    DynamicProfileMode(database::DatabaseHelper& d, std::unique_ptr<TableNames>&& table_names, profile::Profile&& profile)
         : router_(), profile_envelope_(std::move(profile)) {
-        typename Setup::Graph g = Setup::CreateGraph(d, table_names.GetBaseTableName(), &profile_envelope_);
-        std::cout << " Loading " << table_names.GetEdgesTable(profile) << std::endl;
-        router_ = std::move(Router<Setup>{Setup{}, std::move(g), table_names.GetEdgesTable(profile)});
+        typename Setup::Graph g = Setup::CreateGraph(d, table_names->GetBaseTableName(), &profile_envelope_);
+        std::cout << " Loading " << table_names->GetEdgesTable() << std::endl;
+        router_ = std::move(Router<Setup>{Setup{}, std::move(g), std::move(table_names)});
     }
 
     profile::Profile& GetDefaultProfile() {
@@ -66,7 +69,6 @@ public:
     }
 
     Router<Setup>& GetRouter(profile::Profile&& profile) override {
-
         profile_envelope_.SwitchProfile(std::move(profile));
         return router_;
     }
