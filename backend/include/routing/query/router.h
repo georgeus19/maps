@@ -14,7 +14,7 @@
 #include "routing/bidirectional_graph.h"
 #include "routing/query/bidirectional_dijkstra.h"
 #include "routing/edges/ch_edge.h"
-#include "routing/table_name_repository.h"
+#include "routing/table_names.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/ch_search_graph.h"
@@ -45,6 +45,7 @@ public:
     ~Router() = default;
 
     std::string CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target) {
+        std::cout << "Routing on " << table_names_->GetEdgesTable() << std::endl;
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
             throw RouteNotFoundException("Start and end point are the same.");
         }

@@ -25,7 +25,7 @@
 #include "routing/edges/length_source.h"
 #include "routing/edge_factory.h"
 
-#include "routing/table_name_repository.h"
+#include "routing/table_names.h"
 
 #include <string>
 

@@ -27,32 +27,24 @@ class Profile : public IProfile{
     struct Property;
 public:
 
-    Profile(double scale_max);
+    Profile();
 
     void AddIndex(const std::shared_ptr<DataIndex>& index, int32_t importance);
 
     template <typename Graph>
     void Set(Graph& graph);
 
-    void Normalize();
+    void Normalize(double scale_max);
 
     std::string GetName() const;
 
     double GetLength(unsigned_id_type uid) const override;
 
-    std::shared_ptr<DataIndex> GetIndex(const std::string& name) {
-        auto it = std::find_if(properties_.begin(), properties_.end(), [&](const Property& p){
-            return p.index->GetName() == name;
-        });
-        if (it != properties_.end()) {
-            return it->index;
-        } else {
-            return std::shared_ptr<DataIndex>();
-        }
-    }
+    std::shared_ptr<DataIndex> GetIndex(const std::string& name);
+
+    void set_normalized();
 
 private:
-    double scale_max_;
     std::vector<Property> properties_;
     bool normalized_;
 
@@ -74,7 +66,7 @@ private:
 template <typename Graph>
 void Profile::Set(Graph& graph) {
     if (!normalized_) {
-        Normalize();
+        throw InvalidValueException{"Profile is not normalized when Set is used."};
     }
 
     graph.ForEachEdge([&](typename Graph::Edge& edge) {

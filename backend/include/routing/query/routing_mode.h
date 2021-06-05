@@ -1,7 +1,7 @@
 #ifndef ROUTING_QUERY_ROUTING_MODE_H
 #define ROUTING_QUERY_ROUTING_MODE_H
 
-#include "routing/table_name_repository.h"
+#include "routing/table_names.h"
 #include "routing/exception.h"
 
 #include "routing/edges/length_source.h"
@@ -25,7 +25,7 @@ template<typename Setup>
 class StaticProfileMode : public RoutingMode<Setup>{
 public:
     StaticProfileMode()
-        : routers_(), profile_(100) {
+        : routers_(), profile_() {
     }
 
     void AddRouter(database::DatabaseHelper& d, std::unique_ptr<TableNames>&& table_names, const profile::Profile& profile) {

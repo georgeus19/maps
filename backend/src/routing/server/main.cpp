@@ -9,7 +9,7 @@
 #include "routing/profile/data_index.h"
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
-#include "routing/table_name_repository.h"
+#include "routing/table_names.h"
 #include "database/database_helper.h"
 
 #include <ostream>
@@ -24,7 +24,7 @@ using namespace profile;
 using namespace query;
 using namespace database;
 
-static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg, double scale_max);
+static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg);
 static Profile ParseProfile(const crow::json::rvalue& p);
 template <typename Setup, typename Mode>
 static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path);
@@ -43,8 +43,10 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile,
                 [&](){
-                    auto&& profiles = GenerateProfiles(cfg, 100);
-                    DynamicProfileMode<DijkstraSetup> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profiles[0])};
+                    auto&& profiles = GenerateProfiles(cfg);
+                    auto&& profile = profiles[0];
+                    profile.Normalize(100);
+                    DynamicProfileMode<DijkstraSetup> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
                     std::cout << Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
                     d.DisconnectIfOpen();
                     RunServer<DijkstraSetup, DynamicProfileMode<DijkstraSetup>>(cfg, m, config_path);
@@ -53,7 +55,7 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile,
                 [&](){
-                    auto&& profiles = GenerateProfiles(cfg, 100);
+                    auto&& profiles = GenerateProfiles(cfg);
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
                     StaticProfileMode<CHSetup> m{};
                     for(auto&& profile : profiles) {
@@ -74,32 +76,30 @@ int main(int argc, const char ** argv) {
     }
 }
 
-static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg, double scale_max) {
+static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg) {
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    ProfileGenerator gen{d, cfg.algorithm->base_graph_table, scale_max};
+    ProfileGenerator gen{d, cfg.algorithm->base_graph_table};
     for(auto&& prop : cfg.profile_properties) {
+        std::cout << "Load index from " << prop.table_name << std::endl;
+        prop.index->Load(d, prop.table_name);
         gen.AddIndex(std::move(prop.index), std::move(prop.options));
     }
     return gen.Generate();
 }
 
 static Profile ParseProfile(const crow::json::rvalue& p, Profile default_profile) {
-    std::unordered_map<std::string, std::function<std::shared_ptr<DataIndex>()>> indicies{
-            {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<GreenIndex>(); }},
-            {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<PhysicalLengthIndex>(); }}
-    };
-    Profile profile{100};
+    Profile profile{};
     std::cout << "default_profile " << default_profile.GetName() << std::endl; 
     for(auto it = p.begin(); it != p.end(); ++it) {
         std::string index_name = (*it)["name"].s();
         int32_t importance = static_cast<int32_t>((*it)["importance"].i());
-        auto&& index_it = indicies.find(index_name);
         if (std::shared_ptr<DataIndex> index = default_profile.GetIndex(index_name)) {
             profile.AddIndex(index, importance);
         } else {
             throw InvalidArgumentException("Invalid profile query parameter - index " + index_name + " does not exist.");
         }
     }
+    profile.set_normalized();
     return profile;
 }
 

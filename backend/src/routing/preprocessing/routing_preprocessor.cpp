@@ -1,5 +1,5 @@
 #include "routing/edges/basic_edge.h"
-#include "routing/table_name_repository.h"
+#include "routing/table_names.h"
 #include "routing/exception.h"
 #include "routing/configuration_parser.h"
 #include "routing/constants.h"
@@ -31,7 +31,7 @@ using namespace profile;
 
 static void RunAlgorithmPreprocessing(const std::string& config_path);
 static void CreateIndicies(const std::string& path);
-static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, double scale_max);
+static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg);
 static void PrintHelp();
 
 // Run options.
@@ -71,7 +71,7 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
     ConfigurationParser parser{config_path};
     auto&& cfg = parser.Parse();
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    auto&& profiles = GenerateProfiles(d, cfg, 100);
+    auto&& profiles = GenerateProfiles(d, cfg);
     std::unordered_map<std::string, std::function<std::unique_ptr<AlgorithmPreprocessor>(Configuration&&, Profile& profile)>> algorithms{
         {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration&& cfg, Profile& profile){
             CHConfig* ch_config = static_cast<CHConfig*>(cfg.algorithm.get());
@@ -85,8 +85,13 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
         }}
     };
     for(auto&& profile : profiles) {
-        std::unique_ptr<AlgorithmPreprocessor> alg = algorithms[cfg.algorithm->name](std::move(cfg), profile);
-        alg->RunPreprocessing(profile);
+        auto it = algorithms.find(cfg.algorithm->name);
+        if (it != algorithms.end()) {
+            std::unique_ptr<AlgorithmPreprocessor> alg = it->second(std::move(cfg), profile);
+            alg->RunPreprocessing(profile);
+        } else {
+            throw InvalidArgumentException{"There is no preprocessing for algorithm " + cfg.algorithm->name + "."};
+        }
     }
 }
 
@@ -120,8 +125,8 @@ static void CreateIndicies(const std::string& path) {
     }
 }
 
-static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg, double scale_max) {
-    ProfileGenerator gen{d, cfg.algorithm->base_graph_table, scale_max};
+static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg) {
+    ProfileGenerator gen{d, cfg.algorithm->base_graph_table};
     for(auto&& prop : cfg.profile_properties) {
         prop.index->Load(d, prop.table_name);
         gen.AddIndex(std::move(prop.index), std::move(prop.options));

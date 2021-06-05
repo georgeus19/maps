@@ -9,7 +9,7 @@
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/adjacency_list_graph.h"
 #include "routing/bidirectional_graph.h"
-#include "routing/table_name_repository.h"
+#include "routing/table_names.h"
 #include "routing/edges/length_source.h"
 #include "routing/edge_factory.h"
 
@@ -53,6 +53,7 @@ private:
         CHNumberEdgeFactory edge_factory{};
         d_.LoadGraphEdges<Graph>(table_names_->GetBaseTableName(), g, &unpreprocessed_db_graph, edge_factory);
         std::cout << "Profile: " << profile.GetName() << std::endl;
+        profile.Normalize(100);
         profile.Set(g);
         return g;
     }

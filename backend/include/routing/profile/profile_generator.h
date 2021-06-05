@@ -18,7 +18,7 @@ namespace profile{
 class ProfileGenerator {
 public:
 
-    ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table, double scale_max);
+    ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table);
 
     void AddIndex(std::shared_ptr<DataIndex>&& index, std::vector<int32_t>&& importance_options);
 
@@ -28,7 +28,6 @@ private:
     struct IndexInfo;
     database::DatabaseHelper& d_;
     std::string base_graph_table_;
-    double scale_max_;
 
     std::vector<IndexInfo> indices_;
 
@@ -43,8 +42,8 @@ private:
 
 };
 
-ProfileGenerator::ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table, double scale_max)
-    : d_(d), base_graph_table_(base_graph_table), scale_max_(scale_max), indices_() {}
+ProfileGenerator::ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table)
+    : d_(d), base_graph_table_(base_graph_table), indices_() {}
 
 void ProfileGenerator::AddIndex(std::shared_ptr<DataIndex>&& index, std::vector<int32_t>&& importance_options) {
     indices_.emplace_back(std::move(index), std::move(importance_options));
@@ -54,7 +53,7 @@ std::vector<Profile> ProfileGenerator::Generate() {
     std::vector<Profile> profiles{};
     if (indices_.begin() != indices_.end()) {
         for(auto&& im : GetAllImportances(indices_.begin(), indices_.end())) {
-            Profile profile{scale_max_};
+            Profile profile{};
             auto in_it = indices_.begin();
             auto im_it = im.begin();
             for(; in_it != indices_.end();  ++in_it, ++im_it) {
