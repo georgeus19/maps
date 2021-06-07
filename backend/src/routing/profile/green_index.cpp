@@ -63,6 +63,10 @@ void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_inde
     d.RunNontransactional(sql, load);
 }
 
+void GreenIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const {
+    PairIndexImplementation{}.Create(d, index_values, index_table, "green_value");
+}
+
 void GreenIndex::Normalize(double scale_max) {
     for(auto&& green_value : edge_green_values_) {
         if (green_value.valid) {

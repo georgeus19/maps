@@ -7,6 +7,7 @@
 #include "routing/preprocessing/algorithm_preprocessor.h"
 #include "routing/preprocessing/ch_preprocessor.h"
 #include "routing/preprocessing/contraction_parameters.h"
+#include "routing/preprocessing/index_extender.h"
 
 #include "routing/profile/profile_generator.h"
 #include "routing/profile/profile.h"
@@ -30,6 +31,8 @@ using namespace preprocessing;
 using namespace profile;
 
 static void RunAlgorithmPreprocessing(const std::string& config_path);
+template <typename Graph>
+static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d);
 static void CreateIndicies(const std::string& path);
 static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg);
 static void PrintHelp();
@@ -72,8 +75,8 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
     auto&& cfg = parser.Parse();
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
     auto&& profiles = GenerateProfiles(d, cfg);
-    std::unordered_map<std::string, std::function<std::unique_ptr<AlgorithmPreprocessor>(Configuration&&, Profile& profile)>> algorithms{
-        {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration&& cfg, Profile& profile){
+    std::unordered_map<std::string, std::function<void(Configuration&, Profile& profile)>> algorithms{
+        {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration& cfg, Profile& profile){
             CHConfig* ch_config = static_cast<CHConfig*>(cfg.algorithm.get());
             ContractionParameters parameters{
                 ch_config->hop_count,
@@ -81,17 +84,37 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
                 ch_config->deleted_neighbours_coefficient,
                 ch_config->space_size_coefficient
             };
-            return std::make_unique<CHPreprocessor>(std::move(d), std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile), std::move(parameters));
+            CHTableNames table_names{cfg.algorithm->base_graph_table, profile};
+            CHPreprocessor preprocessor{d, &table_names, std::move(parameters)};
+            auto&& graph = preprocessor.LoadGraph(profile);
+            preprocessor.RunPreprocessing(graph);
+            if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
+                ExtendProfileIndicies(cfg, graph, profile, &table_names, d);
+            }
+            preprocessor.SaveGraph(graph);
         }}
     };
     for(auto&& profile : profiles) {
         auto it = algorithms.find(cfg.algorithm->name);
         if (it != algorithms.end()) {
-            std::unique_ptr<AlgorithmPreprocessor> alg = it->second(std::move(cfg), profile);
-            alg->RunPreprocessing(profile);
+            it->second(cfg, profile);
         } else {
             throw InvalidArgumentException{"There is no preprocessing for algorithm " + cfg.algorithm->name + "."};
         }
+    }
+}
+
+template <typename Graph>
+static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
+    IndexExtender<CHPreprocessor::Graph> extender{d, graph};
+    for(auto&& prop : cfg.profile_properties) {
+        std::shared_ptr<DataIndex> index =  profile.GetIndex(prop.index->GetName());
+        if (!index) {
+            throw InvalidValueException{"Index " + prop.table_name + " not in profile when up for extension."};
+        }
+        std::string new_index_table = table_names->GetIndexTablePrefix() + prop.table_name;
+        std::cout << "Extend index " << prop.table_name << " to table " << new_index_table << std::endl;
+        extender.ExtendIndex(index, new_index_table);
     }
 }
 
@@ -128,8 +151,9 @@ static void CreateIndicies(const std::string& path) {
 static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg) {
     ProfileGenerator gen{d, cfg.algorithm->base_graph_table};
     for(auto&& prop : cfg.profile_properties) {
+        std::cout << "Loading index from " << prop.table_name << std::endl;
         prop.index->Load(d, prop.table_name);
-        gen.AddIndex(std::move(prop.index), std::move(prop.options));
+        gen.AddIndex(prop.index, std::move(prop.options));
     }
     return gen.Generate();
 }

@@ -4,6 +4,7 @@
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
 #include "routing/profile/data_index.h"
+#include "routing/profile/pair_index_implementation.h"
 
 #include <string>
 #include <vector>
@@ -20,6 +21,8 @@ public:
     void Create(database::DatabaseHelper& d, const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table);
 
     void Load(database::DatabaseHelper& d, const std::string& green_index_table) override;
+
+    void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const override;
 
     void Normalize(double scale_max) override;
 

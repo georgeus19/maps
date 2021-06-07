@@ -21,9 +21,9 @@ void CopyWriter::WriteInitSql(const string& table_name) {
     // Write COPY command that loads edges from data to table `table_name`.
     string copy = "COPY " + temporary_edges_table + " FROM '" + data_path_ + "' DELIMITER ';' CSV; ";
     // Add length column.
-    string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length double precision; ";
+    string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length DOUBLE PRECISION; ";
     // Calculate lengths.
-    string fill_length_column = "UPDATE " + table_name + " set length = st_length(geog); ";
+    string fill_length_column = "UPDATE " + table_name + " set length = ST_Length(geog); ";
     // Create geo index.
     string create_index = "CREATE INDEX " + table_name + "_gix ON " + table_name + " USING GIST (geog); ";
     f_init_table_ << GetCreateEdgesTable(temporary_edges_table) << std::endl;

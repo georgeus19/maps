@@ -20,7 +20,7 @@ public:
 
     ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table);
 
-    void AddIndex(std::shared_ptr<DataIndex>&& index, std::vector<int32_t>&& importance_options);
+    void AddIndex(std::shared_ptr<DataIndex> index, std::vector<int32_t>&& importance_options);
 
     std::vector<Profile> Generate();
 
@@ -35,7 +35,7 @@ private:
         std::shared_ptr<DataIndex> index;
         std::vector<int32_t> importance_options;
 
-        IndexInfo(std::shared_ptr<DataIndex>&& i, std::vector<int32_t> im) : index(std::move(i)), importance_options(std::move(im)) {}
+        IndexInfo(std::shared_ptr<DataIndex> i, std::vector<int32_t> im) : index(i), importance_options(std::move(im)) {}
     };
 
     std::vector<std::vector<int32_t>> GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end);
@@ -45,8 +45,8 @@ private:
 ProfileGenerator::ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table)
     : d_(d), base_graph_table_(base_graph_table), indices_() {}
 
-void ProfileGenerator::AddIndex(std::shared_ptr<DataIndex>&& index, std::vector<int32_t>&& importance_options) {
-    indices_.emplace_back(std::move(index), std::move(importance_options));
+void ProfileGenerator::AddIndex(std::shared_ptr<DataIndex> index, std::vector<int32_t>&& importance_options) {
+    indices_.emplace_back(index, std::move(importance_options));
 }
 
 std::vector<Profile> ProfileGenerator::Generate() {

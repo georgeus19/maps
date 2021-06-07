@@ -25,11 +25,13 @@ public:
     virtual const std::string& GetEdgesTable() const = 0;
 
     virtual const std::string& GetVerticesTable() const = 0;
+
+    virtual const std::string& GetIndexTablePrefix() const = 0;
 };
 
 class DijkstraTableNames : public TableNames{
 public:
-    DijkstraTableNames(const std::string& base_graph_table) : base_graph_table_(base_graph_table) {}
+    DijkstraTableNames(const std::string& base_graph_table) : base_graph_table_(base_graph_table), index_table_prefix_() {}
 
     const std::string& GetBaseTableName() const override {
         return base_graph_table_;
@@ -43,15 +45,19 @@ public:
         throw NotImplementedException{"Dijkstra does not have any vertices table!"};
     }
 
+    const std::string& GetIndexTablePrefix() const override {
+        return index_table_prefix_;
+    }
 private:
     std::string base_graph_table_;
+    std::string index_table_prefix_;
 };
 
 class CHTableNames : public TableNames{
 public:
     CHTableNames(const std::string& base_graph_table, const profile::Profile& profile)
         : base_graph_table_(base_graph_table), edges_table_(Constants::AlgorithmNames::kContractionHierarchies + base_graph_table + profile.GetName()), 
-            vertices_table_(edges_table_ + "vertices_") {}
+            vertices_table_(edges_table_ + "vertices_"), index_table_prefix_(edges_table_) {}
 
     const std::string& GetBaseTableName() const override {
         return base_graph_table_;
@@ -65,10 +71,15 @@ public:
         return vertices_table_;
     }
 
+    const std::string& GetIndexTablePrefix() const override {
+        return index_table_prefix_;
+    }
+
 private:
     std::string base_graph_table_;
     std::string edges_table_;
     std::string vertices_table_;
+    std::string index_table_prefix_;
 };
 
 

@@ -41,7 +41,7 @@ protected:
     unsigned_id_type ordering_rank_;
 };
 template <typename Edge, typename ERange>
-CHVertex<Edge, ERange>::CHVertex() : BasicVertex<Edge, ERange>(), ordering_rank_() {}
+CHVertex<Edge, ERange>::CHVertex() : BasicVertex<Edge, ERange>(), ordering_rank_(0) {}
 
 template <typename Edge, typename ERange>
 CHVertex<Edge, ERange>::CHVertex(unsigned_id_type osm_id, ERange&& edges, unsigned_id_type ordering_rank)

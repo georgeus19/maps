@@ -28,6 +28,11 @@ void PhysicalLengthIndex::Load(database::DatabaseHelper& d, const std::string& i
     d.RunNontransactional(sql, load);
 }
 
+void PhysicalLengthIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values,
+    const std::string& index_table) const {
+    PairIndexImplementation{}.Create(d, index_values, index_table, "length");
+}
+
 void PhysicalLengthIndex::Normalize(double scale_max) {
     double max_value = std::numeric_limits<double>::min();
     for(auto&& length_value : edge_length_values_) {
