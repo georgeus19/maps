@@ -84,12 +84,12 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
                 ch_config->deleted_neighbours_coefficient,
                 ch_config->space_size_coefficient
             };
-            CHTableNames table_names{cfg.algorithm->base_graph_table, profile};
+            CHTableNames table_names{cfg.algorithm->base_graph_table, profile, cfg.algorithm->mode};
             CHPreprocessor preprocessor{d, &table_names, std::move(parameters)};
             auto&& graph = preprocessor.LoadGraph(profile);
             preprocessor.RunPreprocessing(graph);
             if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
-                ExtendProfileIndicies(cfg, graph, profile, &table_names, d);
+                ExtendProfileIndicies<CHPreprocessor::Graph>(cfg, graph, profile, &table_names, d);
             }
             preprocessor.SaveGraph(graph);
         }}
@@ -106,7 +106,7 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
 
 template <typename Graph>
 static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
-    IndexExtender<CHPreprocessor::Graph> extender{d, graph};
+    IndexExtender<Graph> extender{d, graph};
     for(auto&& prop : cfg.profile_properties) {
         std::shared_ptr<DataIndex> index =  profile.GetIndex(prop.index->GetName());
         if (!index) {

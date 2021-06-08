@@ -39,16 +39,16 @@ TEST(CHSearchGraphTests, ShortcutsAndBackwardEdges) {
     std::vector<Edge> expected{
         typename SearchGraph::Edge{0, 1, 2, 2, SearchGraph::Edge::EdgeType::forward},
         typename SearchGraph::Edge{1, 3, 1, 3, SearchGraph::Edge::EdgeType::twoway},
-        typename SearchGraph::Edge{2, 2, 6, 12, SearchGraph::Edge::EdgeType::backward},
+        typename SearchGraph::Edge{2, 6, 2, 12, SearchGraph::Edge::EdgeType::backward},
         typename SearchGraph::Edge{3, 3, 4, 2, SearchGraph::Edge::EdgeType::twoway},
         typename SearchGraph::Edge{4, 4, 5, 3, SearchGraph::Edge::EdgeType::twoway},
         typename SearchGraph::Edge{5, 4, 6, 6, SearchGraph::Edge::EdgeType::forward},
-        typename SearchGraph::Edge{6, 5, 6, 2, SearchGraph::Edge::EdgeType::backward},
+        typename SearchGraph::Edge{6, 6, 5, 2, SearchGraph::Edge::EdgeType::backward},
         typename SearchGraph::Edge{7, 6, 5, 3, SearchGraph::Edge::EdgeType::forward},
         typename SearchGraph::Edge{8, 4, 1, 3, SearchGraph::Edge::EdgeType::twoway},
         typename SearchGraph::Edge{9, 1, 5, 8, SearchGraph::Edge::EdgeType::twoway},
         typename SearchGraph::Edge{10, 1, 6, 11, SearchGraph::Edge::EdgeType::forward},
-        typename SearchGraph::Edge{11, 5, 2, 10, SearchGraph::Edge::EdgeType::backward},
+        typename SearchGraph::Edge{11, 2, 5, 10, SearchGraph::Edge::EdgeType::backward},
         typename SearchGraph::Edge{11, 2, 5, 15, SearchGraph::Edge::EdgeType::forward}
     };
     std::vector<Edge> actual{};

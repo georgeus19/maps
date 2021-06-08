@@ -16,7 +16,7 @@ template <typename Graph>
 class IndexExtender{
     struct IndexValue;
 public:
-    IndexExtender(std::reference_wrapper<database::DatabaseHelper> d, std::reference_wrapper<Graph> graph) : d_(d), graph_(graph) {}
+    IndexExtender(database::DatabaseHelper& d, Graph& graph) : d_(d), graph_(graph) {}
 
     void ExtendIndex(std::shared_ptr<profile::DataIndex> data_index, const std::string& new_index_table);
 private:
@@ -42,7 +42,11 @@ void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::DataIndex> data_
         // Twoway is twice in the graph.
         bool twoway_condition = edge.IsTwoway() && edge.get_from() < edge.get_to();
         if (edge.IsForward() || twoway_condition) {
-            extended_index.emplace_back(edge.get_uid(), CalculateIndexValue(data_index, edge));
+            if (edge.IsShortcut()) {
+                extended_index.emplace_back(edge.get_uid(), CalculateIndexValue(data_index, edge));
+            } else {
+                extended_index.emplace_back(edge.get_uid(), data_index->Get(edge.get_uid()));
+            }
         }
     });
     data_index->Create(d_.get(), extended_index, new_index_table);
@@ -51,7 +55,7 @@ void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::DataIndex> data_
 template <typename Graph>
 double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::DataIndex> data_index, typename Graph::Edge& input_edge) {
     double index_value = 0;
-    std::stack<std::reference_wrapper<typename Graph::Edge>> shortcut_stack{};
+    std::stack<typename Graph::Edge> shortcut_stack{};
     typename Graph::Edge edge = input_edge;
     while(!shortcut_stack.empty() || edge.IsShortcut()) {
         if (edge.IsShortcut()) {
@@ -74,24 +78,6 @@ double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::DataIn
     index_value += data_index->Get(edge.get_uid());
     return index_value;
 }
-
-// template <typename Graph>
-// void IndexExtender<Graph>::SaveNewIndex(const std::string& table_name, const std::vector<IndexValue>& extended_index) {
-//     std::string drop_table = "DROP TABLE IF EXISTS " + table_name + "; ";
-//     std::string create_table = "CREATE TABLE " + table_name + " ( "
-//                                 " uid BIGINT PRIMARY KEY, "
-//                                 " value DOUBLE PRECISION NOT NULL); ";
-//     std::string insert = "INSERT INTO " + table_name + " (uid, value) VALUES ";
-//     for(auto it = extended_index.begin(); it != extended_index.end(); ++it) {
-//         if (it != extended_index.begin()) {
-//             insert += ", ";
-//         }
-//         insert += "('" + std::to_string(it->uid) + "', " + std::to_string(it->value) + ")";
-//     }
-//     insert += "; ";
-//     std::string sql = drop_table + create_table + insert;
-//     d_.get().RunTransactional(sql);
-// }
 
 
 

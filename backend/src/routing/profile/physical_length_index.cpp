@@ -15,7 +15,7 @@ PhysicalLengthIndex::PhysicalLengthIndex() : edge_length_values_() {}
 void PhysicalLengthIndex::Load(database::DatabaseHelper& d, const std::string& index_table) {
     // edge_length_values_.assign(max_uid + 1, LengthValue{});
     std::string sql = 
-            "SELECT uid, length "
+            "SELECT uid, " + kValueColumnName + " "
             "FROM " + index_table + "; ";
     auto&& load = [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
@@ -30,7 +30,7 @@ void PhysicalLengthIndex::Load(database::DatabaseHelper& d, const std::string& i
 
 void PhysicalLengthIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values,
     const std::string& index_table) const {
-    PairIndexImplementation{}.Create(d, index_values, index_table, "length");
+    PairIndexImplementation{}.Create(d, index_values, index_table, kValueColumnName);
 }
 
 void PhysicalLengthIndex::Normalize(double scale_max) {

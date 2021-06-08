@@ -33,6 +33,8 @@ private:
     struct GreenValue;
     std::vector<GreenValue> edge_green_values_;
 
+    static inline const std::string kValueColumnName = "green_value";
+
     struct GreenValue {
         bool valid;
         double value;

@@ -32,6 +32,8 @@ private:
     struct LengthValue;
     std::vector<LengthValue> edge_length_values_;
 
+    static inline const std::string kValueColumnName = "length";
+
     struct LengthValue {
         bool valid;
         double value;

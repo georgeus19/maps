@@ -55,8 +55,8 @@ private:
 
 class CHTableNames : public TableNames{
 public:
-    CHTableNames(const std::string& base_graph_table, const profile::Profile& profile)
-        : base_graph_table_(base_graph_table), edges_table_(Constants::AlgorithmNames::kContractionHierarchies + base_graph_table + profile.GetName()), 
+    CHTableNames(const std::string& base_graph_table, const profile::Profile& profile, const std::string& table_prefix)
+        : base_graph_table_(base_graph_table), edges_table_(table_prefix + Constants::AlgorithmNames::kContractionHierarchies + base_graph_table + profile.GetName()), 
             vertices_table_(edges_table_ + "vertices_"), index_table_prefix_(edges_table_) {}
 
     const std::string& GetBaseTableName() const override {

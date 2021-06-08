@@ -59,7 +59,7 @@ int main(int argc, const char ** argv) {
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
                     StaticProfileMode<CHSetup> m{};
                     for(auto&& profile : profiles) {
-                        m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile), profile);
+                        m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile, cfg.algorithm->mode), profile);
                     }
                     d.DisconnectIfOpen();
                     RunServer<CHSetup, StaticProfileMode<CHSetup>>(cfg, m, config_path);

@@ -105,36 +105,35 @@ void BasicVertex<Edge, EdgeRange>::ForEachBackwardEdge(const std::function<void(
 
 template <typename Edge, typename EdgeRange>
 Edge& BasicVertex<Edge, EdgeRange>::FindEdge(const std::function<bool(const Edge&)>& f) {
-    return FindEdge(edges_, true, f);
-}
-
-
-template <typename Edge, typename EdgeRange>
-inline Edge& BasicVertex<Edge, EdgeRange>::FindBackwardEdge(const std::function<bool(const Edge&)>& f) {
-    return FindEdge(edges_, false, f);
-}
-
-template <typename Edge, typename EdgeRange>
-Edge& BasicVertex<Edge, EdgeRange>::FindEdge(EdgeRange& edges, bool forward_edges, const std::function<bool(const Edge&)>& f) {
     double min_length = std::numeric_limits<double>::max();
     Edge* edge = nullptr;
-    for (auto&& e : edges) {
-        if (forward_edges && e.IsBackward()) {
-            continue;
-        } 
-        if (!forward_edges && e.IsForward()) {
-            continue;
-        }
+    ForEachEdge([&](Edge& e){
         if (f(e) && e.get_length() < min_length) {
             min_length = e.get_length();
             edge = &e;
         }
-    }
+    });
     if (edge) {
         return *edge;
     } else {
-        std::string s = ((forward_edges) ? "Forward " : "Backward ");
-        throw EdgeNotFoundException(s + "edge not found ");
+        throw EdgeNotFoundException("Forward edge not found ");
+    }
+}
+
+template <typename Edge, typename EdgeRange>
+inline Edge& BasicVertex<Edge, EdgeRange>::FindBackwardEdge(const std::function<bool(const Edge&)>& f) {
+    double min_length = std::numeric_limits<double>::max();
+    Edge* edge = nullptr;
+    ForEachBackwardEdge([&](Edge& e){
+        if (f(e) && e.get_length() < min_length) {
+            min_length = e.get_length();
+            edge = &e;
+        }
+    });
+    if (edge) {
+        return *edge;
+    } else {
+        throw EdgeNotFoundException("Backward edge not found ");
     }
 }
 

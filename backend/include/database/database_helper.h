@@ -387,7 +387,6 @@ void DatabaseHelper::LoadGraphEdges(const std::string& table_name, Graph& graph,
     }
 }
 
-
 template <typename Graph>
 void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
     auto&& current_dir = std::filesystem::current_path();

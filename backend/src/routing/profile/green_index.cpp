@@ -35,7 +35,7 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 			"	edges.uid, "
 			"    SUM( "
 			"        ST_Area(ST_Intersection(edges.geom, green.way)) / ST_Area(edges.geom) "
-			"    ) AS green_value "
+			"    ) AS " + kValueColumnName + " "
 			"FROM  "
 			"( "
 			"	SELECT uid, ST_Buffer(ST_Transform(geog::geometry, 3857), 30) as geom "
@@ -50,7 +50,7 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_index_table) {
     // edge_green_values_.assign(max_uid + 1, GreenValue{});
     std::string sql = 
-            "SELECT uid, COALESCE(green_value, 0) "
+            "SELECT uid, COALESCE(" + kValueColumnName + ", 0) "
             "FROM " + green_index_table + "; ";
     auto&& load = [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
@@ -64,7 +64,7 @@ void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_inde
 }
 
 void GreenIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const {
-    PairIndexImplementation{}.Create(d, index_values, index_table, "green_value");
+    PairIndexImplementation{}.Create(d, index_values, index_table, kValueColumnName);
 }
 
 void GreenIndex::Normalize(double scale_max) {
