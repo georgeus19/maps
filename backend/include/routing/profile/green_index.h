@@ -1,5 +1,5 @@
-#ifndef BACKEND_ROUTING_PROFILE_GREEN_INDEX_H
-#define BACKEND_ROUTING_PROFILE_GREEN_INDEX_H
+#ifndef ROUTING_PROFILE_GREEN_INDEX_H
+#define ROUTING_PROFILE_GREEN_INDEX_H
 
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
@@ -52,4 +52,4 @@ private:
 }
 }
 
-#endif //BACKEND_ROUTING_PROFILE_GREEN_INDEX_H
+#endif //ROUTING_PROFILE_GREEN_INDEX_H

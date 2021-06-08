@@ -39,6 +39,7 @@ struct Constants{
         struct Indicies{
             static inline const std::string kEdgesTable = "edges_table";
             static inline const std::string kPolygonTable = "polygon_table";
+            static inline const std::string kPointTable = "point_table";
             static inline const std::string kIndexTable = "index_table";
         };
     };
@@ -51,6 +52,7 @@ struct Constants{
     struct IndexNames{
         static inline const std::string kGreenIndex = "green";
         static inline const std::string kLengthIndex = "length";
+        static inline const std::string kPeakDistanceIndex = "peak";
     };
 
     struct ModeNames{

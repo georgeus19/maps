@@ -11,6 +11,9 @@
 
 #include "routing/profile/profile_generator.h"
 #include "routing/profile/profile.h"
+#include "routing/profile/green_index.h"
+#include "routing/profile/physical_length_index.h"
+#include "routing/profile/peak_distance_index.h"
 
 #include "database/database_helper.h"
 
@@ -130,6 +133,17 @@ static void CreateIndicies(const std::string& path) {
                 index.Create(d, 
                     toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
                     toml::find<std::string>(table, Constants::Input::Indicies::kPolygonTable),
+                    toml::find<std::string>(table, Constants::Input::Indicies::kIndexTable)
+                ); 
+            }
+        },
+        {
+            Constants::IndexNames::kPeakDistanceIndex,
+            [&](const toml::value& table){
+                PeakDistanceIndex index{};
+                index.Create(d, 
+                    toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
+                    toml::find<std::string>(table, Constants::Input::Indicies::kPointTable),
                     toml::find<std::string>(table, Constants::Input::Indicies::kIndexTable)
                 ); 
             }

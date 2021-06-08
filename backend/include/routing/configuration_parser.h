@@ -1,11 +1,13 @@
-#ifndef BACKEND_ROUTING_CONFIGURATION_PARSER_H
-#define BACKEND_ROUTING_CONFIGURATION_PARSER_H
+#ifndef ROUTING_CONFIGURATION_PARSER_H
+#define ROUTING_CONFIGURATION_PARSER_H
 #include "toml11/toml.hpp"
 #include "routing/constants.h"
 #include "routing/exception.h"
+
 #include "routing/profile/data_index.h"
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
+#include "routing/profile/peak_distance_index.h"
 
 #include <functional>
 #include <iostream>
@@ -128,6 +130,7 @@ Configuration ConfigurationParser::Parse() {
     for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
         std::unordered_map<std::string, std::function<std::shared_ptr<profile::DataIndex>()>> indicies{
             {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
+            {Constants::IndexNames::kPeakDistanceIndex, [](){ return std::make_shared<profile::PeakDistanceIndex>(); }},
             {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
         };
         std::string name = toml::find<std::string>(property, Constants::Input::kName);
@@ -148,4 +151,4 @@ Configuration ConfigurationParser::Parse() {
 
 }
 
-#endif //BACKEND_ROUTING_CONFIGURATION_PARSER_H
+#endif //ROUTING_CONFIGURATION_PARSER_H

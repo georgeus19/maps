@@ -6,11 +6,11 @@ host = "127.0.0.1"
 port = "5432"
 
 [algorithm]
-# name = "ch"
-name = "dijkstra"
+name = "ch"
+# name = "dijkstra"
 base_graph_table = "czedges"
-mode = "dynamic_profile"
-# mode = "static_profile"
+# mode = "dynamic_profile"
+mode = "static_profile"
 [algorithm.parameters]
 hop_count = 5
 edge_difference = 190

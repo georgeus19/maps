@@ -60,7 +60,7 @@ public:
     DynamicProfileMode(database::DatabaseHelper& d, std::unique_ptr<TableNames>&& table_names, profile::Profile&& profile)
         : router_(), profile_envelope_(std::move(profile)) {
         typename Setup::Graph g = Setup::CreateGraph(d, table_names->GetBaseTableName(), &profile_envelope_);
-        std::cout << " Loading " << table_names->GetEdgesTable() << std::endl;
+        std::cout << "Loading " << table_names->GetEdgesTable() << std::endl;
         router_ = std::move(Router<Setup>{Setup{}, std::move(g), std::move(table_names)});
     }
 

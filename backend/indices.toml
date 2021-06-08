@@ -5,10 +5,15 @@ password = "wtz2trln"
 host = "127.0.0.1"
 port = "5432"
 
+# [[indicies]]
+# name = "green"
+# edges_table = "czedges"
+# polygon_table = "planet_osm_polygon"
+# index_table = "czedges_green_index"
 [[indicies]]
-name = "green"
+name = "peak"
 edges_table = "czedges"
-polygon_table = "planet_osm_polygon"
-index_table = "czedges_green_index"
+point_table = "planet_osm_point"
+index_table = "czedges_peak_index"
 [[indicies]]
 name = "length"
