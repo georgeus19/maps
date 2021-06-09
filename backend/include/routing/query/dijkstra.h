@@ -123,7 +123,6 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
     start_node_ = start_node;
     touched_vertices_.clear();
 
-    Vertex& start_vertex = g_.GetVertex(start_node);
     touched_vertices_.insert_or_assign(start_node, VertexRoutingProperties{0, 0});
     q.insert(std::make_pair(0, start_node));
 

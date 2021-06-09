@@ -61,6 +61,7 @@ public:
         endpoints_creator.AddSourceEndpoint(table_names_->GetEdgesTable(), source_vertex_id, source);
         endpoints_creator.AddTargetEndpoint(table_names_->GetEdgesTable(), target_vertex_id, target);
 
+
             auto start_run = std::chrono::high_resolution_clock::now();
         Algorithm<typename Setup::Algorithm> alg{routing_graph};
         alg.Run(source_vertex_id, target_vertex_id);

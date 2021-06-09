@@ -176,7 +176,6 @@ std::pair<std::vector<typename EdgeFactory::Edge>, std::vector<std::pair<unsigne
     unsigned_id_type other_intersection = closest_edge_from_used ? closest_edge_to : closest_edge_from;
     SaveEdge(rows[other_index], result_edges, result_geometries, endpoint_id, other_intersection, free_edge_id);
     ++free_edge_id;
-
     return std::make_pair(result_edges, result_geometries);
 }
 

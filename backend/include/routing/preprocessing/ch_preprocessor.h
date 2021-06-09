@@ -67,8 +67,8 @@ public:
     }
 private:
     std::reference_wrapper<database::DatabaseHelper> d_;
-    ContractionParameters parameters_;
     TableNames* table_names_;
+    ContractionParameters parameters_;
 
 
 };

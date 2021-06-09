@@ -18,11 +18,11 @@ template <typename EndpointAlgorithmPolicy, typename EndpointEdgesCreator>
 class EndpointsCreator {
 public:
     EndpointsCreator(const EndpointAlgorithmPolicy& gp, const EndpointEdgesCreator& eec) 
-        : graph_policy_(gp), endpoint_edges_creator_(eec), free_endpoint_edge_id_(0), source_edges_geometries_(), target_edges_geometries_() {}
-
+        : graph_policy_(gp), endpoint_edges_creator_(eec), free_endpoint_edge_id_(0), source_edges_geometries_(), target_edges_geometries_() {
+        }
 
     EndpointsCreator(EndpointAlgorithmPolicy&& gp, EndpointEdgesCreator&& eec) 
-        : graph_policy_(std::move(gp)), endpoint_edges_creator_(std::move(eec)) {}
+        : graph_policy_(std::move(gp)), endpoint_edges_creator_(std::move(eec)), free_endpoint_edge_id_(0), source_edges_geometries_(), target_edges_geometries_()  {}
 
     void AddSourceEndpoint(const std::string& table_name, unsigned_id_type source_id, utility::Point source_location) {
         auto&& [edges, geometries] = endpoint_edges_creator_.CalculateEndpointEdges(table_name, source_id, source_location, free_endpoint_edge_id_);

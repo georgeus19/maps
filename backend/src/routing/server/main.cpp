@@ -25,7 +25,7 @@ using namespace query;
 using namespace database;
 
 static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg);
-static Profile ParseProfile(const crow::json::rvalue& p);
+static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profile);
 template <typename Setup, typename Mode>
 static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path);
 
@@ -87,7 +87,7 @@ static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg) {
     return gen.Generate();
 }
 
-static Profile ParseProfile(const crow::json::rvalue& p, Profile default_profile) {
+static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profile) {
     Profile profile{};
     std::cout << "default_profile " << default_profile.GetName() << std::endl; 
     for(auto it = p.begin(); it != p.end(); ++it) {
