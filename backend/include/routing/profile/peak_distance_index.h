@@ -24,26 +24,17 @@ public:
 
     void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const override;
 
-    void Normalize(double scale_max) override;
-
     double Get(unsigned_id_type uid) const override;
 
     const std::string& GetName() const override;
 private:
-    struct PeakValue;
-    std::vector<PeakValue> edge_peak_distances_;
+    PairIndexImplementation impl_;
 
     static inline const std::string kValueColumnName = "peak_distance";
 
     static inline const double kDistanceRadius = 500;
 
-    struct PeakValue {
-        bool valid;
-        double peak_distance;
-
-        PeakValue() : valid(false), peak_distance(0) {}
-        PeakValue(double pd) : valid(true), peak_distance(pd) {}
-    };
+    void Normalize() override;
 };
 
 
@@ -51,7 +42,7 @@ private:
 
 
 
-}
-}
 
+}
+}
 #endif //ROUTING_PROFILE_PEAK_INDEX_H

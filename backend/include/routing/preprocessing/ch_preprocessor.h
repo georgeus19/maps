@@ -46,7 +46,6 @@ public:
         CHNumberEdgeFactory edge_factory{};
         d_.get().LoadGraphEdges<Graph>(table_names_->GetBaseTableName(), g, &unpreprocessed_db_graph, edge_factory);
         std::cout << "Profile: " << profile.GetName() << std::endl;
-        profile.Normalize(100);
         profile.Set(g);
         return g;
     }

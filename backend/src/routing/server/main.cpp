@@ -45,7 +45,6 @@ int main(int argc, const char ** argv) {
                 [&](){
                     auto&& profiles = GenerateProfiles(cfg);
                     auto&& profile = profiles[0];
-                    profile.Normalize(100);
                     DynamicProfileMode<DijkstraSetup> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
                     std::cout << Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
                     d.DisconnectIfOpen();
@@ -99,7 +98,6 @@ static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profil
             throw InvalidArgumentException("Invalid profile query parameter - index " + index_name + " does not exist.");
         }
     }
-    profile.set_normalized();
     return profile;
 }
 

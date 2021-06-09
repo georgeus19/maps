@@ -34,19 +34,14 @@ public:
     template <typename Graph>
     void Set(Graph& graph);
 
-    void Normalize(double scale_max);
-
     std::string GetName() const;
 
     double GetLength(unsigned_id_type uid) const override;
 
     std::shared_ptr<DataIndex> GetIndex(const std::string& name);
 
-    void set_normalized();
-
 private:
     std::vector<Property> properties_;
-    bool normalized_;
 
     struct Property{
         std::shared_ptr<DataIndex> index;
@@ -65,10 +60,6 @@ private:
 
 template <typename Graph>
 void Profile::Set(Graph& graph) {
-    if (!normalized_) {
-        throw InvalidValueException{"Profile is not normalized when Set is used."};
-    }
-
     graph.ForEachEdge([&](typename Graph::Edge& edge) {
         edge.set_length(GetLength(edge.get_uid()));
     });

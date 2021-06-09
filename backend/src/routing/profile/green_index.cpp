@@ -10,7 +10,7 @@
 namespace routing {
 namespace profile {
 
-GreenIndex::GreenIndex() : edge_green_values_() {}
+GreenIndex::GreenIndex() : impl_() {}
 
 void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_table, const std::string& osm_polygons_table, const std::string& green_index_table) {
     std::string green_places_table = osm_polygons_table + "_green_geom_temp"; 
@@ -52,51 +52,42 @@ void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_inde
     std::string sql = 
             "SELECT uid, COALESCE(" + kValueColumnName + ", 0) "
             "FROM " + green_index_table + "; ";
-    auto&& load = [&](const database::DbRow& row) {
-        unsigned_id_type uid = row.get<unsigned_id_type>(0);
-        double green_value = row.get<double>(1);
-        if (uid >= edge_green_values_.size()) {
-            edge_green_values_.resize(uid + 1);
-        }
-        edge_green_values_[uid] = green_value;
-    };
+    auto&& load = impl_.CreateLoadFunction();
     d.RunNontransactional(sql, load);
+    Normalize();
 }
 
 void GreenIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const {
-    PairIndexImplementation{}.Create(d, index_values, index_table, kValueColumnName);
+    impl_.Create(d, index_values, index_table, kValueColumnName);
 }
 
-void GreenIndex::Normalize(double scale_max) {
-    for(auto&& green_value : edge_green_values_) {
-        if (green_value.valid) {
-            if (green_value.value > 1) {
-                green_value.value = 1;
-            }
-            
-            // The lower, the better green index in routing so it is necessary to flip it.
-            // The create query gives green_value the higher, the better.
-            green_value.value = 1 - green_value.value;
-
-            // The value should be within [0, scale_max].
-            green_value.value *= scale_max;
-        }
-    }
-}
 
 double GreenIndex::Get(unsigned_id_type uid) const {
-    assert(uid < edge_green_values_.size());
-    GreenValue gv = edge_green_values_[uid];
-    if (gv.valid) {
-        return gv.value;
-    } else {
-        throw InvalidValueException{"Green value of edge " + std::to_string(uid) + " not found - resp. invalid value is in its place."};
-    }
+    return impl_.Get(uid);
 }
 
 const std::string& GreenIndex::GetName() const {
     return Constants::IndexNames::kGreenIndex;
 }
+
+void GreenIndex::Normalize() {
+    impl_.ForEachValue([](PairIndexImplementation::Value& value){
+        if (value.valid) {
+            if (value.value > 1) {
+                value.value = 1;
+            }
+            
+            // The lower, the better green index in routing so it is necessary to flip it.
+            // The create query gives green_value the higher, the better.
+            value.value = 1 - value.value;
+
+            // The value should be within [0, scale_max].
+            value.value *= kScaleMax;
+        }
+    });
+}
+
+
 
 
 }

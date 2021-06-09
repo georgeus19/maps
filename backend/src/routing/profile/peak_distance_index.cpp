@@ -10,7 +10,7 @@
 namespace routing {
 namespace profile {
 
-PeakDistanceIndex::PeakDistanceIndex() : edge_peak_distances_() {}
+PeakDistanceIndex::PeakDistanceIndex() : impl_() {}
 
 void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::string& edges_table,
     const std::string& osm_point_table, const std::string& peak_index_table) {
@@ -40,51 +40,29 @@ void PeakDistanceIndex::Load(database::DatabaseHelper& d, const std::string& pea
     std::string sql = 
             "SELECT uid, LEAST(COALESCE(" + kValueColumnName + ", " + std::to_string(max_distance) + "), " + std::to_string(max_distance) + ") "
             "FROM " + peak_index_table + "; ";
-    auto&& load = [&](const database::DbRow& row) {
-        unsigned_id_type uid = row.get<unsigned_id_type>(0);
-        double green_value = row.get<double>(1);
-        if (uid >= edge_peak_distances_.size()) {
-            edge_peak_distances_.resize(uid + 1);
-        }
-        edge_peak_distances_[uid] = green_value;
-    };
+    auto&& load = impl_.CreateLoadFunction();
     d.RunNontransactional(sql, load);
+    Normalize();
 }
 
 void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const {
-    PairIndexImplementation{}.Create(d, index_values, index_table, kValueColumnName);
-}
-
-void PeakDistanceIndex::Normalize(double scale_max) {
-    double max_value = std::numeric_limits<double>::min();
-    for(auto&& peak_value : edge_peak_distances_) {
-        if (peak_value.valid) {
-            if (max_value < peak_value.peak_distance) {
-                max_value = peak_value.peak_distance;
-            }
-        }
-    }
-    for(auto&& peak_value : edge_peak_distances_) {
-        if (peak_value.valid) {
-            peak_value.peak_distance /= max_value;
-            peak_value.peak_distance *= scale_max;
-        }
-    }
+    impl_.Create(d, index_values, index_table, kValueColumnName);
 }
 
 double PeakDistanceIndex::Get(unsigned_id_type uid) const {
-    assert(uid < edge_peak_distances_.size());
-    PeakValue pv = edge_peak_distances_[uid];
-    if (pv.valid) {
-        return pv.peak_distance;
-    } else {
-        throw InvalidValueException{"Peak distance value of edge " + std::to_string(uid) + " not found - resp. invalid value is in its place."};
-    }
+    return impl_.Get(uid);
 }
 
 const std::string& PeakDistanceIndex::GetName() const {
     return Constants::IndexNames::kPeakDistanceIndex;
 }
+
+void PeakDistanceIndex::Normalize() {
+    impl_.Normalize(kScaleMax);
+}
+
+
+
 
 
 }

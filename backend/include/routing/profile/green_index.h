@@ -24,24 +24,15 @@ public:
 
     void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const override;
 
-    void Normalize(double scale_max) override;
-
     double Get(unsigned_id_type uid) const override;
 
     const std::string& GetName() const override;
 private:
-    struct GreenValue;
-    std::vector<GreenValue> edge_green_values_;
+    PairIndexImplementation impl_;
 
     static inline const std::string kValueColumnName = "green_value";
 
-    struct GreenValue {
-        bool valid;
-        double value;
-
-        GreenValue() : valid(false), value(0) {}
-        GreenValue(double val) : valid(true), value(val) {}
-    };
+    void Normalize() override;
 };
 
 
@@ -49,7 +40,7 @@ private:
 
 
 
-}
-}
 
+}
+}
 #endif //ROUTING_PROFILE_GREEN_INDEX_H
