@@ -1,5 +1,5 @@
-#ifndef BACKEND_ROUTING_PROFILE_H
-#define BACKEND_ROUTING_PROFILE_H
+#ifndef ROUTING_PROFILE_H
+#define ROUTING_PROFILE_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/profile/data_index.h"
@@ -68,7 +68,7 @@ void Profile::Set(Graph& graph) {
 
 
 
-}
-}
 
-#endif //BACKEND_ROUTING_PROFILE_H
+}
+}
+#endif //ROUTING_PROFILE_H

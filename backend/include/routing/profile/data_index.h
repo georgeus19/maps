@@ -1,5 +1,5 @@
-#ifndef BACKEND_ROUTING_PROFILE_DATA_INDEX_H
-#define BACKEND_ROUTING_PROFILE_DATA_INDEX_H
+#ifndef ROUTING_PROFILE_DATA_INDEX_H
+#define ROUTING_PROFILE_DATA_INDEX_H
 
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
@@ -22,6 +22,10 @@ public:
 
     virtual const std::string& GetName() const = 0;
 
+    double GetInverted(unsigned_id_type uid) const {
+        return kScaleMax - Get(uid);
+    }
+
 protected:
     /**
      * Denotes the maximum value of any value of all data indices.
@@ -34,7 +38,7 @@ private:
 };
 
 
-}
-}
 
-#endif //BACKEND_ROUTING_PROFILE_DATA_INDEX_H
+}
+}
+#endif //ROUTING_PROFILE_DATA_INDEX_H
