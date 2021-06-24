@@ -1,5 +1,5 @@
 #include "crow/crow_all.h"
-#include "routing/query/setup.h"
+#include "routing/query/algorithm_factory.h"
 #include "utility/point.h"
 #include "routing/query/router.h"
 #include "routing/query/routing_mode.h"
@@ -45,10 +45,10 @@ int main(int argc, const char ** argv) {
                 [&](){
                     auto&& profiles = GenerateProfiles(cfg);
                     auto&& profile = profiles[0];
-                    DynamicProfileMode<DijkstraSetup> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
+                    DynamicProfileMode<DijkstraFactory> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
                     std::cout << Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
                     d.DisconnectIfOpen();
-                    RunServer<DijkstraSetup, DynamicProfileMode<DijkstraSetup>>(cfg, m, config_path);
+                    RunServer<DijkstraFactory, DynamicProfileMode<DijkstraFactory>>(cfg, m, config_path);
                 }
             },
             {
@@ -56,12 +56,12 @@ int main(int argc, const char ** argv) {
                 [&](){
                     auto&& profiles = GenerateProfiles(cfg);
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
-                    StaticProfileMode<CHSetup> m{};
+                    StaticProfileMode<CHFactory> m{};
                     for(auto&& profile : profiles) {
                         m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile, cfg.algorithm->mode), profile);
                     }
                     d.DisconnectIfOpen();
-                    RunServer<CHSetup, StaticProfileMode<CHSetup>>(cfg, m, config_path);
+                    RunServer<CHFactory, StaticProfileMode<CHFactory>>(cfg, m, config_path);
                 }
             }
     };

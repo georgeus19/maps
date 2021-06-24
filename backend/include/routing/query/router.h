@@ -19,7 +19,7 @@
 #include "routing/vertices/ch_vertex.h"
 #include "routing/ch_search_graph.h"
 #include "routing/routing_graph.h"
-#include "routing/query/setup.h"
+#include "routing/query/endpoint_edges_creator.h"
 #include "routing/query/endpoints_creator.h"
 
 #include <string>
@@ -28,14 +28,14 @@
 namespace routing {
 namespace query {
 
-template <typename Setup>
+template <typename AlgorithmFactory>
 class Router {
-    using EC = EndpointsCreator<typename Setup::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename Setup::EndpointEdgeFactory>>;
+    using EC = EndpointsCreator<typename AlgorithmFactory::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename AlgorithmFactory::EndpointEdgeFactory>>;
 public:
-    Router() : setup_(), base_graph_(), table_names_(), base_graph_max_vertex_id_(), base_graph_max_edge_id_() {}
+    Router() : alg_factory_(), base_graph_(), table_names_(), base_graph_max_vertex_id_(), base_graph_max_edge_id_() {}
 
-    Router(const Setup& setup, typename Setup::Graph&& graph, std::unique_ptr<TableNames>&& table_names) 
-        : setup_(setup), base_graph_(std::move(graph)), table_names_(std::move(table_names)),
+    Router(const AlgorithmFactory& af, typename AlgorithmFactory::Graph&& graph, std::unique_ptr<TableNames>&& table_names) 
+        : alg_factory_(af), base_graph_(std::move(graph)), table_names_(std::move(table_names)),
             base_graph_max_vertex_id_(base_graph_.GetMaxVertexId()), base_graph_max_edge_id_(base_graph_.GetMaxEdgeId()) {}
 
     Router(Router&& other)= default;
@@ -49,12 +49,12 @@ public:
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
             throw RouteNotFoundException("Start and end point are the same.");
         }
-        RoutingGraph<typename Setup::Graph> routing_graph{base_graph_};
-        auto&& db_graph = setup_.CreateDbGraph();
+        RoutingGraph<typename AlgorithmFactory::Graph> routing_graph{base_graph_};
+        auto&& db_graph = alg_factory_.CreateDbGraph();
 
         EC endpoints_creator{
-            setup_.CreateEndpointAlgorithmPolicy(routing_graph),
-            setup_.CreateEndpointEdgesCreator(d, &db_graph)
+            alg_factory_.CreateEndpointAlgorithmPolicy(routing_graph),
+            alg_factory_.CreateEndpointEdgesCreator(d, &db_graph)
         };
         unsigned_id_type source_vertex_id = base_graph_max_vertex_id_ + 1;
         unsigned_id_type target_vertex_id = base_graph_max_vertex_id_ + 2;
@@ -63,19 +63,19 @@ public:
 
 
             auto start_run = std::chrono::high_resolution_clock::now();
-        Algorithm<typename Setup::Algorithm> alg{routing_graph};
+        Algorithm<typename AlgorithmFactory::Algorithm> alg{routing_graph};
         alg.Run(source_vertex_id, target_vertex_id);
             auto finish_run = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> elapsed_run = finish_run - start_run;
             std::cout << "Elapsed time - run alg: " << elapsed_run.count() << " s\n";
 
-        std::vector<typename Setup::Algorithm::Edge> res = alg.GetRoute();
+        std::vector<typename AlgorithmFactory::Algorithm::Edge> res = alg.GetRoute();
         std::cout << "Get route done." << std::endl;
         return GetRouteGeometry(d, endpoints_creator, res);
     }
 
     std::string GetRouteGeometry(database::DatabaseHelper& d, EC& endpoints_creator,
-        std::vector<typename Setup::Algorithm::Edge>& route) {
+        std::vector<typename AlgorithmFactory::Algorithm::Edge>& route) {
         auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route[0].get_uid());
         auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route[route.size() - 1].get_uid());
         route.pop_back();
@@ -88,8 +88,8 @@ public:
     }
 
 private:
-    Setup setup_;
-    typename Setup::Graph base_graph_;
+    AlgorithmFactory alg_factory_;
+    typename AlgorithmFactory::Graph base_graph_;
     std::unique_ptr<TableNames> table_names_;
     unsigned_id_type base_graph_max_vertex_id_;
     unsigned_id_type base_graph_max_edge_id_;

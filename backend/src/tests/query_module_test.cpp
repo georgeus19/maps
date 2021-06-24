@@ -40,21 +40,21 @@ TEST(QueryModuleTests, QueryModuleTest) {
     // utility::Point target{13.399605229319672,  49.72901499324271};
     // // // lon lat
     //  std::string edge_table = "CHczedges";
-    // auto&& g = CHSetup::CreateGraph(edge_table);
-    // Router<CHSetup> router{g, edge_table};
+    // auto&& g = CHFactory::CreateGraph(edge_table);
+    // Router<CHFactory> router{g, edge_table};
     // auto&& result = router.CalculateShortestRoute("CHczedges", source, target);
     // utility::Point source{13.376990, 49.746841}; // plzen
     // // utility::Point target{15.608720, 50.627522}; // vrchlabi
     // utility::Point target{13.391600, 49.934470}; // plasy
     // std::cout << "Dijkstra query:" << std::endl;
     // auto start = std::chrono::high_resolution_clock::now();
-    // auto&& result = CCalculateShortestRoute<DijkstraSetup>(table_name, source, target);
+    // auto&& result = CCalculateShortestRoute<DijkstraFactory>(table_name, source, target);
     // auto finish = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> elapsed = finish - start;
     // std::cout << "Elapsed time: " << elapsed.count() << " s\n";
     // std::cout << "Contraction hierarchies query:" << std::endl;
     // start = std::chrono::high_resolution_clock::now();
-    // auto&& CHresult = CCalculateShortestRoute<CHSetup>("CH" + table_name, source, target);
+    // auto&& CHresult = CCalculateShortestRoute<CHFactory>("CH" + table_name, source, target);
     // finish = std::chrono::high_resolution_clock::now();
     // elapsed = finish - start;
     // std::cout << "Elapsed time: " << elapsed.count() << " s\n";

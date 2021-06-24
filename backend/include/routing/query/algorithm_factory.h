@@ -1,5 +1,5 @@
-#ifndef ROUTING_QUERY_SETUP_H
-#define ROUTING_QUERY_SETUP_H
+#ifndef ROUTING_QUERY_ALGORITHM_FACTORY_H
+#define ROUTING_QUERY_ALGORITHM_FACTORY_H
 
 #include "routing/routing_graph.h"
 #include "routing/adjacency_list_graph.h"
@@ -32,7 +32,7 @@
 namespace routing {
 namespace query {
 
-class DijkstraSetup {
+class DijkstraFactory {
 public:
     using EdgeFactory = BasicProfileEdgeFactory;
     using Edge = EdgeFactory::Edge;
@@ -45,7 +45,7 @@ public:
     using Algorithm = Dijkstra<RoutingGraph<Graph>>;
     using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyDijkstra<RoutingGraph<Graph>, EdgeRangePolicyVector<Edge>>;
 
-    DijkstraSetup() : endpoint_edges_lengths_() {}
+    DijkstraFactory() : endpoint_edges_lengths_() {}
 
     static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name, DynamicLengthSource* length_source) {
         Graph g{};
@@ -70,7 +70,7 @@ private:
     EndpointEdgesLengths endpoint_edges_lengths_;
 };
 
-class CHSetup {
+class CHFactory {
 public:
     using EdgeFactory = CHNumberEdgeFactory;
     using Edge = EdgeFactory::Edge;
@@ -115,4 +115,4 @@ public:
 
 }
 }
-#endif //ROUTING_QUERY_SETUP_H
+#endif //ROUTING_QUERY_ALGORITHM_FACTORY_H

@@ -15,8 +15,6 @@ namespace osm_parser {
             return;
         }
 
-        osmium::unsigned_object_id_type id = way.id();
-
         for (const osmium::NodeRef &nr : way.nodes()) {
 
             osmium::unsigned_object_id_type node_id = nr.positive_ref();
