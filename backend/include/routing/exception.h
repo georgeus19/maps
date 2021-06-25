@@ -64,12 +64,12 @@ public:
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
 
-class DataIndexAlreadyPresentException : public std::exception {
+class PreferenceIndexAlreadyPresentException : public std::exception {
     std::string message_;
 public:
-    DataIndexAlreadyPresentException();
-    DataIndexAlreadyPresentException(const std::string & message);
-    DataIndexAlreadyPresentException(std::string && message);
+    PreferenceIndexAlreadyPresentException();
+    PreferenceIndexAlreadyPresentException(const std::string & message);
+    PreferenceIndexAlreadyPresentException(std::string && message);
 
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };

@@ -3,7 +3,7 @@
 
 #include "database/database_helper.h"
 
-#include "routing/profile/data_index.h"
+#include "routing/profile/preference_index.h"
 #include <string>
 #include <vector>
 #include <stack>
@@ -18,7 +18,7 @@ class IndexExtender{
 public:
     IndexExtender(database::DatabaseHelper& d, Graph& graph) : d_(d), graph_(graph) {}
 
-    void ExtendIndex(std::shared_ptr<profile::DataIndex> data_index, const std::string& new_index_table);
+    void ExtendIndex(std::shared_ptr<profile::PreferenceIndex> data_index, const std::string& new_index_table);
 private:
     std::reference_wrapper<database::DatabaseHelper> d_;
     std::reference_wrapper<Graph> graph_;
@@ -30,13 +30,13 @@ private:
         IndexValue(unsigned_id_type u, double v) : uid(u), value(v) {}
     };
 
-    double CalculateIndexValue(std::shared_ptr<profile::DataIndex> data_index, typename Graph::Edge& input_edge);
+    double CalculateIndexValue(std::shared_ptr<profile::PreferenceIndex> data_index, typename Graph::Edge& input_edge);
 
     void SaveNewIndex(const std::string& table_name, const std::vector<IndexValue>& extended_index);
 };
 
 template <typename Graph>
-void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::DataIndex> data_index, const std::string& new_index_table) {
+void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::PreferenceIndex> data_index, const std::string& new_index_table) {
     std::vector<std::pair<unsigned_id_type, double>> extended_index{};
     graph_.get().ForEachEdge([&](typename Graph::Edge& edge){
         // Twoway is twice in the graph.
@@ -53,7 +53,7 @@ void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::DataIndex> data_
 }
 
 template <typename Graph>
-double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::DataIndex> data_index, typename Graph::Edge& input_edge) {
+double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::PreferenceIndex> data_index, typename Graph::Edge& input_edge) {
     double index_value = 0;
     std::stack<typename Graph::Edge> shortcut_stack{};
     typename Graph::Edge edge = input_edge;

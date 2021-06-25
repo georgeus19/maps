@@ -1,5 +1,5 @@
-#ifndef ROUTING_PROFILE_DATA_INDEX_H
-#define ROUTING_PROFILE_DATA_INDEX_H
+#ifndef ROUTING_PROFILE_PREFERENCE_INDEX_H
+#define ROUTING_PROFILE_PREFERENCE_INDEX_H
 
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
@@ -12,7 +12,7 @@
 namespace routing {
 namespace profile {
 
-class DataIndex{
+class PreferenceIndex{
 public:
     virtual void Load(database::DatabaseHelper& d, const std::string& index_table) = 0;
 
@@ -41,4 +41,4 @@ private:
 
 }
 }
-#endif //ROUTING_PROFILE_DATA_INDEX_H
+#endif //ROUTING_PROFILE_PREFERENCE_INDEX_H

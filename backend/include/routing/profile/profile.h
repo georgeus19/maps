@@ -2,7 +2,7 @@
 #define ROUTING_PROFILE_H
 
 #include "routing/edges/basic_edge.h"
-#include "routing/profile/data_index.h"
+#include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/exception.h"
@@ -29,7 +29,7 @@ public:
 
     Profile();
 
-    void AddIndex(const std::shared_ptr<DataIndex>& index, int32_t importance);
+    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, int32_t importance);
 
     template <typename Graph>
     void Set(Graph& graph);
@@ -38,16 +38,16 @@ public:
 
     double GetLength(unsigned_id_type uid) const override;
 
-    std::shared_ptr<DataIndex> GetIndex(const std::string& name);
+    std::shared_ptr<PreferenceIndex> GetIndex(const std::string& name);
 
 private:
     std::vector<Property> properties_;
 
     struct Property{
-        std::shared_ptr<DataIndex> index;
+        std::shared_ptr<PreferenceIndex> index;
         int32_t importance;
 
-        Property(const std::shared_ptr<DataIndex>& ix, int32_t im) : index(ix), importance(im) {}
+        Property(const std::shared_ptr<PreferenceIndex>& ix, int32_t im) : index(ix), importance(im) {}
 
         Property(const Property& other) = default;
         Property(Property&& other) = default;

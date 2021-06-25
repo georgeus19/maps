@@ -5,7 +5,7 @@ namespace profile{
 
 Profile::Profile() : properties_() {}
 
-void Profile::AddIndex(const std::shared_ptr<DataIndex>& index, int32_t importance) {
+void Profile::AddIndex(const std::shared_ptr<PreferenceIndex>& index, int32_t importance) {
     properties_.emplace_back(index, importance);
 }
 
@@ -35,14 +35,14 @@ double Profile::GetLength(unsigned_id_type uid) const {
     return length;
 }    
 
-std::shared_ptr<DataIndex> Profile::GetIndex(const std::string& name) {
+std::shared_ptr<PreferenceIndex> Profile::GetIndex(const std::string& name) {
         auto it = std::find_if(properties_.begin(), properties_.end(), [&](const Property& p){
             return p.index->GetName() == name;
         });
         if (it != properties_.end()) {
             return it->index;
         } else {
-            return std::shared_ptr<DataIndex>();
+            return std::shared_ptr<PreferenceIndex>();
         }
     }
 

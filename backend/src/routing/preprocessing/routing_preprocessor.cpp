@@ -111,7 +111,7 @@ template <typename Graph>
 static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
     IndexExtender<Graph> extender{d, graph};
     for(auto&& prop : cfg.profile_properties) {
-        std::shared_ptr<DataIndex> index =  profile.GetIndex(prop.index->GetName());
+        std::shared_ptr<PreferenceIndex> index =  profile.GetIndex(prop.index->GetName());
         if (!index) {
             throw InvalidValueException{"Index " + prop.table_name + " not in profile when up for extension."};
         }

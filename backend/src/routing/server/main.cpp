@@ -6,7 +6,7 @@
 #include "routing/configuration_parser.h"
 #include "routing/profile/profile_generator.h"
 #include "routing/profile/profile.h"
-#include "routing/profile/data_index.h"
+#include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/table_names.h"
@@ -92,7 +92,7 @@ static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profil
     for(auto it = p.begin(); it != p.end(); ++it) {
         std::string index_name = (*it)["name"].s();
         int32_t importance = static_cast<int32_t>((*it)["importance"].i());
-        if (std::shared_ptr<DataIndex> index = default_profile.GetIndex(index_name)) {
+        if (std::shared_ptr<PreferenceIndex> index = default_profile.GetIndex(index_name)) {
             profile.AddIndex(index, importance);
         } else {
             throw InvalidArgumentException("Invalid profile query parameter - index " + index_name + " does not exist.");

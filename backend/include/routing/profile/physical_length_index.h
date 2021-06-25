@@ -3,7 +3,7 @@
 
 #include "routing/edges/basic_edge.h"
 #include "database/database_helper.h"
-#include "routing/profile/data_index.h"
+#include "routing/profile/preference_index.h"
 #include "routing/profile/pair_index_implementation.h"
 
 #include <string>
@@ -14,7 +14,7 @@
 namespace routing {
 namespace profile {
 
-class PhysicalLengthIndex : public DataIndex{
+class PhysicalLengthIndex : public PreferenceIndex{
 public:
     PhysicalLengthIndex();
 

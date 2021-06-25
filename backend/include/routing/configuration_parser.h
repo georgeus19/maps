@@ -4,7 +4,7 @@
 #include "routing/constants.h"
 #include "routing/exception.h"
 
-#include "routing/profile/data_index.h"
+#include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/profile/peak_distance_index.h"
@@ -32,11 +32,11 @@ struct DatabaseConfig{
 };
 
 struct ProfileProperty {
-    std::shared_ptr<profile::DataIndex> index;
+    std::shared_ptr<profile::PreferenceIndex> index;
     std::string table_name;
     std::vector<int32_t> options;
 
-    ProfileProperty(std::shared_ptr<profile::DataIndex>&& i, std::string&& t, std::vector<int32_t>&& o) : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
+    ProfileProperty(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<int32_t>&& o) : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
 };
 
 
@@ -128,7 +128,7 @@ Configuration ConfigurationParser::Parse() {
     
     std::vector<ProfileProperty> profile_properties;
     for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
-        std::unordered_map<std::string, std::function<std::shared_ptr<profile::DataIndex>()>> indicies{
+        std::unordered_map<std::string, std::function<std::shared_ptr<profile::PreferenceIndex>()>> indicies{
             {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
             {Constants::IndexNames::kPeakDistanceIndex, [](){ return std::make_shared<profile::PeakDistanceIndex>(); }},
             {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
