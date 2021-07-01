@@ -1,9 +1,9 @@
-#ifndef OSM_PARSER_CONSTANTS_H
-#define OSM_PARSER_CONSTANTS_H
+#ifndef GRAPH_BUILDER_CONSTANTS_H
+#define GRAPH_BUILDER_CONSTANTS_H
 
 #include <string>
 
-namespace osm_parser {
+namespace graph_builder {
 
 struct Constants{
 
@@ -48,4 +48,4 @@ struct Constants{
 
 }
 
-#endif// OSM_PARSER_CONSTANTS_H
+#endif// GRAPH_BUILDER_CONSTANTS_H

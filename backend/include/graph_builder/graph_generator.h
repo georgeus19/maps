@@ -1,11 +1,11 @@
-#ifndef OSM_PARSER_GRAPH_GENERATOR_H
-#define OSM_PARSER_GRAPH_GENERATOR_H
+#ifndef GRAPH_BUILDER_GRAPH_GENERATOR_H
+#define GRAPH_BUILDER_GRAPH_GENERATOR_H
 
-#include "osm_parser/link_counter.h"
-#include "osm_parser/writer.h"
-#include "osm_parser/edge.h"
-#include "osm_parser/constants.h"
-#include "osm_parser/highway_filter.h"
+#include "graph_builder/link_counter.h"
+#include "graph_builder/writer.h"
+#include "graph_builder/edge.h"
+#include "graph_builder/constants.h"
+#include "graph_builder/highway_filter.h"
 
 #include <string>
 #include <iostream>
@@ -26,7 +26,7 @@
 #include <osmium/geom/wkt.hpp>
 
 
-namespace osm_parser {
+namespace graph_builder {
     /**
      * Class derived from osmium hadler class means that three methods can be overridden
      * - node(), way(), ref() - and these methods are called when osm node, way, ref
@@ -207,4 +207,4 @@ namespace osm_parser {
         }
     };
 }
-#endif //OSM_PARSER_GRAPH_GENERATOR_H
+#endif //GRAPH_BUILDER_GRAPH_GENERATOR_H

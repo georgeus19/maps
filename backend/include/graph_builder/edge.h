@@ -20,10 +20,10 @@
 #include <osmium/geom/wkb.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/geom/wkt.hpp>
-namespace osm_parser {
+namespace graph_builder {
 
     /**
-     * Define index type which will be used throughout the osm_parser target.
+     * Define index type which will be used throughout the graph_builder target.
      */
     using unsigned_id_type = osmium::unsigned_object_id_type;
 

@@ -1,7 +1,7 @@
-#include "osm_parser/link_counter.h"
+#include "graph_builder/link_counter.h"
 
 using namespace std;
-namespace osm_parser {
+namespace graph_builder {
     LinkCounter::LinkCounter(index_type &node_links) : node_links_(node_links) {}
 
     void LinkCounter::way(const osmium::Way &way) {

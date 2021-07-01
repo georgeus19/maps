@@ -11,10 +11,10 @@
  * Libosmium library provides a way to define handlers which say what should
  * be done with any read osm element - node, way, ref.
  */
-#include "osm_parser/link_counter.h"
-#include "osm_parser/graph_generator.h"
-#include "osm_parser/writer.h"
-#include "osm_parser/bicycle_highway_filter.h"
+#include "graph_builder/link_counter.h"
+#include "graph_builder/graph_generator.h"
+#include "graph_builder/writer.h"
+#include "graph_builder/bicycle_highway_filter.h"
 
 #include <string>
 #include <iostream>
@@ -34,7 +34,7 @@
 #include <osmium/geom/wkt.hpp>
 #include <osmium/geom/mercator_projection.hpp>
 using namespace std;
-namespace osm_parser {
+namespace graph_builder {
     using location_index_type = osmium::index::map::SparseMemArray<osmium::unsigned_object_id_type, osmium::Location>;
     using location_handler_type = osmium::handler::NodeLocationsForWays<location_index_type>;
 
@@ -67,7 +67,7 @@ namespace osm_parser {
      *
      * Split each way that has intersection nodes in itself to segments (edges)
      * that contain no intersection in middle nodes (endpoints can be intersections).
-     * Create geometries for these segments and save them to file - see osm_parser/graph_generator.h
+     * Create geometries for these segments and save them to file - see graph_builder/graph_generator.h
      * for more information.
      *
      * @param node_index Index of all references nodes by "highway" ways - identifies intersection nodes.
@@ -104,7 +104,7 @@ namespace osm_parser {
 
 // Target graph_builder executable entrypoint.
 int main(int argc, const char *argv[]) {
-    using namespace osm_parser;
+    using namespace graph_builder;
     if (argc != 5) {
         std::cout << "There must be 4 arguments: input_path table_name output_sql_path output_data_path."
                   << std::endl;

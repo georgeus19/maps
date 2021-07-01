@@ -1,14 +1,14 @@
-#ifndef OSM_PARSER_BICYCLE_HIGHWAY_FILTER_H
-#define OSM_PARSER_BICYCLE_HIGHWAY_FILTER_H
+#ifndef GRAPH_BUILDER_BICYCLE_HIGHWAY_FILTER_H
+#define GRAPH_BUILDER_BICYCLE_HIGHWAY_FILTER_H
 
 #include <osmium/osm/way.hpp>
 
-#include "osm_parser/highway_filter.h"
-#include "osm_parser/constants.h"
+#include "graph_builder/highway_filter.h"
+#include "graph_builder/constants.h"
 
 #include <unordered_set>
 
-namespace osm_parser{
+namespace graph_builder {
 
 class BycicleHighwayFilter : public HighwayFilter{
 public: 
@@ -56,4 +56,4 @@ bool BycicleHighwayFilter::FilterHighway(const osmium::TagList& tags) {
 
 
 }
-#endif// OSM_PARSER_BICYCLE_HIGHWAY_FILTER_H
+#endif// GRAPH_BUILDER_BICYCLE_HIGHWAY_FILTER_H

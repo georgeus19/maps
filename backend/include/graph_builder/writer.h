@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "osm_parser/edge.h"
+#include "graph_builder/edge.h"
 #include <osmium/handler.hpp>
 #include <osmium/osm/node.hpp>
 #include <osmium/osm/way.hpp>
@@ -14,10 +14,10 @@
 #include <osmium/geom/wkb.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/geom/wkt.hpp>
-namespace osm_parser {
+namespace graph_builder {
     
 /**
- * Interface for osm_parser writers that can be used
+ * Interface for graph_builder writers that can be used
  * to write a sql script to a file that generates an edgelist.
  *
  * A part of the script should also be to generate an geo index

@@ -16,7 +16,7 @@
 #include <osmium/geom/wkb.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/geom/wkt.hpp>
-namespace osm_parser {
+namespace graph_builder {
 
     using index_type = osmium::index::map::SparseMemMap<osmium::unsigned_object_id_type, size_t>;
 

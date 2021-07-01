@@ -1,5 +1,5 @@
-#include "osm_parser/edge.h"
-namespace osm_parser {
+#include "graph_builder/edge.h"
+namespace graph_builder {
     Edge::Edge(unsigned_id_type osm_id, uint64_t uid, std::string &&geography, unsigned_id_type from, unsigned_id_type to, bool undirected, const std::string& highway) :
             osm_id_(osm_id), uid_(uid), geography_(std::move(geography)), from_(from), to_(to), undirected_(undirected), highway_(highway) {}
 

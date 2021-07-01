@@ -1,6 +1,6 @@
-#include "osm_parser/writer.h"
+#include "graph_builder/writer.h"
 using namespace std;
-namespace osm_parser {
+namespace graph_builder {
     
 CopyWriter::CopyWriter(const std::string &sql_path, const std::string &data_path) {
     f_init_table_ = ofstream{};
