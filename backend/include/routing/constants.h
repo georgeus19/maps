@@ -12,7 +12,7 @@ struct Constants{
             static inline const std::string kAlgorithm = "algorithm";
             static inline const std::string kParameters = "parameters";
             static inline const std::string kProfileProperties = "profile_properties";
-            static inline const std::string kIndicies = "indicies";
+            static inline const std::string kIndices = "indices";
         };
 
         struct Preprocessing {
@@ -36,7 +36,7 @@ struct Constants{
         static inline const std::string kBaseGraphTable = "base_graph_table";
         static inline const std::string kMode = "mode";
 
-        struct Indicies{
+        struct Indices{
             static inline const std::string kEdgesTable = "edges_table";
             static inline const std::string kPolygonTable = "polygon_table";
             static inline const std::string kPointTable = "point_table";

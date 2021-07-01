@@ -35,8 +35,8 @@ using namespace profile;
 
 static void RunAlgorithmPreprocessing(const std::string& config_path);
 template <typename Graph>
-static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d);
-static void CreateIndicies(const std::string& path);
+static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d);
+static void CreateIndices(const std::string& path);
 static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg);
 static void PrintHelp();
 
@@ -51,7 +51,7 @@ int main(int argc, const char** argv) {
     }
     std::unordered_map<std::string, std::function<void()>> run_options{
         {kCreateIndex, [=](){
-            CreateIndicies(argv[2]);
+            CreateIndices(argv[2]);
         }},
         {kAlgorithmPreprocessing, [=](){
             RunAlgorithmPreprocessing(argv[2]);
@@ -92,7 +92,7 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
             auto&& graph = preprocessor.LoadGraph(profile);
             preprocessor.RunPreprocessing(graph);
             if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
-                ExtendProfileIndicies<CHPreprocessor::Graph>(cfg, graph, profile, &table_names, d);
+                ExtendProfileIndices<CHPreprocessor::Graph>(cfg, graph, profile, &table_names, d);
             }
             preprocessor.SaveGraph(graph);
         }}
@@ -108,7 +108,7 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
 }
 
 template <typename Graph>
-static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
+static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
     IndexExtender<Graph> extender{d, graph};
     for(auto&& prop : cfg.profile_properties) {
         std::shared_ptr<PreferenceIndex> index =  profile.GetIndex(prop.index->GetName());
@@ -121,19 +121,19 @@ static void ExtendProfileIndicies(Configuration& cfg, Graph& graph, Profile& pro
     }
 }
 
-static void CreateIndicies(const std::string& path) {
+static void CreateIndices(const std::string& path) {
     auto&& data = toml::parse(path);
     DatabaseConfig db_cfg{toml::find(data, Constants::Input::TableNames::kDatabase)};
     DatabaseHelper d{db_cfg.name, db_cfg.user, db_cfg.password, db_cfg.host, db_cfg.port};
-    std::unordered_map<std::string, std::function<void(const toml::value&)>> indicies{
+    std::unordered_map<std::string, std::function<void(const toml::value&)>> indices{
         {
             Constants::IndexNames::kGreenIndex,
             [&](const toml::value& table){
                 GreenIndex index{};
                 index.Create(d, 
-                    toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
-                    toml::find<std::string>(table, Constants::Input::Indicies::kPolygonTable),
-                    toml::find<std::string>(table, Constants::Input::Indicies::kIndexTable)
+                    toml::find<std::string>(table, Constants::Input::Indices::kEdgesTable),
+                    toml::find<std::string>(table, Constants::Input::Indices::kPolygonTable),
+                    toml::find<std::string>(table, Constants::Input::Indices::kIndexTable)
                 ); 
             }
         },
@@ -142,18 +142,18 @@ static void CreateIndicies(const std::string& path) {
             [&](const toml::value& table){
                 PeakDistanceIndex index{};
                 index.Create(d, 
-                    toml::find<std::string>(table, Constants::Input::Indicies::kEdgesTable),
-                    toml::find<std::string>(table, Constants::Input::Indicies::kPointTable),
-                    toml::find<std::string>(table, Constants::Input::Indicies::kIndexTable)
+                    toml::find<std::string>(table, Constants::Input::Indices::kEdgesTable),
+                    toml::find<std::string>(table, Constants::Input::Indices::kPointTable),
+                    toml::find<std::string>(table, Constants::Input::Indices::kIndexTable)
                 ); 
             }
         },
         {Constants::IndexNames::kLengthIndex, [](const toml::value&){ /* no action necessary... - already present in base graph! */ }}
     };
-    for(auto&& index : toml::find<toml::array>(data, Constants::Input::TableNames::kIndicies)) {
+    for(auto&& index : toml::find<toml::array>(data, Constants::Input::TableNames::kIndices)) {
         std::string name = toml::find<std::string>(index, Constants::Input::kName);
-        auto&& it = indicies.find(name);
-        if (it != indicies.end()) {
+        auto&& it = indices.find(name);
+        if (it != indices.end()) {
             it->second(index);
             std::cout << "Index " << name << " created." << std::endl;
         } else {
@@ -174,5 +174,5 @@ static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configu
 
 static void PrintHelp() {
     std::cout << "For algorithm preprocessing: --algorithm config_path.toml" << std::endl;
-    std::cout << "For creating data indicies: --create-index indices_inputs.toml" << std::endl;
+    std::cout << "For creating data indices: --create-index indices_inputs.toml" << std::endl;
 }

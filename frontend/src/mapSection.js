@@ -17,28 +17,12 @@ var markerIcon   = L.icon({
 });
 
 /**
- * `MapSection` contains a container for the map. 
- * Forwards all `props` to `MapContainer`.
- * @param {*} props Properties.
- */
-function MapSection(props) {
-    return <div className="MapSection">
-        <MapContainer currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
-            pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
-            searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
-            route={props.route} 
-            currentTab={props.currentTab}
-            />
-    </div>
-}
-
-/**
- * `MapContainer` contains the map element.
+ * `MapSection` contains the map element.
  * It handles all interaction with the map - creating point markers,
  * printing route in the map, changing map views.
  * @param {*} props Properties
  */
-function MapContainer(props) {
+function MapSection(props) {
     /**
      * Represents current view of the map editor. It is used to change the view of the
      * map editor to have newly created point in the center of the map editor.
@@ -232,15 +216,17 @@ function MapContainer(props) {
         setPoint(e.latlng.lng, e.latlng.lat);
     }
 
-    return <Map className="Map" bounds={bounds} onViewportChanged={(v) => {setViewport(v)}} viewport={viewport} onclick={(e) => handleClick(e)}>
-        <TileLayer
-            url="/hot/{z}/{x}/{y}.png" // Address of tiles on our local server.
-            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-        /> 
-        {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1, false)}
-        {(props.currentTab === TabEnum.routeTab || props.currentTab === TabEnum.exportTab) && routeMarkers}
-        {(props.currentTab === TabEnum.routeTab || props.currentTab === TabEnum.exportTab) && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
-    </Map>;
+    return <div className="MapSection">
+            <Map className="Map" bounds={bounds} onViewportChanged={(v) => {setViewport(v)}} viewport={viewport} onclick={(e) => handleClick(e)}>
+                <TileLayer
+                    url="/hot/{z}/{x}/{y}.png" // Address of tiles on our local server.
+                    attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                /> 
+                {props.currentTab === TabEnum.searchTab && searchMarker && printMarker(searchMarker, -1, false)}
+                {(props.currentTab === TabEnum.routeTab || props.currentTab === TabEnum.exportTab) && routeMarkers}
+                {(props.currentTab === TabEnum.routeTab || props.currentTab === TabEnum.exportTab) && <GeoJSON data={props.route.data} key={(props.route.key)}></GeoJSON>}
+            </Map>
+        </div>;
     // (
        /*/  Map using tiles from osm server.
         <Map className="Map" center={[49.7315809334801,13.384550088168409]} zoom={13} onclick={(e) => handleClick(e)}>

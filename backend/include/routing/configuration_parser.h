@@ -128,13 +128,13 @@ Configuration ConfigurationParser::Parse() {
     
     std::vector<ProfileProperty> profile_properties;
     for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
-        std::unordered_map<std::string, std::function<std::shared_ptr<profile::PreferenceIndex>()>> indicies{
+        std::unordered_map<std::string, std::function<std::shared_ptr<profile::PreferenceIndex>()>> indices{
             {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
             {Constants::IndexNames::kPeakDistanceIndex, [](){ return std::make_shared<profile::PeakDistanceIndex>(); }},
             {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
         };
         std::string name = toml::find<std::string>(property, Constants::Input::kName);
-        if (!indicies.contains(name)) {
+        if (!indices.contains(name)) {
             throw ParseException{"Index " + name + " does not exist."};
         }
         std::string table_name = toml::find<std::string>(property, Constants::Input::kTableName);
@@ -142,7 +142,7 @@ Configuration ConfigurationParser::Parse() {
         for(auto&& importance : toml::find<toml::array>(property, Constants::Input::kImportance)) {
             importance_options.push_back(static_cast<int32_t>(importance.as_integer()));
         }
-        profile_properties.emplace_back(indicies[name](), std::move(table_name), std::move(importance_options));
+        profile_properties.emplace_back(indices[name](), std::move(table_name), std::move(importance_options));
     }
 
     return Configuration{std::move(db_config), std::move(profile_properties), std::move(alg)};

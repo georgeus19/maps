@@ -96,7 +96,7 @@ function Header(props) {
 
 /**
  * Component `RoutingTab` consists of two containers. 
- * Former is `PointContainer` that lets user define a route.
+ * Former is `Route` that lets user define a route.
  * Latter is `Profile` that lets user define special ProfilePropertys for the route (e.g. max altitude).
  * @param {*} props 
  */
@@ -210,12 +210,12 @@ function RoutingTab(props) {
 
     return (
         <div className="Tab">
-            <PointContainer 
+            <Route 
                 currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
                 pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
                 route={props.route} setRoute={props.setRoute}
                 profile={props.profile}
-            ></PointContainer>
+            ></Route>
             <Profile
                 profile={props.profile} dispatchProfile={props.dispatchProfile}
                 currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
@@ -225,12 +225,12 @@ function RoutingTab(props) {
 }
 
 /**
- * Component `PointContainer` provides functionality for defining a route.
+ * Component `Route` provides functionality for defining a route.
  * User can fill in selects/ inputs to search for a point (startpoint, endpoint).
  * User can add more points that make a route.
  * @param {*} props 
  */
-function PointContainer(props) {
+function Route(props) {
     
     // Create an array of `PathPoint` where between all adjacent ones is placed AddPoint.
     // -> `PathPoint`,`AddPoint`,`PathPoint`, ...
@@ -248,7 +248,7 @@ function PointContainer(props) {
     console.log("points: ", points);
     console.log(props.pathPoints.length);
     return (
-        <div className="PointContainer" >
+        <div className="Route" >
             {points}
         </div>
             
@@ -440,27 +440,27 @@ function Footer(props) {
 }
 
 /**
- * Component `SearchTab` just forwards all `props` to `SearchContainer` which it contains.
+ * Component `SearchTab` just forwards all `props` to `Search` which it contains.
  * @param {*} props 
  */
 function SearchTab(props) {
     return (
         <div className="Tab">
-            <SearchContainer
+            <Search
                 searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
-            ></SearchContainer>
+            ></Search>
         </div>
     );
 }
 
 /**
- * Component `SearchContainer` provides a way for user to search 
+ * Component `Search` provides a way for user to search 
  * in the map by having an select/input with dropdown menu.
  * Requests are sent to the server and it tries to find suitable
  * location whose addresses match the text provided by users. 
  * @param {*} props 
  */
-function SearchContainer(props) {
+function Search(props) {
     /**
      * Represents text value of select/ input.
      */
@@ -484,7 +484,7 @@ function SearchContainer(props) {
     const placeholder = 'Select place to search...'
 
     return (
-        <div className="SearchContainer">
+        <div className="Search">
             <SearchInput
                 searchPoint={props.searchPoint} dispatchSearchPoint={props.dispatchSearchPoint}
                 selectedPlace={props.searchPoint.address} setSelectedPlace={(t) => {}}
@@ -505,7 +505,7 @@ function ExportTab(props) {
 
     return (
         <div className="Tab">
-            <ExportContainer route={props.route} />
+            <Export route={props.route} />
         </div>
     );
 }
@@ -514,9 +514,9 @@ function ExportTab(props) {
  * Not yet implemented.
  * @param {*} props 
  */
-function ExportContainer(props) {
+function Export(props) {
     return (
-        <div className="ExportContainer"> 
+        <div className="Export"> 
             <ExportButton route={props.route} ></ExportButton>
         </div>
     );
