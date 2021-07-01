@@ -26,6 +26,7 @@ void CopyWriter::WriteInitSql(const string& table_name) {
     string fill_length_column = "UPDATE " + table_name + " set length = ST_Length(geog); ";
     // Create geo index.
     string create_index = "CREATE INDEX " + table_name + "_gix ON " + table_name + " USING GIST (geog); ";
+    f_init_table_ << "BEGIN;" << std::endl;
     f_init_table_ << GetCreateEdgesTable(temporary_edges_table) << std::endl;
     f_init_table_ << copy << std::endl;
     f_init_table_ << GetCreateVertexIdMappingTable(temporary_edges_table, vertex_id_mapping_table) << std::endl;
@@ -36,6 +37,7 @@ void CopyWriter::WriteInitSql(const string& table_name) {
     f_init_table_ << add_length_column << std::endl;
     f_init_table_ << fill_length_column << std::endl;
     f_init_table_ << create_index << std::endl;
+    f_init_table_ << "COMMIT;" << std::endl;
 }
 
 void CopyWriter::WriteEdge(const string &table_name, const Edge &edge) {
