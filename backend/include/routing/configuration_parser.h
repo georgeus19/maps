@@ -8,11 +8,15 @@
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/profile/peak_distance_index.h"
+#include "routing/profile/profile_generator.h"
+
+#include "database/database_helper.h"
 
 #include <functional>
 #include <iostream>
 #include <unordered_map>
 #include <memory>
+#include <string>
 
 namespace routing {
 
@@ -59,13 +63,35 @@ struct CHConfig : public AlgorithmConfig {
         space_size_coefficient(ssc) {}
 };
 
+struct ProfileProperties{
+    std::vector<ProfileProperty> properties;
+
+    ProfileProperties(std::vector<ProfileProperty>&& pp) : properties(pp) {}
+
+    profile::ProfileGenerator GetProfileGenerator() {
+        profile::ProfileGenerator gen{};
+        for(auto&& prop : properties) {
+            gen.AddIndex(prop.index, std::move(prop.options));
+        }
+        return gen;
+    }
+
+    void LoadIndices(database::DatabaseHelper& d, const std::string& table_name_prefix = std::string{}) {
+        for(auto&& prop : properties) {
+            std::string index_table = prop.table_name + table_name_prefix;
+            std::cout << "Load index from " << index_table << std::endl;
+            prop.index->Load(d, index_table);
+        }
+    }
+};
+
 struct Configuration {
     DatabaseConfig database;
-    std::vector<ProfileProperty> profile_properties;
+    ProfileProperties profile_properties;
     std::unique_ptr<AlgorithmConfig> algorithm;
 
-    Configuration(DatabaseConfig&& db, std::vector<ProfileProperty>&& lm, std::unique_ptr<AlgorithmConfig> alg)
-        : database(std::move(db)), profile_properties(std::move(lm)), algorithm(std::move(alg)) {}
+    Configuration(DatabaseConfig&& db, ProfileProperties&& pp, std::unique_ptr<AlgorithmConfig> alg)
+        : database(std::move(db)), profile_properties(std::move(pp)), algorithm(std::move(alg)) {}
 };
 
 class ConfigurationParser {
@@ -145,7 +171,7 @@ Configuration ConfigurationParser::Parse() {
         profile_properties.emplace_back(indices[name](), std::move(table_name), std::move(importance_options));
     }
 
-    return Configuration{std::move(db_config), std::move(profile_properties), std::move(alg)};
+    return Configuration{std::move(db_config), ProfileProperties{std::move(profile_properties)}, std::move(alg)};
 }
 
 

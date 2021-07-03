@@ -95,15 +95,15 @@ class ProfileEndpointEdgeFactory{
 public:
     using Edge = E;
 
-    ProfileEndpointEdgeFactory(EndpointEdgesLengths* profile) : profile_(profile) {}
+    ProfileEndpointEdgeFactory(EndpointEdgesLengths* edge_lengths) : edge_lengths_(edge_lengths) {}
 
     template <typename Input>
     E Create(const Input& input) {
-        profile_->AddLength(input.GetUid(), input.GetLength());
-        return E{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{profile_}};
+        edge_lengths_->AddLength(input.GetUid(), input.GetLength());
+        return E{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{edge_lengths_}};
     }
 private:
-    EndpointEdgesLengths* profile_;
+    EndpointEdgesLengths* edge_lengths_;
 };
 
 

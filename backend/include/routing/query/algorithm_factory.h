@@ -70,7 +70,7 @@ private:
     EndpointEdgesLengths endpoint_edges_lengths_;
 };
 
-class CHFactory {
+class CHStaticFactory {
 public:
     using EdgeFactory = CHNumberEdgeFactory;
     using Edge = EdgeFactory::Edge;
@@ -84,6 +84,8 @@ public:
     using DbGraph = database::CHDbGraph;
     using Algorithm = BidirectionalDijkstra<RoutingGraph<Graph>>;
     using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>>;
+
+    CHStaticFactory() {}
 
     static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
         TemporaryGraph g{};
@@ -107,6 +109,49 @@ public:
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
         return EndpointAlgorithmPolicy{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
     }
+};
+
+class CHDynamicFactory {
+public:
+    using EdgeFactory = CHProfileEdgeFactory;
+    using Edge = EdgeFactory::Edge;
+    using EndpointEdgeFactory =  ProfileEndpointEdgeFactory<Edge>;
+    using EdgeIterator = std::vector<Edge>::iterator;
+    using EdgeRange = IteratorEdgeRange<Edge, EdgeIterator>;
+    using Vertex = CHVertex<Edge, EdgeRange>;
+    
+    using TemporaryGraph = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<Edge>>, Edge>>;
+    using Graph = CHSearchGraph<Vertex, Edge>;
+    using DbGraph = database::CHDbGraph;
+    using Algorithm = BidirectionalDijkstra<RoutingGraph<Graph>>;
+    using EndpointAlgorithmPolicy = EndpointAlgorithmPolicyContractionHierarchies<RoutingGraph<Graph>, EdgeRangePolicyVectorIterator<Edge>>;
+
+    CHDynamicFactory() : endpoint_edges_lengths_() {}
+
+    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
+        TemporaryGraph g{};
+        DbGraph db_graph{};
+        CHNumberEdgeFactory edge_factory{};
+        d.LoadGraphEdges<TemporaryGraph>(graph_table_name, g, &db_graph, edge_factory);
+        d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
+        Graph search_graph{};
+        search_graph.Load(g);
+        return search_graph;
+    }
+
+    DbGraph CreateDbGraph() {
+        return DbGraph{};
+    }
+
+    EndpointEdgesCreator<EndpointEdgeFactory> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<EndpointEdgeFactory>{d, db_graph, EndpointEdgeFactory{&endpoint_edges_lengths_}};
+    }
+
+    EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
+        return EndpointAlgorithmPolicy{routing_graph, EdgeRangePolicyVectorIterator<Edge>{}};
+    }
+private:
+    EndpointEdgesLengths endpoint_edges_lengths_;
 };
 
 

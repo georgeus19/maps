@@ -24,7 +24,6 @@ using namespace profile;
 using namespace query;
 using namespace database;
 
-static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg);
 static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profile);
 template <typename Setup, typename Mode>
 static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path);
@@ -43,8 +42,9 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile,
                 [&](){
-                    auto&& profiles = GenerateProfiles(cfg);
-                    auto&& profile = profiles[0];
+                    cfg.profile_properties.LoadIndices(d);
+                    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+                    Profile profile = gen.GetFrontProfile();
                     DynamicProfileMode<DijkstraFactory> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
                     std::cout << Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
                     d.DisconnectIfOpen();
@@ -54,14 +54,26 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile,
                 [&](){
-                    auto&& profiles = GenerateProfiles(cfg);
+                    auto&& gen = cfg.profile_properties.GetProfileGenerator();
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
-                    StaticProfileMode<CHFactory> m{};
-                    for(auto&& profile : profiles) {
-                        m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile, cfg.algorithm->mode), profile);
+                    StaticProfileMode<CHStaticFactory> m{};
+                    for(auto&& profile : gen.Generate()) {
+                        m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile), profile);
                     }
                     d.DisconnectIfOpen();
-                    RunServer<CHFactory, StaticProfileMode<CHFactory>>(cfg, m, config_path);
+                    RunServer<CHStaticFactory, StaticProfileMode<CHStaticFactory>>(cfg, m, config_path);
+                }
+            },
+            {
+                Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kDynamicProfile,
+                [&](){
+                    cfg.profile_properties.LoadIndices(d);
+                    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+                    Profile profile = gen.GetFrontProfile();
+                    std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
+                    DynamicProfileMode<CHDynamicFactory> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
+                    d.DisconnectIfOpen();
+                    RunServer<CHDynamicFactory, DynamicProfileMode<CHDynamicFactory>>(cfg, m, config_path);
                 }
             }
     };
@@ -73,17 +85,6 @@ int main(int argc, const char ** argv) {
     } else {
         throw InvalidArgumentException{"No such mode= " + cfg.algorithm->mode + " with given algorithm " + cfg.algorithm->name + " was found"};
     }
-}
-
-static std::vector<profile::Profile> GenerateProfiles(Configuration& cfg) {
-    DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    ProfileGenerator gen{d, cfg.algorithm->base_graph_table};
-    for(auto&& prop : cfg.profile_properties) {
-        std::cout << "Load index from " << prop.table_name << std::endl;
-        prop.index->Load(d, prop.table_name);
-        gen.AddIndex(std::move(prop.index), std::move(prop.options));
-    }
-    return gen.Generate();
 }
 
 static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profile) {
@@ -100,6 +101,7 @@ static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profil
     }
     return profile;
 }
+
 
 template <typename Setup, typename Mode>
 static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path) {

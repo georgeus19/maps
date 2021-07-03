@@ -34,10 +34,11 @@ using namespace preprocessing;
 using namespace profile;
 
 static void RunAlgorithmPreprocessing(const std::string& config_path);
+static void StaticModePreprocessing(DatabaseHelper& d, Configuration& cfg);
+static void DynamicModePreprocessing(DatabaseHelper& d, Configuration& cfg);
 template <typename Graph>
 static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d);
 static void CreateIndices(const std::string& path);
-static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg);
 static void PrintHelp();
 
 // Run options.
@@ -77,40 +78,74 @@ static void RunAlgorithmPreprocessing(const std::string& config_path) {
     ConfigurationParser parser{config_path};
     auto&& cfg = parser.Parse();
     DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-    auto&& profiles = GenerateProfiles(d, cfg);
-    std::unordered_map<std::string, std::function<void(Configuration&, Profile& profile)>> algorithms{
-        {Constants::AlgorithmNames::kContractionHierarchies, [&](Configuration& cfg, Profile& profile){
-            CHConfig* ch_config = static_cast<CHConfig*>(cfg.algorithm.get());
-            ContractionParameters parameters{
-                ch_config->hop_count,
-                ch_config->edge_difference_coefficient,
-                ch_config->deleted_neighbours_coefficient,
-                ch_config->space_size_coefficient
-            };
-            CHTableNames table_names{cfg.algorithm->base_graph_table, profile, cfg.algorithm->mode};
-            CHPreprocessor preprocessor{d, &table_names, std::move(parameters)};
-            auto&& graph = preprocessor.LoadGraph(profile);
-            preprocessor.RunPreprocessing(graph);
-            if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
-                ExtendProfileIndices<CHPreprocessor::Graph>(cfg, graph, profile, &table_names, d);
-            }
-            preprocessor.SaveGraph(graph);
-        }}
+
+    std::unordered_map<std::string, std::function<void(DatabaseHelper& d, Configuration& cfg)>> modes{
+        {Constants::ModeNames::kStaticProfile, StaticModePreprocessing},
+        {Constants::ModeNames::kDynamicProfile, DynamicModePreprocessing}
     };
-    for(auto&& profile : profiles) {
+
+    auto it = modes.find(cfg.algorithm->mode);
+    if (it != modes.end()) {
+        it->second(d, cfg);
+    } else {
+        throw InvalidArgumentException{"No mode " + cfg.algorithm->mode + " found!"};
+    }
+}
+
+static void CHPreprocessing(DatabaseHelper&d, Configuration& cfg, Profile& profile) {
+    CHConfig* ch_config = static_cast<CHConfig*>(cfg.algorithm.get());
+    ContractionParameters parameters{
+        ch_config->hop_count,
+        ch_config->edge_difference_coefficient,
+        ch_config->deleted_neighbours_coefficient,
+        ch_config->space_size_coefficient
+    };
+    CHTableNames table_names{cfg.algorithm->base_graph_table, profile};
+    CHPreprocessor preprocessor{d, &table_names, std::move(parameters)};
+    auto&& graph = preprocessor.LoadGraph(profile);
+    preprocessor.RunPreprocessing(graph);
+    if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
+        ExtendProfileIndices<CHPreprocessor::Graph>(cfg, graph, profile, &table_names, d);
+    }
+    preprocessor.SaveGraph(graph);
+}
+
+static void StaticModePreprocessing(DatabaseHelper& d, Configuration& cfg) {
+    std::unordered_map<std::string, std::function<void(DatabaseHelper&, Configuration&, Profile&)>> algorithms{
+        {Constants::AlgorithmNames::kContractionHierarchies, CHPreprocessing}
+    };
+    cfg.profile_properties.LoadIndices(d);
+    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+    for(auto&& profile : gen.Generate()) {
         auto it = algorithms.find(cfg.algorithm->name);
         if (it != algorithms.end()) {
-            it->second(cfg, profile);
+            it->second(d, cfg, profile);
         } else {
             throw InvalidArgumentException{"There is no preprocessing for algorithm " + cfg.algorithm->name + "."};
         }
     }
 }
 
+static void DynamicModePreprocessing(DatabaseHelper& d, Configuration& cfg) {
+    std::unordered_map<std::string, std::function<void(DatabaseHelper&, Configuration&, Profile&)>> algorithms{
+        {Constants::AlgorithmNames::kContractionHierarchies, CHPreprocessing}
+    };
+    cfg.profile_properties.LoadIndices(d);
+    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+    Profile profile = gen.GetFrontProfile();
+
+    auto it = algorithms.find(cfg.algorithm->name);
+    if (it != algorithms.end()) {
+        it->second(d, cfg, profile);
+    } else {
+        throw InvalidArgumentException{"There is no preprocessing for algorithm " + cfg.algorithm->name + "."};
+    }
+}
+
 template <typename Graph>
 static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
     IndexExtender<Graph> extender{d, graph};
-    for(auto&& prop : cfg.profile_properties) {
+    for(auto&& prop : cfg.profile_properties.properties) {
         std::shared_ptr<PreferenceIndex> index =  profile.GetIndex(prop.index->GetName());
         if (!index) {
             throw InvalidValueException{"Index " + prop.table_name + " not in profile when up for extension."};
@@ -160,16 +195,6 @@ static void CreateIndices(const std::string& path) {
             std::cout << "No index " << name << " exists." << std::endl;
         }
     }
-}
-
-static std::vector<profile::Profile> GenerateProfiles(DatabaseHelper& d, Configuration& cfg) {
-    ProfileGenerator gen{d, cfg.algorithm->base_graph_table};
-    for(auto&& prop : cfg.profile_properties) {
-        std::cout << "Loading index from " << prop.table_name << std::endl;
-        prop.index->Load(d, prop.table_name);
-        gen.AddIndex(prop.index, std::move(prop.options));
-    }
-    return gen.Generate();
 }
 
 static void PrintHelp() {

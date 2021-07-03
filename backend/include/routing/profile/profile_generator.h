@@ -18,16 +18,16 @@ namespace profile{
 class ProfileGenerator {
 public:
 
-    ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table);
+    ProfileGenerator();
 
     void AddIndex(std::shared_ptr<PreferenceIndex> index, std::vector<int32_t>&& importance_options);
 
     std::vector<Profile> Generate();
 
+    Profile GetFrontProfile();
+
 private:
     struct IndexInfo;
-    database::DatabaseHelper& d_;
-    std::string base_graph_table_;
 
     std::vector<IndexInfo> indices_;
 
@@ -42,8 +42,7 @@ private:
 
 };
 
-ProfileGenerator::ProfileGenerator(database::DatabaseHelper& d, const std::string& base_graph_table)
-    : d_(d), base_graph_table_(base_graph_table), indices_() {}
+ProfileGenerator::ProfileGenerator() : indices_() {}
 
 void ProfileGenerator::AddIndex(std::shared_ptr<PreferenceIndex> index, std::vector<int32_t>&& importance_options) {
     indices_.emplace_back(index, std::move(importance_options));
@@ -63,6 +62,12 @@ std::vector<Profile> ProfileGenerator::Generate() {
         }
     }
     return profiles;
+}
+
+Profile ProfileGenerator::GetFrontProfile() {
+    Profile profile{};
+    profile.AddIndex(indices_.front().index, indices_.front().importance_options.front());
+    return profile;
 }
 
 std::vector<std::vector<int32_t>> ProfileGenerator::GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end) {
