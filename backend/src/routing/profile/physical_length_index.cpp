@@ -48,7 +48,7 @@ const std::string& PhysicalLengthIndex::GetName() const {
 }
 
 void PhysicalLengthIndex::Normalize() {
-    impl_.Normalize(kScaleMax);
+    impl_.Normalize();
 }
 
 

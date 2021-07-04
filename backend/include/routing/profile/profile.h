@@ -18,42 +18,38 @@
 namespace routing{
 namespace profile{
 
-class IProfile{
-public:
-    virtual double GetLength(unsigned_id_type uid) const = 0;
-};
-
-class Profile : public IProfile{
+class Profile {
     struct Property;
 public:
 
     Profile();
 
-    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, int32_t importance);
+    Profile(const std::shared_ptr<PreferenceIndex>& base_index);
+
+    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, double importance);
 
     template <typename Graph>
     void Set(Graph& graph);
 
     std::string GetName() const;
 
-    double GetLength(unsigned_id_type uid) const override;
+    double GetLength(unsigned_id_type uid) const;
 
-    std::shared_ptr<PreferenceIndex> GetIndex(const std::string& name);
+    const std::shared_ptr<PreferenceIndex>& GetBaseIndex();
+
+    const std::shared_ptr<PreferenceIndex>& GetIndex(const std::string& name);
 
 private:
+
+    std::shared_ptr<PreferenceIndex> base_index_;
+
     std::vector<Property> properties_;
 
     struct Property{
         std::shared_ptr<PreferenceIndex> index;
-        int32_t importance;
+        double importance;
 
-        Property(const std::shared_ptr<PreferenceIndex>& ix, int32_t im) : index(ix), importance(im) {}
-
-        Property(const Property& other) = default;
-        Property(Property&& other) = default;
-        Property& operator=(const Property& other) = default;
-        Property& operator=(Property&& other) = default;
-        ~Property() = default;
+        Property(const std::shared_ptr<PreferenceIndex>& ix, double im) : index(ix), importance(im) {}
     };
 
 };

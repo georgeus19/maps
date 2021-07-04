@@ -30,7 +30,7 @@ protected:
     /**
      * Denotes the maximum value of any value of all data indices.
      */
-    static inline const double kScaleMax = 100;
+    static inline const double kScaleMax = 1;
 
 private:
     virtual void Normalize() = 0;

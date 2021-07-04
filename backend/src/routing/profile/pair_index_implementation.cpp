@@ -40,7 +40,7 @@ void PairIndexImplementation::Create(database::DatabaseHelper& d, const std::vec
     d.RunTransactional(sql);
 }
 
-void PairIndexImplementation::Normalize(double scale_max) {
+void PairIndexImplementation::Normalize() {
     double max_value = std::numeric_limits<double>::min();
     for(auto&& p : values_) {
         if (p.valid) {
@@ -52,7 +52,6 @@ void PairIndexImplementation::Normalize(double scale_max) {
     for(auto&& p : values_) {
         if (p.valid) {
             p.value /= max_value;
-            p.value *= scale_max;
         }
     }
 }

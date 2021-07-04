@@ -76,13 +76,6 @@ void GreenIndex::Normalize() {
             if (value.value > 1) {
                 value.value = 1;
             }
-            
-            // The lower, the better green index in routing so it is necessary to flip it.
-            // The create query gives green_value the higher, the better.
-            value.value = 1 - value.value;
-
-            // The value should be within [0, scale_max].
-            value.value *= kScaleMax;
         }
     });
 }

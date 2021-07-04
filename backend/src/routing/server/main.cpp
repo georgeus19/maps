@@ -90,16 +90,12 @@ int main(int argc, const char ** argv) {
 }
 
 static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profile) {
-    Profile profile{};
-    std::cout << "default_profile " << default_profile.GetName() << std::endl; 
+    Profile profile{default_profile.GetBaseIndex()};
+    // std::cout << "default_profile " << default_profile.GetName() << std::endl; 
     for(auto it = p.begin(); it != p.end(); ++it) {
         std::string index_name = (*it)["name"].s();
-        int32_t importance = static_cast<int32_t>((*it)["importance"].i());
-        if (std::shared_ptr<PreferenceIndex> index = default_profile.GetIndex(index_name)) {
-            profile.AddIndex(index, importance);
-        } else {
-            throw InvalidArgumentException("Invalid profile query parameter - index " + index_name + " does not exist.");
-        }
+        double importance = static_cast<double>((*it)["importance"].d());
+        profile.AddIndex(default_profile.GetIndex(index_name), importance);
     }
     return profile;
 }

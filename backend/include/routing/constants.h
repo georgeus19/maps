@@ -11,7 +11,7 @@ struct Constants{
             static inline const std::string kDatabase = "database";
             static inline const std::string kAlgorithm = "algorithm";
             static inline const std::string kParameters = "parameters";
-            static inline const std::string kProfileProperties = "profile_properties";
+            static inline const std::string kPreferences = "preferences";
             static inline const std::string kIndices = "indices";
         };
 
@@ -34,6 +34,9 @@ struct Constants{
         static inline const std::string kTableName = "table_name";
         static inline const std::string kImportance = "importance";
         static inline const std::string kBaseGraphTable = "base_graph_table";
+        static inline const std::string kBaseIndex = "base_index";
+        static inline const std::string kBaseIndexTable = "base_index_table";
+        
         static inline const std::string kMode = "mode";
 
         struct Indices{

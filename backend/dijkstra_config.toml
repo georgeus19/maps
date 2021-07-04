@@ -17,15 +17,15 @@ edge_difference = 190
 deleted_neighbours = 120
 space_size = 0
 
-[[profile_properties]]
-name = "length"
-table_name = "czedges_length_index"
-importance = [ 100 ]
-[[profile_properties]]
+[preferences]
+base_index = "length"
+base_index_table = "czedges_length_index"
+
+[[preferences.indices]]
 name = "green"
 table_name = "czedges_green_index"
-importance = [ 20, 40, 60, 80, 100 ]
-[[profile_properties]]
+importance = [ 0.0, -0.2, -0.4, -0.6, -0.8, -1.0 ]
+[[preferences.indices]]
 name = "peak"
 table_name = "czedges_peak_index"
-importance = [ 20, 40, 60, 80, 100 ]
+importance = [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ]

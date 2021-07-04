@@ -35,12 +35,13 @@ struct DatabaseConfig{
         port(toml::find<std::string>(table, Constants::Input::Database::kPort))  {}
 };
 
-struct ProfileProperty {
+struct ProfilePreference {
     std::shared_ptr<profile::PreferenceIndex> index;
     std::string table_name;
-    std::vector<int32_t> options;
+    std::vector<double> options;
 
-    ProfileProperty(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<int32_t>&& o) : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
+    ProfilePreference(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<double>&& o)
+        : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
 };
 
 
@@ -63,13 +64,16 @@ struct CHConfig : public AlgorithmConfig {
         space_size_coefficient(ssc) {}
 };
 
-struct ProfileProperties{
-    std::vector<ProfileProperty> properties;
+struct ProfilePreferences{
+    std::shared_ptr<profile::PreferenceIndex> base_index;
+    std::string base_index_table;
+    std::vector<ProfilePreference> properties;
 
-    ProfileProperties(std::vector<ProfileProperty>&& pp) : properties(pp) {}
+    ProfilePreferences(std::shared_ptr<profile::PreferenceIndex>&& bi, std::string&& bit, std::vector<ProfilePreference>&& pp)
+        : base_index(std::move(bi)), base_index_table(std::move(bit)), properties(std::move(pp)) {}
 
     profile::ProfileGenerator GetProfileGenerator() {
-        profile::ProfileGenerator gen{};
+        profile::ProfileGenerator gen{base_index};
         for(auto&& prop : properties) {
             gen.AddIndex(prop.index, std::move(prop.options));
         }
@@ -77,6 +81,8 @@ struct ProfileProperties{
     }
 
     void LoadIndices(database::DatabaseHelper& d, const std::string& table_name_prefix = std::string{}) {
+        std::cout << "Load base index from " << base_index_table << std::endl;
+        base_index->Load(d, base_index_table);
         for(auto&& prop : properties) {
             std::string index_table = table_name_prefix + prop.table_name;
             std::cout << "Load index from " << index_table << std::endl;
@@ -87,10 +93,10 @@ struct ProfileProperties{
 
 struct Configuration {
     DatabaseConfig database;
-    ProfileProperties profile_properties;
+    ProfilePreferences profile_properties;
     std::unique_ptr<AlgorithmConfig> algorithm;
 
-    Configuration(DatabaseConfig&& db, ProfileProperties&& pp, std::unique_ptr<AlgorithmConfig> alg)
+    Configuration(DatabaseConfig&& db, ProfilePreferences&& pp, std::unique_ptr<AlgorithmConfig> alg)
         : database(std::move(db)), profile_properties(std::move(pp)), algorithm(std::move(alg)) {}
 };
 
@@ -152,26 +158,41 @@ Configuration ConfigurationParser::Parse() {
     } 
     std::unique_ptr<AlgorithmConfig> alg = algorithms[alg_name](algorithm.as_table());
     
-    std::vector<ProfileProperty> profile_properties;
-    for(auto&& property : toml::find<toml::array>(data_, Constants::Input::TableNames::kProfileProperties)) {
-        std::unordered_map<std::string, std::function<std::shared_ptr<profile::PreferenceIndex>()>> indices{
-            {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
-            {Constants::IndexNames::kPeakDistanceIndex, [](){ return std::make_shared<profile::PeakDistanceIndex>(); }},
-            {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
-        };
-        std::string name = toml::find<std::string>(property, Constants::Input::kName);
+    std::unordered_map<std::string, std::function<std::shared_ptr<profile::PreferenceIndex>()>> indices{
+        {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
+        {Constants::IndexNames::kPeakDistanceIndex, [](){ return std::make_shared<profile::PeakDistanceIndex>(); }},
+        {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
+    };
+
+    auto&& preferences = toml::find(data_, Constants::Input::TableNames::kPreferences);
+    std::string base_index = toml::find<std::string>(preferences, Constants::Input::kBaseIndex);
+    if (!indices.contains(base_index)) {
+        throw ParseException{"Base index " + base_index + " does not exist."};
+    }
+    std::string base_index_table = toml::find<std::string>(preferences, Constants::Input::kBaseIndexTable);
+    
+    std::vector<ProfilePreference> profile_preferences;
+    for(auto&& index : toml::find<toml::array>(preferences, Constants::Input::TableNames::kIndices)) {
+        
+        std::string name = toml::find<std::string>(index, Constants::Input::kName);
         if (!indices.contains(name)) {
             throw ParseException{"Index " + name + " does not exist."};
         }
-        std::string table_name = toml::find<std::string>(property, Constants::Input::kTableName);
-        std::vector<int32_t> importance_options;
-        for(auto&& importance : toml::find<toml::array>(property, Constants::Input::kImportance)) {
-            importance_options.push_back(static_cast<int32_t>(importance.as_integer()));
+        std::string table_name = toml::find<std::string>(index, Constants::Input::kTableName);
+        std::vector<double> importance_options;
+        for(auto&& importance : toml::find<toml::array>(index, Constants::Input::kImportance)) {
+            importance_options.push_back(static_cast<double>(importance.as_floating()));
         }
-        profile_properties.emplace_back(indices[name](), std::move(table_name), std::move(importance_options));
+        profile_preferences.emplace_back(indices[name](), std::move(table_name), std::move(importance_options));
     }
 
-    return Configuration{std::move(db_config), ProfileProperties{std::move(profile_properties)}, std::move(alg)};
+    ProfilePreferences pref{ 
+        indices[base_index](),
+        std::move(base_index_table),
+        std::move(profile_preferences)
+    };
+
+    return Configuration{std::move(db_config), std::move(pref), std::move(alg)};
 }
 
 

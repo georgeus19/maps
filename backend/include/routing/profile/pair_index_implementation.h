@@ -26,7 +26,7 @@ public:
     void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table,
         const std::string& value_col_name) const;
 
-    void Normalize(double scale_max);
+    void Normalize();
 
     double Get(unsigned_id_type uid) const;
 

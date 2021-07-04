@@ -59,7 +59,7 @@ const std::string& PeakDistanceIndex::GetName() const {
 }
 
 void PeakDistanceIndex::Normalize() {
-    impl_.Normalize(kScaleMax);
+    impl_.Normalize();
 }
 
 
