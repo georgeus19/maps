@@ -17,7 +17,7 @@ space_size = 0
 
 [[profile_properties]]
 name = "length"
-table_name = "czedges"
+table_name = "czedges_length_index"
 importance = [ 100 ]
 [[profile_properties]]
 name = "green"

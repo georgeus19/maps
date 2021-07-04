@@ -51,30 +51,30 @@ class BasicProfileEdgeFactory{
 public:
     using Edge = BasicEdge<ProfileLengthSource>; 
 
-    BasicProfileEdgeFactory(DynamicLengthSource* profile) : profile_(profile) {}
+    BasicProfileEdgeFactory(DynamicLengthSource* length_source) : length_source_(length_source) {}
 
     template <typename Input>
     Edge Create(const Input& input) {
-        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{profile_},
+        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{length_source_},
             EdgeTypeResolver<ProfileLengthSource>{}.GetEdgeType(input.GetUndirected())};
     }
 private:
-    DynamicLengthSource* profile_;
+    DynamicLengthSource* length_source_;
 };
 
 class CHProfileEdgeFactory{
 public:
     using Edge = CHEdge<ProfileLengthSource>;
 
-    CHProfileEdgeFactory(DynamicLengthSource* profile) : profile_(profile) {}
+    CHProfileEdgeFactory(DynamicLengthSource* length_source) : length_source_(length_source) {}
 
     template <typename Input>
     Edge Create(const Input& input) {
-        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{profile_},
+        return Edge{input.GetUid(), input.GetFrom(), input.GetTo(), ProfileLengthSource{length_source_},
             EdgeTypeResolver<ProfileLengthSource>{}.GetEdgeType(input.GetUndirected()), input.GetContractedVertex()};
     }
 private:
-    DynamicLengthSource* profile_;
+    DynamicLengthSource* length_source_;
 };
 
 template <typename E>

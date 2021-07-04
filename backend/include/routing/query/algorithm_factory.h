@@ -47,11 +47,11 @@ public:
 
     DijkstraFactory() : endpoint_edges_lengths_() {}
 
-    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name, DynamicLengthSource* length_source) {
+    static Graph CreateGraph(database::DatabaseHelper& d, TableNames* table_names, DynamicLengthSource* length_source) {
         Graph g{};
         DbGraph db_graph{};
         EdgeFactory edge_factory{length_source};
-        d.LoadGraphEdges<Graph>(graph_table_name, g, &db_graph, edge_factory);
+        d.LoadGraphEdges<Graph>(table_names->GetEdgesTable(), g, &db_graph, edge_factory);
         return g;
     }
 
@@ -87,12 +87,12 @@ public:
 
     CHStaticFactory() {}
 
-    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
+    static Graph CreateGraph(database::DatabaseHelper& d, TableNames* table_names) {
         TemporaryGraph g{};
         DbGraph db_graph{};
-        CHNumberEdgeFactory edge_factory{};
-        d.LoadGraphEdges<TemporaryGraph>(graph_table_name, g, &db_graph, edge_factory);
-        d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
+        EdgeFactory edge_factory{};
+        d.LoadGraphEdges<TemporaryGraph>(table_names->GetEdgesTable(), g, &db_graph, edge_factory);
+        d.LoadAdditionalVertexProperties(table_names->GetVerticesTable(), g);
         Graph search_graph{};
         search_graph.Load(g);
         return search_graph;
@@ -128,12 +128,12 @@ public:
 
     CHDynamicFactory() : endpoint_edges_lengths_() {}
 
-    static Graph CreateGraph(database::DatabaseHelper& d, const std::string& graph_table_name) {
+    static Graph CreateGraph(database::DatabaseHelper& d, TableNames* table_names, DynamicLengthSource* length_source) {
         TemporaryGraph g{};
         DbGraph db_graph{};
-        CHNumberEdgeFactory edge_factory{};
-        d.LoadGraphEdges<TemporaryGraph>(graph_table_name, g, &db_graph, edge_factory);
-        d.LoadAdditionalVertexProperties(graph_table_name + "_vertices", g);
+        EdgeFactory edge_factory{length_source};
+        d.LoadGraphEdges<TemporaryGraph>(table_names->GetEdgesTable(), g, &db_graph, edge_factory);
+        d.LoadAdditionalVertexProperties(table_names->GetVerticesTable(), g);
         Graph search_graph{};
         search_graph.Load(g);
         return search_graph;

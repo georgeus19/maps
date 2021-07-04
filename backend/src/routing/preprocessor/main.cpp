@@ -183,7 +183,16 @@ static void CreateIndices(const std::string& path) {
                 ); 
             }
         },
-        {Constants::IndexNames::kLengthIndex, [](const toml::value&){ /* no action necessary... - already present in base graph! */ }}
+        {
+            Constants::IndexNames::kLengthIndex,
+            [&](const toml::value& table){
+                PhysicalLengthIndex index{};
+                index.Create(d,
+                    toml::find<std::string>(table, Constants::Input::Indices::kEdgesTable),
+                    toml::find<std::string>(table, Constants::Input::Indices::kIndexTable)
+                );
+            }
+        }
     };
     for(auto&& index : toml::find<toml::array>(data, Constants::Input::TableNames::kIndices)) {
         std::string name = toml::find<std::string>(index, Constants::Input::kName);

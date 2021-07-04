@@ -17,3 +17,5 @@ point_table = "planet_osm_point"
 index_table = "czedges_peak_index"
 [[indices]]
 name = "length"
+edges_table = "czedges"
+index_table = "czedges_length_index"

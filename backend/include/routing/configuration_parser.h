@@ -78,7 +78,7 @@ struct ProfileProperties{
 
     void LoadIndices(database::DatabaseHelper& d, const std::string& table_name_prefix = std::string{}) {
         for(auto&& prop : properties) {
-            std::string index_table = prop.table_name + table_name_prefix;
+            std::string index_table = table_name_prefix + prop.table_name;
             std::cout << "Load index from " << index_table << std::endl;
             prop.index->Load(d, index_table);
         }

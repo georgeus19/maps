@@ -31,6 +31,7 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
 int main(int argc, const char ** argv) {
     if (argc != 2) {
         std::cout << "Arguments: config_path" << std::endl;
+        return 1;
     }
     std::string config_path = argv[1];
     ConfigurationParser parser{config_path};
@@ -67,11 +68,12 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kDynamicProfile,
                 [&](){
-                    cfg.profile_properties.LoadIndices(d);
                     auto&& gen = cfg.profile_properties.GetProfileGenerator();
                     Profile profile = gen.GetFrontProfile();
+                    std::unique_ptr<TableNames> table_names = std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile);
+                    cfg.profile_properties.LoadIndices(d, table_names->GetIndexTablePrefix());
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
-                    DynamicProfileMode<CHDynamicFactory> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
+                    DynamicProfileMode<CHDynamicFactory> m{d, std::move(table_names), std::move(profile)};
                     d.DisconnectIfOpen();
                     RunServer<CHDynamicFactory, DynamicProfileMode<CHDynamicFactory>>(cfg, m, config_path);
                 }
@@ -142,7 +144,7 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
             ConfigurationParser parser{config_path};
             auto&& cfg = parser.Parse();
             std::vector<crow::json::wvalue> result;
-            for(auto&& prop : cfg.profile_properties) {
+            for(auto&& prop : cfg.profile_properties.properties) {
                 crow::json::wvalue json_prop;
                 json_prop["name"] = prop.index->GetName();
                 json_prop["importance_options"] = prop.options;

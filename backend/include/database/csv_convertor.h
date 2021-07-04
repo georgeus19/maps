@@ -1,5 +1,5 @@
-#ifndef BACKEND_CSV_CONVERTOR_H
-#define BACKEND_CSV_CONVERTOR_H
+#ifndef DATABASE_CSV_CONVERTOR_H
+#define DATABASE_CSV_CONVERTOR_H
 
 #include <vector>
 #include <set>
@@ -71,14 +71,14 @@ void CsvConvertor::SaveVertexOrdering(Graph& graph) {
 
 template<typename Edge>
 void CsvConvertor::SaveEdge(const Edge& edge) {
-    f_ << std::to_string(0) << "; "
+    f_ << std::to_string(0) << ";"
         << std::to_string(edge.get_uid()) << ";" 
-        << "null; " 
-        << std::to_string(edge.get_from()) << "; " 
-        << std::to_string(edge.get_to()) << "; " 
-        << std::to_string(edge.IsTwoway()) << "; " 
-        << std::to_string(edge.get_length()) << "; " 
-        << std::to_string(edge.IsShortcut()) << "; "
+        << "null;" 
+        << std::to_string(edge.get_from()) << ";" 
+        << std::to_string(edge.get_to()) << ";" 
+        << std::to_string(edge.IsTwoway()) << ";" 
+        << std::to_string(edge.get_length()) << ";" 
+        << std::to_string(edge.IsShortcut()) << ";"
         << std::to_string(edge.get_contracted_vertex());
     f_ << std::endl;
 }
@@ -87,7 +87,7 @@ void CsvConvertor::SaveEdge(const Edge& edge) {
 
 template <typename Vertex>
 void CsvConvertor::SaveOrderingRank(const Vertex& vertex) {
-    f_ << std::to_string(vertex.get_osm_id()) << "; "
+    f_ << std::to_string(vertex.get_osm_id()) << ";"
         << std::to_string(vertex.get_ordering_rank());
     f_ << std::endl;
 }
@@ -96,4 +96,4 @@ void CsvConvertor::SaveOrderingRank(const Vertex& vertex) {
 
 }
 
-#endif //BACKEND_CSV_CONVERTOR_H
+#endif //DATABASE_CSV_CONVERTOR_H

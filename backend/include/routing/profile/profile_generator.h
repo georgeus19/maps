@@ -66,7 +66,9 @@ std::vector<Profile> ProfileGenerator::Generate() {
 
 Profile ProfileGenerator::GetFrontProfile() {
     Profile profile{};
-    profile.AddIndex(indices_.front().index, indices_.front().importance_options.front());
+    for(auto&& index_info : indices_) {
+        profile.AddIndex(index_info.index, index_info.importance_options.front());
+    }
     return profile;
 }
 

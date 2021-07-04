@@ -2,9 +2,10 @@
 #define ROUTING_PROFILE_PHYSICAL_LENGTH_INDEX_H
 
 #include "routing/edges/basic_edge.h"
-#include "database/database_helper.h"
 #include "routing/profile/preference_index.h"
 #include "routing/profile/pair_index_implementation.h"
+
+#include "database/database_helper.h"
 
 #include <string>
 #include <vector>
@@ -17,6 +18,8 @@ namespace profile {
 class PhysicalLengthIndex : public PreferenceIndex{
 public:
     PhysicalLengthIndex();
+
+    void Create(database::DatabaseHelper& d, const std::string& edges_table, const std::string& length_index_table);
 
     void Load(database::DatabaseHelper& d, const std::string& green_index_table) override;
 

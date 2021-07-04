@@ -25,7 +25,7 @@ public:
 
     void AddRouter(database::DatabaseHelper& d, std::unique_ptr<TableNames>&& table_names, const profile::Profile& profile) {
         profile_ = profile;
-        auto&& g = AlgorithmStaticFactory::CreateGraph(d, table_names->GetEdgesTable());
+        auto&& g = AlgorithmStaticFactory::CreateGraph(d, table_names.get());
         std::cout << " Loading " << table_names->GetEdgesTable() << std::endl;
         routers_.emplace(profile.GetName(), Router<AlgorithmStaticFactory>{AlgorithmStaticFactory{}, std::move(g), std::move(table_names)});
 
@@ -54,7 +54,7 @@ class DynamicProfileMode{
 public:
     DynamicProfileMode(database::DatabaseHelper& d, std::unique_ptr<TableNames>&& table_names, profile::Profile&& profile)
         : router_(), profile_envelope_(std::move(profile)) {
-        typename AlgorithmDynamicFactory::Graph g = AlgorithmDynamicFactory::CreateGraph(d, table_names->GetBaseTableName(), &profile_envelope_);
+        typename AlgorithmDynamicFactory::Graph g = AlgorithmDynamicFactory::CreateGraph(d, table_names.get(), &profile_envelope_);
         std::cout << "Loading " << table_names->GetEdgesTable() << std::endl;
         router_ = std::move(Router<AlgorithmDynamicFactory>{AlgorithmDynamicFactory{}, std::move(g), std::move(table_names)});
     }

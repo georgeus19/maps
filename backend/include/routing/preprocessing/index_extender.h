@@ -4,10 +4,12 @@
 #include "database/database_helper.h"
 
 #include "routing/profile/preference_index.h"
+
 #include <string>
 #include <vector>
 #include <stack>
 #include <functional>
+#include <fstream>
 
 namespace routing{
 namespace preprocessing{
