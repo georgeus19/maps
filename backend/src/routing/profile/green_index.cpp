@@ -66,6 +66,10 @@ double GreenIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
+double GreenIndex::GetOriginal(unsigned_id_type uid) const {
+    return impl_.Get(uid);
+}
+
 const std::string& GreenIndex::GetName() const {
     return Constants::IndexNames::kGreenIndex;
 }

@@ -21,9 +21,12 @@
 #include "routing/routing_graph.h"
 #include "routing/query/endpoint_edges_creator.h"
 #include "routing/query/endpoints_creator.h"
+#include "routing/query/route.h"
 
 #include <string>
 #include <memory>
+#include <utility>
+#include <vector>
 
 namespace routing {
 namespace query {
@@ -44,7 +47,7 @@ public:
     Router operator=(const Router& other) = delete;
     ~Router() = default;
 
-    std::string CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target) {
+    Route<typename AlgorithmFactory::Algorithm::Edge> CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target) {
         std::cout << "Routing on " << table_names_->GetEdgesTable() << std::endl;
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
             throw RouteNotFoundException("Start and end point are the same.");
@@ -69,13 +72,14 @@ public:
             std::chrono::duration<double> elapsed_run = finish_run - start_run;
             std::cout << "Elapsed time - run alg: " << elapsed_run.count() << " s\n";
 
-        std::vector<typename AlgorithmFactory::Algorithm::Edge> res = alg.GetRoute();
+        std::vector<typename AlgorithmFactory::Algorithm::Edge> route = alg.GetRoute();
         std::cout << "Get route done." << std::endl;
-        return GetRouteGeometry(d, endpoints_creator, res);
+        auto&& geom = GetRouteGeometry(d, endpoints_creator, route);
+        return Route<typename AlgorithmFactory::Algorithm::Edge>{std::move(route), std::move(geom)};
     }
 
     std::string GetRouteGeometry(database::DatabaseHelper& d, EC& endpoints_creator,
-        std::vector<typename AlgorithmFactory::Algorithm::Edge>& route) {
+        std::vector<typename AlgorithmFactory::Algorithm::Edge> route) {
         auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route[0].get_uid());
         auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route[route.size() - 1].get_uid());
         route.pop_back();

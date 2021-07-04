@@ -6,7 +6,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import Form from 'react-bootstrap/Form'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Camera, Search, PlusSquare, PlusCircle, Trash2 } from 'react-feather';
+import { Camera, PlusSquare, PlusCircle, Trash2 } from 'react-feather';
 import { point } from 'leaflet';
 import { Range } from 'react-range';
 var FileSaver = require('file-saver');
@@ -62,6 +62,7 @@ function PrimaryPanel(props) {
             pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
             route={props.route} setRoute={props.setRoute}
             profile={profile} dispatchProfile={dispatchProfile}
+            routeLength={props.routeLength} setRouteLength={props.setRouteLength} 
         ></RoutingTab>;
     } else if (props.currentTab === TabEnum.exportTab) {
         tab = <ExportTab setCurrentPoint={props.setCurrentPoint}
@@ -87,9 +88,12 @@ function Header(props) {
 
     return (
         <div className="Header" onClick={() => {} /* props.setCurrentPoint(-1) */ }>
-            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.searchTab ? 'selected' : ''}`} onClick={() => props.setTab(TabEnum.searchTab)}>Search</Button>
-            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.routeTab ? 'selected' : ''}`} onClick={() => props.setTab(TabEnum.routeTab)}>Route</Button>
-            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.exportTab ? 'selected' : ''}`} onClick={() => props.setTab(TabEnum.exportTab)}>Export</Button>
+            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.searchTab ? 'selected' : ''}`}
+                    onClick={() => props.setTab(TabEnum.searchTab)}>Search</Button>
+            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.routeTab ? 'selected' : ''}`}
+                    onClick={() => props.setTab(TabEnum.routeTab)}>Route</Button>
+            <Button className={`HeaderOption GreenButton ${props.currentTab === TabEnum.exportTab ? 'selected' : ''}`}
+                    onClick={() => props.setTab(TabEnum.exportTab)}>Export</Button>
         </div>
     )
 }
@@ -125,14 +129,14 @@ function RoutingTab(props) {
                     return Promise.reject(response);
                 })
                 .then((data) => {
-                    // console.log(data);
+                    // console.log("DATA RECEIVED:", data);
                     if (data.ok) {
                         const route = JSON.parse(data.route);
                         if (route.length === 0) {
                             return Promise.reject("No route found");
                         } else {
-                            console.log("Fetched route: ", route);
-                            return route;
+                            // console.log("Fetched route: ", route);
+                            return { geom:route, length:data.length };
                         }
                     } else {
                         return Promise.reject(data.error);
@@ -142,8 +146,9 @@ function RoutingTab(props) {
         .then((routes) => {
             const joinedRoute = {
                 'type': 'LineString',
-                'coordinates': mergeRoutes(routes)
+                'coordinates': mergeRoutes(routes.map((r) => r.geom))
             };
+            props.setRouteLength(routes.reduce((a, r) => a + r.length, 0));
             props.setRoute({data:joinedRoute, key:props.route.key < 0 ? 1 : -1});
             // console.log("routes ", routes);
             // console.log("joinedRoute ", joinedRoute);
@@ -215,13 +220,19 @@ function RoutingTab(props) {
                 pathPoints={props.pathPoints} dispatchPoints={props.dispatchPoints}
                 route={props.route} setRoute={props.setRoute}
                 profile={props.profile}
+                setRouteLength={props.setRouteLength}
             ></Route>
             <Profile
                 profile={props.profile} dispatchProfile={props.dispatchProfile}
                 currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint}
             ></Profile>
+            {props.routeLength && <RouteLength routeLength={props.routeLength}></RouteLength>}
         </div>
     );
+}
+
+function RouteLength(props) {
+    return <div>Route length: {(props.routeLength / 1000).toFixed(2)} km</div>;
 }
 
 /**
@@ -236,8 +247,11 @@ function Route(props) {
     // -> `PathPoint`,`AddPoint`,`PathPoint`, ...
     let points=[];  
     props.pathPoints.forEach((point, index) => {
-        points.push(<PathPoint key={index} currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint} 
-        dispatchPoints={props.dispatchPoints} index={index} pointName={point.name} pointCount={props.pathPoints.length}></PathPoint>);
+        points.push(
+            <PathPoint 
+                key={index} currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint} setRouteLength={props.setRouteLength}
+                dispatchPoints={props.dispatchPoints} index={index} pointName={point.name} pointCount={props.pathPoints.length}
+            ></PathPoint>);
         if (index !== props.pathPoints.length - 1) {
             points.push(<AddPoint key={"plus" + index} currentPoint={props.currentPoint} setCurrentPoint={props.setCurrentPoint} 
             dispatchPoints={props.dispatchPoints} nextPointIndex={index + 1}></AddPoint>);
@@ -298,6 +312,7 @@ function PathPoint(props) {
 
     const trashHandleClick = (e) => {
         props.dispatchPoints({type:'delete', index:props.index});
+        props.setRouteLength(null);
         if (props.pointCount <= 2) {
             props.dispatchPoints({type:'insert', value:{name:'', latLon:[null, null]}, index:props.index});
         } 

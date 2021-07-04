@@ -40,6 +40,8 @@ function App() {
 	 */
 	const [route, setRoute] = useState({data:[], key:-1});
 
+	const [routeLength, setRouteLength] = useState(null);
+
 	/**
 	 * Indicates which tab is currently open in Primary panel.
 	 */
@@ -61,6 +63,7 @@ function App() {
 				pathPoints={pathPoints} dispatchPoints={dispatchPoints}
 				searchPoint={searchPoint} dispatchSearchPoint={dispatchSearchPoint}
 				route={route} setRoute={setRoute}
+				routeLength={routeLength} setRouteLength={setRouteLength} 
 				currentTab={currentTab} setCurrentTab={setCurrentTab}
 			/>
 		</div>

@@ -26,6 +26,8 @@ public:
 
     double Get(unsigned_id_type uid) const override;
 
+    double GetOriginal(unsigned_id_type uid) const override;
+
     const std::string& GetName() const override;
 private:
     PairIndexImplementation impl_;

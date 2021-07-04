@@ -20,6 +20,8 @@ public:
 
     virtual double Get(unsigned_id_type uid) const = 0;
 
+    virtual double GetOriginal(unsigned_id_type uid) const = 0;
+
     virtual const std::string& GetName() const = 0;
 
     double GetInverted(unsigned_id_type uid) const {

@@ -11,6 +11,8 @@
 namespace routing{
 namespace profile{
 
+PairIndexImplementation::PairIndexImplementation() : max_(1) {}
+
 void PairIndexImplementation::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table,
         const std::string& value_col_name) const {
         
@@ -49,6 +51,7 @@ void PairIndexImplementation::Normalize() {
             }
         }
     }
+    max_ = max_value;
     for(auto&& p : values_) {
         if (p.valid) {
             p.value /= max_value;
@@ -64,6 +67,10 @@ double PairIndexImplementation::Get(unsigned_id_type uid) const {
     } else {
         throw InvalidValueException{"Index value of edge " + std::to_string(uid) + " not found - resp. invalid value is in its place."};
     }
+}
+
+double PairIndexImplementation::GetOriginal(unsigned_id_type uid) const {
+    return Get(uid) * max_;
 }
 
 std::function<void(const database::DbRow&)> PairIndexImplementation::CreateLoadFunction() {

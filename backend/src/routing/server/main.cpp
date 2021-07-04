@@ -122,8 +122,9 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
                 std::cout << req.url_params << std::endl;
                 auto&& router = mode.GetRouter(std::move(profile));
                 DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};
-                auto&& result = router.CalculateShortestRoute(d, source, target);
-                response["route"] = result; 
+                auto&& route = router.CalculateShortestRoute(d, source, target);
+                response["route"] = route.get_geometry();
+                response["length"] = route.GetLength(mode.GetDefaultProfile().GetBaseIndex().get());
                 response["ok"] = "true";
                 
             } catch(const std::exception& e){

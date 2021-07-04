@@ -23,6 +23,8 @@ public:
         Value(double val) : valid(true), value(val) {}
     };
 
+    PairIndexImplementation();
+
     void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table,
         const std::string& value_col_name) const;
 
@@ -30,11 +32,14 @@ public:
 
     double Get(unsigned_id_type uid) const;
 
+    double GetOriginal(unsigned_id_type uid) const;
+
     std::function<void(const database::DbRow&)> CreateLoadFunction();
 
     void ForEachValue(const std::function<void(Value&)>& f);
 private:
     std::vector<Value> values_;
+    double max_;
 };
 
     

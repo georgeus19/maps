@@ -43,6 +43,11 @@ double PhysicalLengthIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
+double PhysicalLengthIndex::GetOriginal(unsigned_id_type uid) const {
+    return impl_.GetOriginal(uid);
+}
+
+
 const std::string& PhysicalLengthIndex::GetName() const {
     return Constants::IndexNames::kLengthIndex;
 }

@@ -54,6 +54,10 @@ double PeakDistanceIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
+double PeakDistanceIndex::GetOriginal(unsigned_id_type uid) const {
+    return impl_.GetOriginal(uid);
+}
+
 const std::string& PeakDistanceIndex::GetName() const {
     return Constants::IndexNames::kPeakDistanceIndex;
 }
