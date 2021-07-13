@@ -81,15 +81,6 @@ public:
     void RunNontransactional(const std::string& sql, const std::function<void(const DbRow&)> f);
 
     /**
-     * Find a graph edge that would be closest to `point`.
-     *
-     * @param table_name Name of table where to search for the edge.
-     * @param point Location of point whose closest edge is found.
-     * @return EdgeDbRow representing the closest Edge.
-     */
-    std::unique_ptr<DbEdgeIterator> FindClosestEdge(utility::Point point, const std::string & table_name, DbGraph* db_graph);
-
-    /**
      * Convert `point` to string point in WKT format = POINT(X Y)
      *
      * @param point Point to convert.
@@ -105,19 +96,6 @@ public:
     std::string MakeGeographyPoint(utility::Point point);
 
     /**
-     * Calculate how big the radius should be to load a graph that
-     * would contain the best path from `start` to `end` from the
-     * point exactly between them. Resp. write a how-to calculate
-     * the radius in postgis using string.
-     *
-     * @param start Start point of route.
-     * @param end End point of route.
-     * @param mult How much of distance between `start` and `end` should be taken into account.
-     * @return String postgis calculation of radius.
-     */
-    std::string CalculateRadius(utility::Point start, utility::Point end, float mult);
-
-    /**
      * Find an edge that is closest to 'endpoint` and split it into segments.
      * The segments have one intersection at the location on the closest edge
      * the `endpoint` is closest to. The other intersection is always an
@@ -127,33 +105,11 @@ public:
      * accurately since it is possible to start the routing algorithm
      * at the closest point in graph from the `endpoint`.
      *
-     * Better that CalculateEdgeSegments since it provides a way to put segments
-     * to routing graph.
-     *
      * @param table_name Table from which segments are got.
      * @param endpoint Endpoint of a route for which segments are found.
      * @return Vector of DbRows each representing one segment. Each segment can be transformed to graph edge.
      */
     std::vector<DbRow> GetClosestSegments(utility::Point endpoint, const std::string& table_name, DbGraph* db_graph);
-
-    /**
-     * Split an edge into segments by a blade and return
-     * geometries of each segment. Also returns the
-     * distances to each segment's endpoint to each
-     * `next_edge`'s endpoint so that it can be calculated
-     * which segment is closer to `next_edge` and use it's geometry.
-     *
-     * @tparam Edge Graph Edge type.
-     * @param edge_geography Edge geography that is split to segments.
-     * @param blade_geography Blade geography that splits `edge`.
-     * @param next_edge It's endpoints are used to calculate distance to segments' endpoint (to determine which is closer).
-     * @param table_name Name of table where edges are saved.
-     * @return Vector of DbRow where each represents one segment and the calculated distances.
-     */
-    template <typename Edge>
-    std::vector<DbRow> CalculateEdgeSegments(const std::string& edge_geography, const std::string& blade_geography,
-                                                const Edge& next_edge, const std::string& table_name);
-
 
     /**
      * Find geometries of all edges in `edges` and return them.
@@ -173,11 +129,6 @@ public:
     void LoadGraphEdges(const std::string& table_name, Graph& graph, DbGraph* db_graph, EdgeFactory& edge_factory);
 
     /**
-     * Add columns to edge list table which consider shortcut edges.
-     */
-    bool AddShortcutColumns(const std::string& table_name);
-
-    /**
      * Appends shortcuts of the graph to the given table - needs to have appropriate columns.
      */ 
     template <typename Graph>
@@ -188,8 +139,6 @@ public:
      */ 
     template <typename Graph>
     void AddVertexOrdering(const std::string& table_name, Graph& graph);
-
-    unsigned_id_type GetMaxEdgeId(const std::string& table_name);
 
     void DropGeographyIndex(const std::string& table_name);
 
@@ -270,102 +219,6 @@ std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const 
         }
     }
     return geojson;
-}
-
-/**
- * Example of sql:
-WITH next_edge AS (
-SELECT *
-FROM czedges
-WHERE uid = 8
-),
-segments as (
-SELECT (st_dump(
-    st_transform(
-    ST_Split(
-        ST_Snap(l, blade, 0.0000001),
-        blade
-    ),
-    4326))).geom as segment
-FROM ST_Transform('SRID=4326;LINESTRING(13.391116 49.7264131,13.3912178 49.7259554)'::geometry, 3785) as l,
-    ST_Transform('SRID=4326;POINT(13.3911702145311 49.7261693481709)'::geometry, 3785) as blade
-    )
-SELECT ST_Distance(
-        ST_StartPoint(next_edge.geog::geometry)::geography,
-        ST_EndPoint(segment::geometry)::geography
-    ),
-    ST_Distance(
-        ST_StartPoint(next_edge.geog::geometry)::geography,
-        ST_StartPoint(segment::geometry)::geography
-    ),
-    ST_Distance(
-        ST_EndPoint(next_edge.geog::geometry)::geography,
-        ST_StartPoint(segment::geometry)::geography
-
-    ),
-    ST_Distance(
-        ST_EndPoint(next_edge.geog::geometry)::geography,
-        ST_EndPoint(segment::geometry)::geography
-    ),
-    ST_AsGeoJSON(segment),
-    ST_AsGeoJSON(next_edge.geog)
-FROM segments, next_edge
-*/
-template <typename Edge>
-std::vector<DbRow> DatabaseHelper::CalculateEdgeSegments(const std::string & edge_geography, const std::string & blade_geography,
-                                            const Edge & next_edge, const std::string & table_name) {
-
-    std::string line =  "SRID=4326;" + edge_geography;
-    std::string blade = "SRID=4326;" + blade_geography;
-
-    // Find `next_edge` in table.
-    // Split the edge with the point (blade). It is important to snap line to blade so that
-    // line always contains blade when split is executed.
-    // Calculate distances to endpoints of `next_edge` from segments' endpoints.
-    std::string sql = " " \
-                    "WITH next_edge AS ( " \
-                    "    SELECT * " \
-                    "    FROM " + table_name + " " \
-                    "    WHERE uid = " + std::to_string(next_edge.get_uid()) + " " \
-                    "), "
-                                                                            "segments as ( " \
-                    "    SELECT (ST_Dump( " \
-                    "        ST_Transform( " \
-                    "        ST_Split( " \
-                    "            ST_Snap(l, blade, 0.0000001), " \
-                    "            blade " \
-                    "        ), " \
-                    "        4326))).geom as segment " \
-                    "    FROM ST_Transform('" + line + "'::geometry, 3785) as l, " \
-                    "         ST_Transform('" + blade + "'::geometry, 3785) as blade " \
-                    ") " \
-                    "SELECT ST_Distance( " \
-                    "        ST_StartPoint(next_edge.geog::geometry)::geography, " \
-                    "        ST_EndPoint(segment::geometry)::geography " \
-                    "    ), " \
-                    "    ST_Distance( " \
-                    "        ST_StartPoint(next_edge.geog::geometry)::geography, " \
-                    "        ST_StartPoint(segment::geometry)::geography " \
-                    "    ), " \
-                    "    ST_Distance( " \
-                    "        ST_EndPoint(next_edge.geog::geometry)::geography, " \
-                    "        ST_StartPoint(segment::geometry)::geography " \
-                    "    ), " \
-                    "    ST_Distance( " \
-                    "        ST_EndPoint(next_edge.geog::geometry)::geography, " \
-                    "        ST_EndPoint(segment::geometry)::geography " \
-                    "    ), " \
-                    "    ST_AsGeoJSON(segment), "
-                    "    ST_AsGeoJSON(next_edge.geog) " \
-                    "FROM segments, next_edge "; \
-    pqxx::nontransaction n{*connection_};
-    pqxx::result result{n.exec(sql)};
-
-    std::vector<DbRow> result_rows{};
-    for (pqxx::result::const_iterator c = result.begin(); c != result.end(); ++c) {
-        result_rows.push_back(DbRow{c});
-    }
-    return result_rows;
 }
 
 /*

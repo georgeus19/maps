@@ -41,64 +41,6 @@ void DatabaseHelper::RunNontransactional(const std::string& sql, const std::func
 	}
 }
 
-/*
-	* Example of sql:
--- Get the closest graph edge to POINT(13.394182 49.725673).
-WITH closest_candidates AS (
-SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length
-FROM czedges as e
-ORDER BY
-e.geog <-> 'SRID=4326;POINT(13.394182 49.725673)'::geography
-LIMIT 100
-),
-closest_edge AS (SELECT *
-FROM closest_candidates
-ORDER BY
-ST_Distance(geog, 'SRID=4326;POINT(13.394182 49.725673)'::geography)
-LIMIT 1
-)
-SELECT *, 'SRID=4326;POINT(13.394182 49.725673)'::geography, st_asText(geog),
-st_astext(st_transform(
-st_closestpoint(
-	st_transform(geog::geometry, 3785),
-	st_transform('SRID=4326;POINT(13.394182 49.725673)'::geometry, 3785)
-),
-4326))
-FROM closest_edge
-	*/
-std::unique_ptr<DbEdgeIterator> DatabaseHelper::FindClosestEdge(utility::Point p, const string & table_name, DbGraph* db_graph){
-	string point = MakeGeographyPoint(p);
-	/*
-		* Find closest 100 candidates to be the closest edge by comparing bounding rectangles.
-		* Then select the closest edge out of them by comparing true line to point distances.
-		* Return the closest edge info and calculate closest point on the edge from point.
-		*/
-	string closest_edge_sql = "WITH closest_candidates AS ( " \
-									"SELECT e.uid, e.geog, e.from_node, e.to_node, e.length " \
-									"FROM " + table_name + " as e " \
-									"ORDER BY e.geog <-> " + point + " " \
-									"LIMIT 100 " \
-								"), " \
-								"closest_edge as ( " \
-									"SELECT uid, from_node, to_node, length, geog " \
-									"FROM closest_candidates " \
-									"ORDER BY ST_Distance(geog, " + point + ") " \
-									"LIMIT 1 " \
-								") " \
-								+ db_graph->GetEdgeSelect() + 
-								"ST_AsText(ST_Transform( " \
-									"ST_ClosestPoint( " \
-										"ST_Transform(geog::geometry, 3785), " \
-										"ST_Transform(" + point + "::geometry, 3785) " \
-									"), " \
-									"4326)) " \
-								"FROM closest_edge "; \
-	pqxx::nontransaction n{*connection_};
-	pqxx::result result{n.exec(closest_edge_sql)};
-	return db_graph->GetEdgeIterator(result.begin(), result.end());
-}
-
-
 std::string DatabaseHelper::MakeSTPoint(utility::Point p) {
 	return "POINT(" + to_string(p.lon_) + " " + to_string(p.lat_) + ")";
 }
@@ -106,11 +48,6 @@ std::string DatabaseHelper::MakeSTPoint(utility::Point p) {
 
 std::string DatabaseHelper::MakeGeographyPoint(utility::Point p) {
 	return "'SRID=4326;" + MakeSTPoint(p) + "'::geography";
-}
-
-std::string DatabaseHelper::CalculateRadius(utility::Point start, utility::Point end, float mult)  {
-	return " 2000 + " + std::to_string(mult) + " * ST_Distance(" + MakeGeographyPoint(start) + ", " \
-			"" + MakeGeographyPoint(end) + ") ";
 }
 
 /**
@@ -238,29 +175,6 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 		result_rows.push_back(DbRow{c});
 	}
 	return result_rows;
-}
-
-bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
-	try {
-	std::string sql = "ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS shortcut boolean; " \
-						"ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS contracted_vertex INTEGER; " \
-						"UPDATE " + table_name + " set shortcut = false; " \
-						"UPDATE " + table_name + " set contracted_vertex = 0; ";
-	pqxx::work w(*connection_);
-	w.exec(sql);
-	w.commit();
-	} catch (const std::exception& e) {
-		return false; 
-	}
-	return true;
-	
-}
-
-unsigned_id_type DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
-	std::string sql = "select max(uid) from " + table_name + ";";
-	pqxx::nontransaction n{*connection_};
-	pqxx::result result{n.exec(sql)};
-	return (result.begin())[0].as<unsigned_id_type>();
 }
 
 void DatabaseHelper::DropGeographyIndex(const std::string& table_name) {

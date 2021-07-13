@@ -134,7 +134,7 @@ TEST_P(GraphContractorSimpleBackwardEdgesTests, SimpleContractionBackwardEdgesTe
     EXPECT_THAT(actual, testing::UnorderedElementsAreArray(expected));
 }
 
-class GraphContractorfloatContractionEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<Edge>>> {
+class GraphContractorDoubleContractionEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<Edge>>> {
     protected:
     
     G g_;
@@ -144,8 +144,8 @@ class GraphContractorfloatContractionEdgesTests : public testing::TestWithParam<
 };
 
 INSTANTIATE_TEST_CASE_P(
-    floatContractionEdgesTestParameters, 
-    GraphContractorfloatContractionEdgesTests,
+    DoubleContractionEdgesTestParameters, 
+    GraphContractorDoubleContractionEdgesTests,
     ::testing::Values(
         std::make_tuple(1, std::vector<Edge> { Edge{1, 1, 2, 2}, Edge{1, 1, 3, 2}}),
         std::make_tuple(2, std::vector<Edge> { Edge{1, 2, 6, 8}}),
@@ -156,9 +156,9 @@ INSTANTIATE_TEST_CASE_P(
     )
 );
 
-TEST_P(GraphContractorfloatContractionEdgesTests, floatContractionEdgesTest) {
+TEST_P(GraphContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
     size_t tested_vertex_id = std::get<0>(GetParam());
-    std::cout << "float contraction - tested vertex is " << tested_vertex_id << std::endl;
+    std::cout << "Double contraction - tested vertex is " << tested_vertex_id << std::endl;
     std::vector<Edge> expected = std::get<1>(GetParam());
 
     CHVertex<Edge, VectorEdgeRange<Edge>> tested_vertex = g_.GetVertex(tested_vertex_id);

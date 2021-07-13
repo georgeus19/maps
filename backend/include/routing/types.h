@@ -5,7 +5,7 @@
 
 namespace routing {
 
-using unsigned_id_type = std::uint64_t;
+using unsigned_id_type = std::uint32_t;
 
 
 }

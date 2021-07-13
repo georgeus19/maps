@@ -99,7 +99,7 @@ public:
 
     std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
         std::string create_table_sql = "CREATE TABLE " + new_table + " ( " \
-				"osm_id INTEGER NOT NULL, " \
+				"osm_id BIGINT NOT NULL, " \
 				"uid INTEGER PRIMARY KEY, " \
 				"geog geography(LINESTRING), " \
 				"from_node INTEGER NOT NULL, " \
