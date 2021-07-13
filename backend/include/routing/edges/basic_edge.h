@@ -2,11 +2,12 @@
 #define ROUTING_EDGES_BASIC_EDGE_H
 #include <string>
 #include "routing/database/db_edge_iterator.h"
+#include "routing/types.h"
 
 #include <iostream>
 
 namespace routing {
-using unsigned_id_type = std::uint64_t;
+
 
 /**
  * BasicEdge is a graph edge with only most general properties which can be
@@ -34,11 +35,11 @@ public:
         return to_;
     }
 
-    inline double get_length() const {
+    inline float get_length() const {
         return length_.GetLength(uid_);
     }
 
-    inline void set_length(double l) {
+    inline void set_length(float l) {
         length_ = LS{l};
     }
 

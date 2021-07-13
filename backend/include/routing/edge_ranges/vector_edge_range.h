@@ -1,5 +1,5 @@
-#ifndef BACKEND_ROUTING_VECTOR_EDGE_RANGE_H
-#define BACKEND_ROUTING_VECTOR_EDGE_RANGE_H
+#ifndef ROUTING_EDGE_RANGER_VECTOR_EDGE_RANGE_H
+#define ROUTING_EDGE_RANGER_VECTOR_EDGE_RANGE_H
 #include <vector>
 
 namespace routing {
@@ -52,4 +52,4 @@ inline void VectorEdgeRange<Edge>::AddEdge(const Edge& edge) {
 
 
 }
-#endif //BACKEND_ROUTING_VECTOR_EDGE_RANGE_H
+#endif //ROUTING_EDGE_RANGER_VECTOR_EDGE_RANGE_H

@@ -5,6 +5,7 @@
 #include "routing/database/database_helper.h"
 #include "routing/profile/preference_index.h"
 #include "routing/profile/pair_index_implementation.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>
@@ -22,11 +23,11 @@ public:
 
     void Load(database::DatabaseHelper& d, const std::string& peak_index_table) override;
 
-    void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table) const override;
+    void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values, const std::string& index_table) const override;
 
-    double Get(unsigned_id_type uid) const override;
+    float Get(unsigned_id_type uid) const override;
 
-    double GetOriginal(unsigned_id_type uid) const override;
+    float GetOriginal(unsigned_id_type uid) const override;
 
     const std::string& GetName() const override;
 private:
@@ -34,7 +35,7 @@ private:
 
     static inline const std::string kValueColumnName = "peak_distance";
 
-    static inline const double kDistanceRadius = 500;
+    static inline const float kDistanceRadius = 500;
 
     void Normalize() override;
 };

@@ -3,6 +3,7 @@
 
 #include "routing/edges/basic_edge.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include "routing/utility/point.h"
 

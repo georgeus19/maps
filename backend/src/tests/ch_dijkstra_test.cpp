@@ -14,8 +14,11 @@
 #include "tests/graph_test.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
+#include "routing/types.h"
+
 #include <string>
 #include <vector>
+
 using namespace std;
 using namespace routing;
 using namespace query;
@@ -37,7 +40,7 @@ class CHDijkstraTest : public testing::Test {
 
 TEST_F(CHDijkstraTest, LimitedSearch) {
     // CHDijkstra<G> dijkstra{g_};
-    // double max_cost = 4; // Shortest path found to vertices 1, 2, 3, 4.
+    // float max_cost = 4; // Shortest path found to vertices 1, 2, 3, 4.
     // bool res = dijkstra.Run(1, 7, typename CHDijkstra<G>::SearchRangeLimits{max_cost, 20});
 
     // EXPECT_EQ(res, true);
@@ -45,13 +48,13 @@ TEST_F(CHDijkstraTest, LimitedSearch) {
     // EXPECT_EQ(dijkstra.GetPathLength(2), 2);
     // EXPECT_EQ(dijkstra.GetPathLength(3), 2);
     // EXPECT_EQ(dijkstra.GetPathLength(4), 5);
-    // EXPECT_EQ(dijkstra.GetPathLength(5), std::numeric_limits<double>::max());
+    // EXPECT_EQ(dijkstra.GetPathLength(5), std::numeric_limits<float>::max());
     // EXPECT_EQ(dijkstra.GetPathLength(6), 10);
 }
 
 TEST_F(CHDijkstraTest, LimitedSearchWithHopLimit) {
     CHDijkstra<G> dijkstra{g_};
-    double max_cost = 100; // can reach everything with this max cost.
+    float max_cost = 100; // can reach everything with this max cost.
     typename CHDijkstra<G>::TargetVerticesMap target_vertices{};
     target_vertices.emplace(7, false);
     bool res = dijkstra.Run(1, 7, typename CHDijkstra<G>::SearchRangeLimits{max_cost, 2}, target_vertices);
@@ -61,6 +64,6 @@ TEST_F(CHDijkstraTest, LimitedSearchWithHopLimit) {
     EXPECT_EQ(dijkstra.GetPathLength(2), 2);
     EXPECT_EQ(dijkstra.GetPathLength(3), 2);
     EXPECT_EQ(dijkstra.GetPathLength(4), 5);
-    EXPECT_EQ(dijkstra.GetPathLength(5), std::numeric_limits<double>::max());
+    EXPECT_EQ(dijkstra.GetPathLength(5), std::numeric_limits<float>::max());
     EXPECT_EQ(dijkstra.GetPathLength(6), 10);
 }

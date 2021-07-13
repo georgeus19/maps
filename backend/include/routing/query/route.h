@@ -2,6 +2,7 @@
 #define ROUTING_QUERY_ROUTE_H
 
 #include "routing/edges/basic_edge.h"
+#include "routing/types.h"
 
 #include "routing/profile/preference_index.h"
 
@@ -19,7 +20,7 @@ public:
 
     const std::string& get_geometry() const;
 
-    double GetLength(profile::PreferenceIndex* index) const;
+    float GetLength(profile::PreferenceIndex* index) const;
 
 private:
     std::vector<Edge> edges_;
@@ -36,11 +37,11 @@ const std::string& Route<Edge>::get_geometry() const {
 
 
 template <typename Edge>
-double Route<Edge>::GetLength(profile::PreferenceIndex* index) const {
+float Route<Edge>::GetLength(profile::PreferenceIndex* index) const {
     assert(edges_.size() >= 2);
     
     auto it = edges_.begin();
-    double length = it->get_length();
+    float length = it->get_length();
     ++it;
 
     auto end_it = edges_.end();

@@ -12,6 +12,7 @@
 #include "routing/table_names.h"
 #include "routing/edges/length_source.h"
 #include "routing/edge_factory.h"
+#include "routing/types.h"
 
 #include "routing/profile/profile.h"
 

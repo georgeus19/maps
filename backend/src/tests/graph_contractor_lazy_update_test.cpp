@@ -16,6 +16,7 @@
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edges/length_source.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>
@@ -36,7 +37,7 @@ void Print(std::vector<ExpectedVertexProperties>& v, std::string_view name);
 
 struct ExpectedVertexProperties {
     unsigned_id_type vertex_id_;
-    double contraction_priority_;
+    float contraction_priority_;
 
     bool operator ==(const ExpectedVertexProperties& other) const {
         if (vertex_id_ != other.vertex_id_) {
@@ -54,7 +55,7 @@ struct ExpectedVertexProperties {
         std::cout << "Vertex id: " << vertex_id_ << ", Contraction priority: " << contraction_priority_ << std::endl;
     }
 
-    ExpectedVertexProperties(unsigned_id_type vertex_id, double contraction_priority) 
+    ExpectedVertexProperties(unsigned_id_type vertex_id, float contraction_priority) 
         : vertex_id_(vertex_id), contraction_priority_(contraction_priority) {}
 };
 

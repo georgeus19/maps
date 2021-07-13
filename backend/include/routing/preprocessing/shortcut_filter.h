@@ -1,15 +1,17 @@
-#ifndef BACKEND_SHORTCUT_FILTER_H
-#define BACKEND_SHORTCUT_FILTER_H
+#ifndef ROUTING_PREPROCESSING_SHORTCUT_FILTER_H
+#define ROUTING_PREPROCESSING_SHORTCUT_FILTER_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/ch_dijkstra.h"
+#include "routing/preprocessing/contraction_parameters.h"
+#include "routing/utility/comparison.h"
+#include "routing/types.h"
+
 #include <vector>
 #include <iterator>
 #include <set>
 #include <queue>
 #include <cassert>
-#include "routing/preprocessing/contraction_parameters.h"
-#include "routing/utility/comparison.h"
 
 namespace routing {
 namespace preprocessing {
@@ -84,7 +86,7 @@ std::vector<typename ShortcutFilter<Graph>::Edge> ShortcutFilter<Graph>::MergeUn
 template <typename Graph>
 void ShortcutFilter<Graph>::IsTwoway(Edge& shortcut, const Edge& other_shortcut, bool& filter) {
     bool reverse_edge = shortcut.get_from() == other_shortcut.get_to() && shortcut.get_to() == other_shortcut.get_from();
-    bool same_length = utility::AreEqual<double>(shortcut.get_length(), other_shortcut.get_length());
+    bool same_length = utility::AreEqual<float>(shortcut.get_length(), other_shortcut.get_length());
     if (reverse_edge && same_length) {
         if (shortcut.get_from() < shortcut.get_to()) {
             shortcut.SetTwoway();
@@ -103,7 +105,7 @@ bool ShortcutFilter<Graph>::IsDuplicate(Edge& shortcut, const Edge& other_shortc
     if (same_origin && same_destination && not_the_same_edge) {
         if (shortcut.get_length() > other_shortcut.get_length()) {
             filter = true;
-        } else if (utility::AreEqual<double>(shortcut.get_length(), other_shortcut.get_length())) {
+        } else if (utility::AreEqual<float>(shortcut.get_length(), other_shortcut.get_length())) {
             if (shortcut.get_uid() > other_shortcut.get_uid()) {
                 filter = true;
             }
@@ -117,4 +119,4 @@ bool ShortcutFilter<Graph>::IsDuplicate(Edge& shortcut, const Edge& other_shortc
 }
 }
 
-#endif //BACKEND_SHORTCUT_FILTER_H
+#endif //ROUTING_PREPROCESSING_SHORTCUT_FILTER_H

@@ -20,6 +20,7 @@
 #include "routing/query/endpoint_edges_creator.h"
 #include "routing/query/endpoints_creator.h"
 #include "routing/query/route.h"
+#include "routing/types.h"
 
 #include "routing/database/db_graph.h"
 #include "routing/database/db_edge_iterator.h"
@@ -70,7 +71,7 @@ public:
         Algorithm<typename AlgorithmFactory::Algorithm> alg{routing_graph};
         alg.Run(source_vertex_id, target_vertex_id);
             auto finish_run = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> elapsed_run = finish_run - start_run;
+            std::chrono::duration<float> elapsed_run = finish_run - start_run;
             std::cout << "Elapsed time - run alg: " << elapsed_run.count() << " s\n";
 
         std::vector<typename AlgorithmFactory::Algorithm::Edge> route = alg.GetRoute();

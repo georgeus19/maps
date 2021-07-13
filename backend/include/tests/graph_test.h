@@ -8,6 +8,7 @@
 #include "routing/exception.h"
 #include "routing/database/database_helper.h"
 #include "routing/utility/point.h"
+#include "routing/types.h"
 
 #include "routing/edges/ch_edge.h"
 #include "routing/edges/length_source.h"

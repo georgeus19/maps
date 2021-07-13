@@ -1,5 +1,6 @@
 #include "routing/profile/physical_length_index.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 #include "routing/constants.h"
 
 #include <string>
@@ -34,16 +35,16 @@ void PhysicalLengthIndex::Load(database::DatabaseHelper& d, const std::string& i
     Normalize();
 }
 
-void PhysicalLengthIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values,
+void PhysicalLengthIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values,
         const std::string& index_table) const {
     impl_.Create(d, index_values, index_table, kValueColumnName);
 }
 
-double PhysicalLengthIndex::Get(unsigned_id_type uid) const {
+float PhysicalLengthIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
-double PhysicalLengthIndex::GetOriginal(unsigned_id_type uid) const {
+float PhysicalLengthIndex::GetOriginal(unsigned_id_type uid) const {
     return impl_.GetOriginal(uid);
 }
 

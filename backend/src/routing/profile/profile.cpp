@@ -1,4 +1,5 @@
 #include "routing/profile/profile.h"
+#include "routing/types.h"
 
 namespace routing{
 namespace profile{
@@ -7,7 +8,7 @@ Profile::Profile() : base_index_(), properties_() {}
 
 Profile::Profile(const std::shared_ptr<PreferenceIndex>& base_index) : base_index_(base_index), properties_() {}
 
-void Profile::AddIndex(const std::shared_ptr<PreferenceIndex>& index, double importance) {
+void Profile::AddIndex(const std::shared_ptr<PreferenceIndex>& index, float importance) {
     properties_.emplace_back(index, importance);
 }
 
@@ -29,15 +30,15 @@ std::string Profile::GetName() const {
     return name;
 }
 
-double Profile::GetLength(unsigned_id_type uid) const {
+float Profile::GetLength(unsigned_id_type uid) const {
     // std::cout << "PROFILE GET LENGTH:" << std::endl;
-    double base_index_value = base_index_->Get(uid);
+    float base_index_value = base_index_->Get(uid);
     // std::cout << base_index_->GetName() << " " << base_index_->Get(uid) << " " << base_index_->GetInverted(uid) << std::endl;
-    double length = base_index_value;
+    float length = base_index_value;
 
     for(auto&& property : properties_) {
-        double index_value;
-        double importance;
+        float index_value;
+        float importance;
         if (property.importance >= 0) {
             index_value = property.index->Get(uid);
             importance = property.importance;

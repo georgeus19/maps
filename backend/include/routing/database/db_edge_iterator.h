@@ -1,5 +1,9 @@
-#ifndef BACKEND_DB_EDGE_ITERATOR_H
-#define BACKEND_DB_EDGE_ITERATOR_H
+#ifndef ROUTING_DATABASE_DB_EDGE_ITERATOR_H
+#define ROUTING_DATABASE_DB_EDGE_ITERATOR_H
+#include "routing/utility/point.h"
+#include "routing/database/csv_convertor.h"
+#include "routing/types.h"
+
 #include <string>
 #include <string_view>
 #include <pqxx/pqxx>
@@ -11,8 +15,6 @@
 #include <exception>
 #include <functional>
 #include <utility>
-#include "routing/utility/point.h"
-#include "routing/database/csv_convertor.h"
 
 namespace routing {
 namespace database {
@@ -34,13 +36,13 @@ public:
         return it_ == end_;
     }
 
-    virtual uint64_t GetUid() const = 0;
-    virtual uint64_t GetFrom() const = 0;
-    virtual uint64_t GetTo() const = 0;
-    virtual double GetLength() const = 0;
+    virtual unsigned_id_type GetUid() const = 0;
+    virtual unsigned_id_type GetFrom() const = 0;
+    virtual unsigned_id_type GetTo() const = 0;
+    virtual float GetLength() const = 0;
     virtual bool GetUndirected() const = 0;
     virtual bool GetShortcut() const = 0;
-    virtual uint64_t GetContractedVertex() const = 0;
+    virtual unsigned_id_type GetContractedVertex() const = 0;
     virtual std::string GetGeography() const = 0;
 protected:
     pqxx::result::const_iterator it_;
@@ -61,35 +63,35 @@ public:
         : DbEdgeIterator(begin, end) {}
 
 
-    uint64_t GetUid() const override {
-        return it_[0].as<uint64_t>();
+    unsigned_id_type GetUid() const override {
+        return it_[0].as<unsigned_id_type>();
     }
    
     std::string GetGeography() const override {
         return it_[1].as<std::string>();
     }
 
-    uint64_t GetFrom() const override {
-        return it_[2].as<uint64_t>();
+    unsigned_id_type GetFrom() const override {
+        return it_[2].as<unsigned_id_type>();
     }
 
-    uint64_t GetTo() const override {
-        return it_[3].as<uint64_t>();
+    unsigned_id_type GetTo() const override {
+        return it_[3].as<unsigned_id_type>();
     }
 
     bool GetUndirected() const override {
         return it_[4].as<bool>();
     }
 
-    double GetLength() const override {
-        return it_[5].as<double>();
+    float GetLength() const override {
+        return it_[5].as<float>();
     }
 
     bool GetShortcut() const override {
         return false;
     }
 
-    uint64_t GetContractedVertex() const override {
+    unsigned_id_type GetContractedVertex() const override {
         return 0;
     }
 
@@ -108,36 +110,36 @@ public:
     CHDbEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end)
         : DbEdgeIterator(begin, end) {}
 
-    uint64_t GetUid() const override {
-        return it_[0].as<uint64_t>();
+    unsigned_id_type GetUid() const override {
+        return it_[0].as<unsigned_id_type>();
     }
    
     std::string GetGeography() const override {
         return it_[1].as<std::string>();
     }
 
-    uint64_t GetFrom() const override {
-        return it_[2].as<uint64_t>();
+    unsigned_id_type GetFrom() const override {
+        return it_[2].as<unsigned_id_type>();
     }
 
-    uint64_t GetTo() const override {
-        return it_[3].as<uint64_t>();
+    unsigned_id_type GetTo() const override {
+        return it_[3].as<unsigned_id_type>();
     }
 
     bool GetUndirected() const override {
         return it_[4].as<bool>();
     }
 
-    double GetLength() const override {
-        return it_[5].as<double>();
+    float GetLength() const override {
+        return it_[5].as<float>();
     }
 
     bool GetShortcut() const override {
         return it_[6].as<bool>();
     }
 
-    uint64_t GetContractedVertex() const override {
-        return it_[7].as<uint64_t>();
+    unsigned_id_type GetContractedVertex() const override {
+        return it_[7].as<unsigned_id_type>();
     }
 
 
@@ -147,4 +149,4 @@ public:
 
 }
 }
-#endif //BACKEND_DB_EDGE_ITERATOR_H
+#endif //ROUTING_DATABASE_DB_EDGE_ITERATOR_H

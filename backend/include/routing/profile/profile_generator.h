@@ -1,9 +1,10 @@
-#ifndef BACKEND_ROUTING_PROFILE_GENERATOR_H
-#define BACKEND_ROUTING_PROFILE_GENERATOR_H
+#ifndef ROUTING_PROFILE_PROFILE_GENERATOR_H
+#define ROUTING_PROFILE_PROFILE_GENERATOR_H
 
 #include "routing/profile/profile.h"
 #include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
+#include "routing/types.h"
 
 #include "routing/database/database_helper.h"
 
@@ -20,7 +21,7 @@ public:
 
     ProfileGenerator(const std::shared_ptr<PreferenceIndex>& index);
 
-    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, std::vector<double>&& importance_options);
+    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, std::vector<float>&& importance_options);
 
     std::vector<Profile> Generate();
 
@@ -35,18 +36,18 @@ private:
 
     struct IndexInfo{
         std::shared_ptr<PreferenceIndex> index;
-        std::vector<double> importance_options;
+        std::vector<float> importance_options;
 
-        IndexInfo(std::shared_ptr<PreferenceIndex> i, std::vector<double> im) : index(i), importance_options(std::move(im)) {}
+        IndexInfo(std::shared_ptr<PreferenceIndex> i, std::vector<float> im) : index(i), importance_options(std::move(im)) {}
     };
 
-    std::vector<std::vector<double>> GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end);
+    std::vector<std::vector<float>> GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end);
 
 };
 
 ProfileGenerator::ProfileGenerator(const std::shared_ptr<PreferenceIndex>& index) : base_index_(index), indices_() {}
 
-void ProfileGenerator::AddIndex(const std::shared_ptr<PreferenceIndex>& index, std::vector<double>&& importance_options) {
+void ProfileGenerator::AddIndex(const std::shared_ptr<PreferenceIndex>& index, std::vector<float>&& importance_options) {
     indices_.emplace_back(index, std::move(importance_options));
 }
 
@@ -74,15 +75,15 @@ Profile ProfileGenerator::GetFrontProfile() {
     return profile;
 }
 
-std::vector<std::vector<double>> ProfileGenerator::GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end) {
+std::vector<std::vector<float>> ProfileGenerator::GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end) {
     auto next = it;
     ++next;
-    std::vector<std::vector<double>> result;
+    std::vector<std::vector<float>> result;
     if (next != end) {
         auto&& previous_result = GetAllImportances(next, end);
         for(auto&& importance : it->importance_options) {
             for(auto&& p : previous_result) {
-                std::vector<double> v{};
+                std::vector<float> v{};
                 v.push_back(importance);
                 v.insert(v.end(), p.begin(), p.end());
                 result.push_back(std::move(v));
@@ -90,7 +91,7 @@ std::vector<std::vector<double>> ProfileGenerator::GetAllImportances(std::vector
         }
     } else {
         for(auto&& importance : it->importance_options) {
-            std::vector<double> v{};
+            std::vector<float> v{};
             v.push_back(importance);
             result.push_back(std::move(v));
         }
@@ -103,4 +104,4 @@ std::vector<std::vector<double>> ProfileGenerator::GetAllImportances(std::vector
 
 }
 }
-#endif //BACKEND_ROUTING_PROFILE_GENERATOR_H
+#endif //ROUTING_PROFILE_PROFILE_GENERATOR_H

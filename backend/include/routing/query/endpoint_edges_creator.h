@@ -3,6 +3,7 @@
 
 #include "routing/edges/basic_edge.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include "routing/database/database_helper.h"
 #include "routing/database/db_graph.h"
@@ -69,7 +70,7 @@ private:
     class EdgeInputData{
     public:
 
-        EdgeInputData(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, double length)
+        EdgeInputData(unsigned_id_type uid, unsigned_id_type from, unsigned_id_type to, float length)
             : uid_(uid), from_(from), to_(to), length_(length) {}
 
         unsigned_id_type GetUid() const {
@@ -84,7 +85,7 @@ private:
             return to_;
         }
 
-        double GetLength() const {
+        float GetLength() const {
             return length_;
         }
 
@@ -96,7 +97,7 @@ private:
         unsigned_id_type uid_;
         unsigned_id_type from_;
         unsigned_id_type to_;
-        double length_;
+        float length_;
     };
 
     /**
@@ -181,20 +182,20 @@ std::pair<std::vector<typename EdgeFactory::Edge>, std::vector<std::pair<unsigne
 
 template <typename EdgeFactory>
 size_t EndpointEdgesCreator<EdgeFactory>::CalculateSelectedSegmentIndex(std::vector<database::DbRow>& rows) {
-    double tol = 0.001;
+    float tol = 0.001;
 
     database::DbRow r0 = rows[0];
     database::DbRow r1 = rows[1];
     size_t selected_segment_index;
     // Check which segment has the same length as the segment that intersects adjacent from sql.
     // If lengths are the same it does not matter which one is picked.
-    double length = r0.get<double>(kLength);
-    double selected_segment_len = r0.get<double>(kSelectedSegmentLength);
+    float length = r0.get<float>(kLength);
+    float selected_segment_len = r0.get<float>(kSelectedSegmentLength);
     if ((length - selected_segment_len) * (length - selected_segment_len) < tol) {
         selected_segment_index = 0;
     } else {
-        length = r1.get<double>(kLength);
-        selected_segment_len = r1.get<double>(kSelectedSegmentLength);
+        length = r1.get<float>(kLength);
+        selected_segment_len = r1.get<float>(kSelectedSegmentLength);
         if ((length - selected_segment_len) * (length - selected_segment_len) < tol) {
             selected_segment_index = 1;
         } else {
@@ -208,7 +209,7 @@ size_t EndpointEdgesCreator<EdgeFactory>::CalculateSelectedSegmentIndex(std::vec
 template <typename EdgeFactory>
 void EndpointEdgesCreator<EdgeFactory>::SaveEdge(database::DbRow r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
     unsigned_id_type endpoint_id, unsigned_id_type intersection_id, unsigned_id_type free_edge_id) {
-    double length = r.get<double>(kLength);
+    float length = r.get<float>(kLength);
     std::string geometry = r.get<std::string>(kGeometry);
     result_edges.push_back(edge_factory_.Create(EdgeInputData{free_edge_id, endpoint_id, intersection_id, length}));
     result_geometries.push_back(std::make_pair(free_edge_id, geometry));

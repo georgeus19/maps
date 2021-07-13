@@ -2,8 +2,8 @@
 #define ROUTING_PREPROCESSING_INDEX_EXTENDER_H
 
 #include "routing/database/database_helper.h"
-
 #include "routing/profile/preference_index.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>
@@ -27,19 +27,19 @@ private:
 
     struct IndexValue{
         unsigned_id_type uid;
-        double value;
+        float value;
 
-        IndexValue(unsigned_id_type u, double v) : uid(u), value(v) {}
+        IndexValue(unsigned_id_type u, float v) : uid(u), value(v) {}
     };
 
-    double CalculateIndexValue(std::shared_ptr<profile::PreferenceIndex> data_index, typename Graph::Edge& input_edge);
+    float CalculateIndexValue(std::shared_ptr<profile::PreferenceIndex> data_index, typename Graph::Edge& input_edge);
 
     void SaveNewIndex(const std::string& table_name, const std::vector<IndexValue>& extended_index);
 };
 
 template <typename Graph>
 void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::PreferenceIndex> data_index, const std::string& new_index_table) {
-    std::vector<std::pair<unsigned_id_type, double>> extended_index{};
+    std::vector<std::pair<unsigned_id_type, float>> extended_index{};
     graph_.get().ForEachEdge([&](typename Graph::Edge& edge){
         // Twoway is twice in the graph.
         bool twoway_condition = edge.IsTwoway() && edge.get_from() < edge.get_to();
@@ -55,8 +55,8 @@ void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::PreferenceIndex>
 }
 
 template <typename Graph>
-double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::PreferenceIndex> data_index, typename Graph::Edge& input_edge) {
-    double index_value = 0;
+float IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::PreferenceIndex> data_index, typename Graph::Edge& input_edge) {
+    float index_value = 0;
     std::stack<typename Graph::Edge> shortcut_stack{};
     typename Graph::Edge edge = input_edge;
     while(!shortcut_stack.empty() || edge.IsShortcut()) {

@@ -1,5 +1,10 @@
 #ifndef ROUTING_DATABASE_DATABASE_HELPER_H
 #define ROUTING_DATABASE_DATABASE_HELPER_H
+#include "routing/database/csv_convertor.h"
+#include "routing/database/db_graph.h"
+#include "routing/database/db_edge_iterator.h"
+#include "routing/types.h"
+
 #include <string>
 #include <string_view>
 #include <pqxx/pqxx>
@@ -14,9 +19,6 @@
 #include <utility>
 #include "routing/utility/point.h"
 #include <filesystem>
-#include "routing/database/csv_convertor.h"
-#include "routing/database/db_graph.h"
-#include "routing/database/db_edge_iterator.h"
 
 namespace routing {
 namespace database {
@@ -113,7 +115,7 @@ public:
      * @param mult How much of distance between `start` and `end` should be taken into account.
      * @return String postgis calculation of radius.
      */
-    std::string CalculateRadius(utility::Point start, utility::Point end, double mult);
+    std::string CalculateRadius(utility::Point start, utility::Point end, float mult);
 
     /**
      * Find an edge that is closest to 'endpoint` and split it into segments.
@@ -132,7 +134,7 @@ public:
      * @param endpoint Endpoint of a route for which segments are found.
      * @return Vector of DbRows each representing one segment. Each segment can be transformed to graph edge.
      */
-    std::vector<DbRow> GetClosestSegments(utility::Point endpoint, const std::string & table_name, DbGraph* db_graph);
+    std::vector<DbRow> GetClosestSegments(utility::Point endpoint, const std::string& table_name, DbGraph* db_graph);
 
     /**
      * Split an edge into segments by a blade and return
@@ -149,8 +151,8 @@ public:
      * @return Vector of DbRow where each represents one segment and the calculated distances.
      */
     template <typename Edge>
-    std::vector<DbRow> CalculateEdgeSegments(const std::string & edge_geography, const std::string & blade_geography,
-                                                const Edge & next_edge, const std::string & table_name);
+    std::vector<DbRow> CalculateEdgeSegments(const std::string& edge_geography, const std::string& blade_geography,
+                                                const Edge& next_edge, const std::string& table_name);
 
 
     /**
@@ -162,7 +164,7 @@ public:
      * @return String of geometries in geoJSON format.
      */
     template <typename Edge>
-    std::string GetRouteCoordinates(std::vector<Edge> & edges, const std::string & table_name);
+    std::string GetRouteCoordinates(std::vector<Edge>& edges, const std::string& table_name);
 
     /**
      * Load the entire graph from the database table (edgelist)
@@ -187,7 +189,7 @@ public:
     template <typename Graph>
     void AddVertexOrdering(const std::string& table_name, Graph& graph);
 
-    uint64_t GetMaxEdgeId(const std::string& table_name);
+    unsigned_id_type GetMaxEdgeId(const std::string& table_name);
 
     void DropGeographyIndex(const std::string& table_name);
 
@@ -253,9 +255,9 @@ std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const 
     pqxx::nontransaction n(*connection_);
     pqxx::result result{n.exec(complete_sql)};
 
-    std::unordered_map<uint64_t, std::string> geometries{};
+    std::unordered_map<unsigned_id_type, std::string> geometries{};
     for(auto it = result.begin(); it != result.end(); ++it) {
-        geometries.emplace(it[0].as<uint64_t>(), it[1].as<std::string>());
+        geometries.emplace(it[0].as<unsigned_id_type>(), it[1].as<std::string>());
     }
     std::string geojson = "";
     for(auto&& edge : edges) {
@@ -412,8 +414,8 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     std::string data_path{current_dir.string() + "/" + table_name + ".csv"};
     std::string drop_table_sql = "DROP TABLE IF EXISTS " + table_name + "; ";
     std::string create_table_sql = "CREATE TABLE " + table_name + "("  \
-        "osm_id BIGINT PRIMARY KEY, " \
-        "ordering_rank BIGINT NOT NULL); ";
+        "osm_id INTEGER PRIMARY KEY, " \
+        "ordering_rank INTEGER NOT NULL); ";
     std::string copy_sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV; ";
     // string create_index = "CREATE INDEX " + table_name + "_osm_id_idx ON " + table_name + " (osm_id);";
     CsvConvertor convertor{data_path};
@@ -437,9 +439,9 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
 //     pqxx::nontransaction n{*connection_};
 //     pqxx::result result{n.exec(sql)};
 //     for (auto&& it = result.begin(); it != result.end(); ++it) {
-//         uint64_t vertex_id = it[0].as<uint64_t>();
+//         unsigned_id_type vertex_id = it[0].as<unsigned_id_type>();
 //         auto&& vertex = g.GetVertex(vertex_id);
-//         vertex.set_ordering_rank(it[1].as<uint64_t>());
+//         vertex.set_ordering_rank(it[1].as<unsigned_id_type>());
 //     }
 // }
 
@@ -449,9 +451,9 @@ void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_
     pqxx::nontransaction n{*connection_};
     pqxx::result result{n.exec(sql)};
     for (auto&& it = result.begin(); it != result.end(); ++it) {
-        uint64_t vertex_id = it[0].as<uint64_t>();
+        unsigned_id_type vertex_id = it[0].as<unsigned_id_type>();
         auto&& vertex = g.GetVertex(vertex_id);
-        vertex.set_ordering_rank(it[1].as<uint64_t>());
+        vertex.set_ordering_rank(it[1].as<unsigned_id_type>());
     }
 }
 

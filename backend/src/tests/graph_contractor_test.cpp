@@ -16,6 +16,7 @@
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edges/length_source.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>
@@ -133,7 +134,7 @@ TEST_P(GraphContractorSimpleBackwardEdgesTests, SimpleContractionBackwardEdgesTe
     EXPECT_THAT(actual, testing::UnorderedElementsAreArray(expected));
 }
 
-class GraphContractorDoubleContractionEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<Edge>>> {
+class GraphContractorfloatContractionEdgesTests : public testing::TestWithParam<std::tuple<size_t, std::vector<Edge>>> {
     protected:
     
     G g_;
@@ -143,8 +144,8 @@ class GraphContractorDoubleContractionEdgesTests : public testing::TestWithParam
 };
 
 INSTANTIATE_TEST_CASE_P(
-    DoubleContractionEdgesTestParameters, 
-    GraphContractorDoubleContractionEdgesTests,
+    floatContractionEdgesTestParameters, 
+    GraphContractorfloatContractionEdgesTests,
     ::testing::Values(
         std::make_tuple(1, std::vector<Edge> { Edge{1, 1, 2, 2}, Edge{1, 1, 3, 2}}),
         std::make_tuple(2, std::vector<Edge> { Edge{1, 2, 6, 8}}),
@@ -155,9 +156,9 @@ INSTANTIATE_TEST_CASE_P(
     )
 );
 
-TEST_P(GraphContractorDoubleContractionEdgesTests, DoubleContractionEdgesTest) {
+TEST_P(GraphContractorfloatContractionEdgesTests, floatContractionEdgesTest) {
     size_t tested_vertex_id = std::get<0>(GetParam());
-    std::cout << "Double contraction - tested vertex is " << tested_vertex_id << std::endl;
+    std::cout << "float contraction - tested vertex is " << tested_vertex_id << std::endl;
     std::vector<Edge> expected = std::get<1>(GetParam());
 
     CHVertex<Edge, VectorEdgeRange<Edge>> tested_vertex = g_.GetVertex(tested_vertex_id);
@@ -188,7 +189,7 @@ TEST(GraphContractorContractionPriority, BasicGraphPriority) {
     G g{};
     TestBasicReverseGraph(g);
 
-    std::vector<std::pair<double, unsigned_id_type>> expected_priorities {
+    std::vector<std::pair<float, unsigned_id_type>> expected_priorities {
         std::make_pair(-2, 1),
         std::make_pair(-2, 2),
         std::make_pair(-3, 3),
@@ -200,7 +201,7 @@ TEST(GraphContractorContractionPriority, BasicGraphPriority) {
     GraphContractor<G> contractor(g,  ContractionParameters{5, 1, 1, 0}, 11);
     auto&& q = contractor.CalculateContractionPriority();
 
-    std::vector<std::pair<double, unsigned_id_type>> actual_priorities{};
+    std::vector<std::pair<float, unsigned_id_type>> actual_priorities{};
     while(!q.empty()) {
         auto pair = q.top();
         actual_priorities.push_back(pair);

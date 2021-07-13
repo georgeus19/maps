@@ -1,13 +1,16 @@
-#ifndef BACKEND_ROUTE_RETRIEVER_H
-#define BACKEND_ROUTE_RETRIEVER_H
+#ifndef ROUTING_QUERY_ROUTE_RETRIEVER_H
+#define ROUTING_QUERY_ROUTE_RETRIEVER_H
+
+#include "routing/edges/basic_edge.h"
+#include "routing/types.h"
+
+#include "tsl/robin_map.h"
 
 #include <exception>
 #include <string>
 #include <functional>
 #include <vector>
 #include <stack>
-#include "routing/edges/basic_edge.h"
-#include "tsl/robin_map.h"
 
 namespace routing {
 namespace query {
@@ -210,4 +213,4 @@ inline unsigned_id_type RouteRetriever<Graph, VertexRoutingProperties>::GetPrevi
 }
 }
 
-#endif //BACKEND_ROUTE_RETRIEVER_H
+#endif //ROUTING_QUERY_ROUTE_RETRIEVER_H

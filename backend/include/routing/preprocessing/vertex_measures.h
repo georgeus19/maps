@@ -1,15 +1,17 @@
-#ifndef BACKEND_VERTEX_MEASURES_H
-#define BACKEND_VERTEX_MEASURES_H
+#ifndef ROUTING_PREPROCESSING_VERTEX_MEASURES_H
+#define ROUTING_PREPROCESSING_VERTEX_MEASURES_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/ch_dijkstra.h"
+#include "routing/preprocessing/contraction_parameters.h"
+#include "tsl/robin_set.h"
+#include "routing/preprocessing/shortcut_finder.h"
+#include "routing/types.h"
+
 #include <vector>
 #include <set>
 #include <queue>
 #include <cassert>
-#include "routing/preprocessing/contraction_parameters.h"
-#include "tsl/robin_set.h"
-#include "routing/preprocessing/shortcut_finder.h"
 
 namespace routing {
 namespace preprocessing {
@@ -28,9 +30,9 @@ public:
 
     int32_t CalculateDeletedNeighbours(Vertex& vertex);
 
-    double CalculateContractionAttractivity(Vertex& vertex);
+    float CalculateContractionAttractivity(Vertex& vertex);
 
-    double CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts);
+    float CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts);
 
 private:
 
@@ -82,17 +84,17 @@ int32_t VertexMeasures<Graph>::CalculateDeletedNeighbours(Vertex& vertex) {
 }
 
 template <typename Graph>
-inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
+inline float VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex) {
     auto&& shortcuts = shortcut_finder_.FindShortcuts(vertex);
     return CalculateContractionAttractivity(vertex, shortcuts);
 }
 
 template <typename Graph>
-inline double VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
+inline float VertexMeasures<Graph>::CalculateContractionAttractivity(Vertex& vertex, std::vector<Edge>& shortcuts) {
     int32_t edge_difference = CalculateEdgeDifference(vertex, shortcuts) * parameters_.get_edge_difference_coefficient();
     int32_t deleted_neighbours = CalculateDeletedNeighbours(vertex) * parameters_.get_deleted_neighbours_coefficient();
     int32_t settled_vertices = static_cast<int32_t>(shortcut_finder_.GetSearchSpaceSize()) * parameters_.get_space_size_coefficient();
-    return static_cast<double>(edge_difference + deleted_neighbours + settled_vertices);
+    return static_cast<float>(edge_difference + deleted_neighbours + settled_vertices);
 }
 
 template <typename Graph>
@@ -120,4 +122,4 @@ void VertexMeasures<Graph>::IncrementCurrentEdgeCount(size_t& adjacent_edges_cou
 }
 }
 
-#endif //BACKEND_VERTEX_MEASURES_H
+#endif //ROUTING_PREPROCESSING_VERTEX_MEASURES_H

@@ -17,6 +17,7 @@
 #include "routing/vertices/basic_vertex.h"
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edges/length_source.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>

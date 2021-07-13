@@ -1,6 +1,7 @@
 #include "routing/profile/road_type_index.h"
 #include "routing/exception.h"
 #include "routing/constants.h"
+#include "routing/types.h"
 
 #include "routing/database/database_helper.h"
 
@@ -18,7 +19,7 @@ namespace profile {
 RoadTypeIndex::RoadTypeIndex() : impl_() {}
 
 void RoadTypeIndex::Create(database::DatabaseHelper& d, const std::string& edges_table, const std::string& index_table) {
-    std::unordered_map<std::string, double> road_type_values{
+    std::unordered_map<std::string, float> road_type_values{
          {"primary", 0.8},
          {"secondary", 0.6},
          {"tertiary", 0.4},
@@ -41,12 +42,12 @@ void RoadTypeIndex::Create(database::DatabaseHelper& d, const std::string& edges
          {"turning_circle", 0.5}
     };
 
-    std::vector<std::pair<unsigned_id_type, double>> index_values{};
+    std::vector<std::pair<unsigned_id_type, float>> index_values{};
     auto&& load = [&](const database::DbRow& row){
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
         auto&& highway = row.get<std::string>(1);
         auto&& it = road_type_values.find(highway);
-        double road_type_value = 0.5;
+        float road_type_value = 0.5;
         if (it != road_type_values.end()) { 
             road_type_value = it->second;
         }
@@ -68,16 +69,16 @@ void RoadTypeIndex::Load(database::DatabaseHelper& d, const std::string& index_t
     Normalize();
 }
 
-void RoadTypeIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values,
+void RoadTypeIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values,
         const std::string& index_table) const {
     impl_.Create(d, index_values, index_table, kValueColumnName);
 }
 
-double RoadTypeIndex::Get(unsigned_id_type uid) const {
+float RoadTypeIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
-double RoadTypeIndex::GetOriginal(unsigned_id_type uid) const {
+float RoadTypeIndex::GetOriginal(unsigned_id_type uid) const {
     return impl_.GetOriginal(uid);
 }
 

@@ -2,6 +2,7 @@
 #define ROUTING_ALGORITHM_H
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
+#include "routing/types.h"
                                    
 #include <vector>
 

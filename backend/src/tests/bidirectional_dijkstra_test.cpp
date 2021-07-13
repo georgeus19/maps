@@ -17,6 +17,8 @@
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edge_ranges/iterator_edge_range.h"
 #include "routing/edges/length_source.h"
+#include "routing/types.h"
+
 #include <string>
 #include <vector>
 

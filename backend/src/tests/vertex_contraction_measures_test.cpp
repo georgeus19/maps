@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"  
 #include "routing/adjacency_list_graph.h"
 #include "routing/edges/basic_edge.h"
-
+#include "routing/types.h"
 #include "routing/algorithm.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
@@ -36,10 +36,10 @@ using G = BidirectionalGraph<AdjacencyListGraph<CHVertex<Edge, VectorEdgeRange<E
 struct VertexMeasuresTest {
     int32_t edge_difference;
     int32_t deleted_neighbours;
-    double contraction_priority;
+    float contraction_priority;
     
 
-    VertexMeasuresTest(int32_t ed, int32_t dn, double cp) 
+    VertexMeasuresTest(int32_t ed, int32_t dn, float cp) 
         : edge_difference(ed), deleted_neighbours(dn), contraction_priority(cp) {}
 
     bool operator == (const VertexMeasuresTest& other) {
@@ -114,7 +114,7 @@ TEST_P(VertexContractionMeasuresTests, VertexContractionMeasuresTest) {
         contractor.ContractVertex(g_.GetVertex(v));
     }
     auto&& tested_vertex = g_.GetVertex(parameters.tested_vertex);
-    double edge_difference = measures.CalculateEdgeDifference(tested_vertex);
+    float edge_difference = measures.CalculateEdgeDifference(tested_vertex);
     int32_t deleted_neighbours = measures.CalculateDeletedNeighbours(tested_vertex);
     int32_t contraction_priority = measures.CalculateContractionAttractivity(tested_vertex);
     std::cout << "Test measures of vertex " << parameters.tested_vertex << std::endl;

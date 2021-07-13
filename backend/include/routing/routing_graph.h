@@ -1,16 +1,18 @@
 #ifndef ROUTING_QUERY_ROUTING_GRAPH_H
 #define ROUTING_QUERY_ROUTING_GRAPH_H
+
+#include "routing/edges/basic_edge.h"
+#include "routing/database/database_helper.h"
+#include "routing/vertices/basic_vertex.h"
+#include "routing/exception.h"
+#include "routing/types.h"
+
 #include <unordered_map>
 #include <vector>
 #include <utility>
 #include <functional>
 #include <queue>
 #include <string>
-
-#include "routing/edges/basic_edge.h"
-#include "routing/database/database_helper.h"
-#include "routing/vertices/basic_vertex.h"
-#include "routing/exception.h"
 #include <set>
 #include <vector>
 

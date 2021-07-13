@@ -1,9 +1,10 @@
-#ifndef BACKEND_ROUTING_ADJACENCY_GRAPH_H
-#define BACKEND_ROUTING_ADJACENCY_GRAPH_H
+#ifndef ROUTING_ADJACENCY_GRAPH_H
+#define ROUTING_ADJACENCY_GRAPH_H
 #include "routing/edges/basic_edge.h"
 #include "routing/database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include <unordered_map>
 #include <vector>
@@ -163,4 +164,4 @@ void AdjacencyListGraph<V, E>::SetOsmId(unsigned_id_type vertex_id) {
 
 }
 
-#endif //BACKEND_ROUTING_ADJACENCY_GRAPH_H
+#endif //ROUTING_ADJACENCY_GRAPH_H

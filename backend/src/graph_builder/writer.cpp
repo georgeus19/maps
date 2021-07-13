@@ -21,7 +21,7 @@ void CopyWriter::WriteInitSql(const string& table_name) {
     // Write COPY command that loads edges from data to table `table_name`.
     string copy = "COPY " + temporary_edges_table + " FROM '" + data_path_ + "' DELIMITER ';' CSV; ";
     // Add length column.
-    string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length DOUBLE PRECISION; ";
+    string add_length_column = "ALTER TABLE " + table_name + " ADD COLUMN length REAL; ";
     // Calculate lengths.
     string fill_length_column = "UPDATE " + table_name + " set length = ST_Length(geog); ";
     // Create geo index.
@@ -54,11 +54,11 @@ void CopyWriter::WriteFinishSql(const std::string &table_name) {
 std::string CopyWriter::GetCreateEdgesTable(const std::string& table_name) const {
     return GetDropTable(table_name) + 
         "CREATE TABLE " + table_name + "("  \
-        "   osm_id BIGINT NOT NULL, " \
-        "   uid BIGINT PRIMARY KEY, " \
+        "   osm_id INTEGER NOT NULL, " \
+        "   uid INTEGER PRIMARY KEY, " \
         "   geog geography(LINESTRING) NOT NULL, " \
-        "   from_node BIGINT NOT NULL, " \
-        "   to_node BIGINT NOT NULL, " \
+        "   from_node INTEGER NOT NULL, " \
+        "   to_node INTEGER NOT NULL, " \
         "   undirected BOOLEAN NOT NULL, " \
         "   highway TEXT NOT NULL " \
         "); ";
@@ -67,8 +67,8 @@ std::string CopyWriter::GetCreateEdgesTable(const std::string& table_name) const
 std::string CopyWriter::GetCreateVertexIdMappingTable(const std::string& edges_table, const std::string& mapping_table) const {
     return GetDropTable(mapping_table) + 
         "CREATE TABLE " + mapping_table + " ( " \
-        "   osm_id BIGINT PRIMARY KEY, " \
-        "   new_id BIGSERIAL NOT NULL); " \
+        "   osm_id INTEGER PRIMARY KEY, " \
+        "   new_id SERIAL NOT NULL); " \
         "INSERT INTO " + mapping_table + "(osm_id)( " \
         "   SELECT from_node as vertex_id " \
         "   FROM " + edges_table + " " \

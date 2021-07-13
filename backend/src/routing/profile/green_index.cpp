@@ -1,6 +1,7 @@
 #include "routing/profile/green_index.h"
 #include "routing/exception.h"
 #include "routing/constants.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>
@@ -56,17 +57,17 @@ void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_inde
     Normalize();
 }
 
-void GreenIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values,
+void GreenIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values,
 		const std::string& index_table) const {
     impl_.Create(d, index_values, index_table, kValueColumnName);
 }
 
 
-double GreenIndex::Get(unsigned_id_type uid) const {
+float GreenIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
-double GreenIndex::GetOriginal(unsigned_id_type uid) const {
+float GreenIndex::GetOriginal(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 

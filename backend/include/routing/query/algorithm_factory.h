@@ -24,6 +24,7 @@
 #include "routing/edge_ranges/iterator_edge_range.h"
 #include "routing/edges/length_source.h"
 #include "routing/edge_factory.h"
+#include "routing/types.h"
 
 #include "routing/table_names.h"
 

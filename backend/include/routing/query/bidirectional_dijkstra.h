@@ -1,10 +1,13 @@
-#ifndef BACKEND_BIDIRECTIONAL_DIJKSTRA_H
-#define BACKEND_BIDIRECTIONAL_DIJKSTRA_H
+#ifndef ROUTING_QUERY_BIDIRECTIONAL_DIJKSTRA_H
+#define ROUTING_QUERY_BIDIRECTIONAL_DIJKSTRA_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/algorithm.h"
 #include "routing/query/route_retriever.h"
+#include "routing/types.h"
+
 #include "tsl/robin_map.h"
+
 #include <vector>
 #include <set>
 #include <queue>
@@ -21,7 +24,7 @@ class BidirectionalDijkstra {
 public:
     using Vertex = typename G::Vertex;
     using Edge = typename G::Edge;
-    using QueuePair = std::pair<double, Vertex*>;
+    using QueuePair = std::pair<float, Vertex*>;
     using Graph = G;
 
     BidirectionalDijkstra(G& g);
@@ -64,21 +67,21 @@ private:
 
     PriorityQueueMember GetMin(PriorityQueue& a, PriorityQueue& b);
 
-    double GetSummedCosts(double forward_cost, double backward_cost);
+    float GetSummedCosts(float forward_cost, float backward_cost);
 
-    double GetMaxCost() const;
+    float GetMaxCost() const;
 
     /**
 	 * Stores information from the search. It is memory & performance inefficient to store it in vertices
 	 * since a small portion of graph is searched.
 	 */
     struct VertexRoutingProperties {
-        double cost;
+        float cost;
         unsigned_id_type previous;
 
-		VertexRoutingProperties() : cost(std::numeric_limits<double>::max()), previous(0) {}
+		VertexRoutingProperties() : cost(std::numeric_limits<float>::max()), previous(0) {}
 
-        VertexRoutingProperties(double c, unsigned_id_type p) : cost(c), previous(p) {}
+        VertexRoutingProperties(float c, unsigned_id_type p) : cost(c), previous(p) {}
 
         VertexRoutingProperties(const VertexRoutingProperties& other) = default;
         VertexRoutingProperties(VertexRoutingProperties&& other) = default;
@@ -94,13 +97,13 @@ private:
     };
 
     struct PriorityQueueMember {
-        double cost_priority;
+        float cost_priority;
         unsigned_id_type vertex_id;
         Direction* direction;
 
-        PriorityQueueMember() : cost_priority(std::numeric_limits<double>::max()), vertex_id(0), direction(nullptr) {}
+        PriorityQueueMember() : cost_priority(std::numeric_limits<float>::max()), vertex_id(0), direction(nullptr) {}
 
-        PriorityQueueMember(double c, unsigned_id_type v, Direction* dir) : cost_priority(c), vertex_id(v), direction(dir) {}
+        PriorityQueueMember(float c, unsigned_id_type v, Direction* dir) : cost_priority(c), vertex_id(v), direction(dir) {}
 
         bool operator< (const PriorityQueueMember& other) {
             return cost_priority < other.cost_priority;
@@ -116,7 +119,7 @@ private:
         Direction(PriorityQueue& q, UnorderedMap& tv) : queue_(q), touched_vertices_(tv) {}
         virtual ~Direction() = default;
 
-        void SetRoutingProperties(unsigned_id_type vertex_id, double cost, unsigned_id_type previous) {
+        void SetRoutingProperties(unsigned_id_type vertex_id, float cost, unsigned_id_type previous) {
             touched_vertices_.insert_or_assign(vertex_id, VertexRoutingProperties{cost, previous});
         }
 
@@ -125,7 +128,7 @@ private:
         }
 
         virtual void ForEachEdge(Vertex& vertex, const std::function<void(Edge&)>& f) = 0;
-        virtual void Enqueue(double cost_priority, unsigned_id_type vertex_id) = 0;
+        virtual void Enqueue(float cost_priority, unsigned_id_type vertex_id) = 0;
     protected:
         PriorityQueue& queue_;
         UnorderedMap& touched_vertices_;
@@ -141,7 +144,7 @@ private:
             vertex.ForEachEdge(f);
         }
 
-        void Enqueue(double cost_priority, unsigned_id_type vertex_id) override {
+        void Enqueue(float cost_priority, unsigned_id_type vertex_id) override {
             queue_.emplace(cost_priority, vertex_id, this);
         }
 
@@ -157,7 +160,7 @@ private:
             vertex.ForEachBackwardEdge(f);
         }
 
-        void Enqueue(double cost_priority, unsigned_id_type vertex_id) override {
+        void Enqueue(float cost_priority, unsigned_id_type vertex_id) override {
             queue_.emplace(cost_priority, vertex_id, this);
         }
 
@@ -183,7 +186,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
     forward_touched_vertices_.insert_or_assign(start_node, VertexRoutingProperties{0, 0});
     backward_touched_vertices_.insert_or_assign(end_node, VertexRoutingProperties{0, 0});
 
-    double min_path_length = std::numeric_limits<double>::max();
+    float min_path_length = std::numeric_limits<float>::max();
     
     while (!forward_queue.empty() || !backward_queue.empty()) {
         PriorityQueueMember min_member = GetMin(forward_queue, backward_queue);
@@ -194,7 +197,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         if (queue_member_is_dead) {
             continue; // The element already has lower cost - dead element in queue (was added multiple time with diff costs).
         }
-        double path_length = GetSummedCosts(forward_touched_vertices_[vertex.get_osm_id()].cost, backward_touched_vertices_[vertex.get_osm_id()].cost);
+        float path_length = GetSummedCosts(forward_touched_vertices_[vertex.get_osm_id()].cost, backward_touched_vertices_[vertex.get_osm_id()].cost);
         if (path_length < min_path_length) {
             min_path_length = path_length;
             settled_vertex_ = vertex.get_osm_id();
@@ -204,7 +207,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         direction->ForEachEdge(vertex, [&](Edge& edge) {
             unsigned_id_type neighbour_id = edge.get_to();
             Vertex& neighbour = g_.GetVertex(neighbour_id);
-            double new_cost = vertex_routing_properties.cost + edge.get_length();
+            float new_cost = vertex_routing_properties.cost + edge.get_length();
             VertexRoutingProperties& neighbour_routing_properties = direction->GetRoutingProperties(neighbour_id);
             if (vertex.get_ordering_rank() < neighbour.get_ordering_rank() && new_cost < neighbour_routing_properties.cost) {
                 neighbour_routing_properties.cost = new_cost;
@@ -215,7 +218,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
 
     }
 
-    if (min_path_length == std::numeric_limits<double>::max()) {
+    if (min_path_length == std::numeric_limits<float>::max()) {
         throw RouteNotFoundException("Route from " + std::to_string(start_node) + " to " + std::to_string(end_node) + " could not be found");
     }
 
@@ -246,8 +249,8 @@ typename BidirectionalDijkstra<G>::PriorityQueueMember BidirectionalDijkstra<G>:
 }
 
 template <typename G>
-double BidirectionalDijkstra<G>::GetSummedCosts(double forward_cost, double backward_cost) {
-    double max = std::max(forward_cost, backward_cost);
+float BidirectionalDijkstra<G>::GetSummedCosts(float forward_cost, float backward_cost) {
+    float max = std::max(forward_cost, backward_cost);
     if (max != GetMaxCost()) { 
         return forward_cost + backward_cost;
     } else {
@@ -256,12 +259,12 @@ double BidirectionalDijkstra<G>::GetSummedCosts(double forward_cost, double back
 }
 
 template <typename G>
-inline double BidirectionalDijkstra<G>:: GetMaxCost() const {
-    return std::numeric_limits<double>::max();
+inline float BidirectionalDijkstra<G>:: GetMaxCost() const {
+    return std::numeric_limits<float>::max();
 }
 
 
 }
 }
 
-#endif //BACKEND_BIDIRECTIONAL_DIJKSTRA_H
+#endif //ROUTING_QUERY_BIDIRECTIONAL_DIJKSTRA_H

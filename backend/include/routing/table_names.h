@@ -4,6 +4,7 @@
 #include "routing/profile/profile.h"
 #include "routing/constants.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include <string>
 #include <vector>

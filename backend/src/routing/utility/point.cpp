@@ -3,7 +3,7 @@
 namespace routing {
 namespace utility {
 
-Point::Point(double lon, double lat) : lon_(lon), lat_(lat) {}
+Point::Point(float lon, float lat) : lon_(lon), lat_(lat) {}
 
 void Point::Swap(Point & other) {
     std::swap(lon_, other.lon_);

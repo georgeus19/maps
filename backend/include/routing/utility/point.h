@@ -10,10 +10,10 @@ namespace utility {
  * Point represent geographical location on Earth.
  */
 struct Point {
-    double lon_;
-    double lat_;
+    float lon_;
+    float lat_;
 
-    Point(double lon, double lat);
+    Point(float lon, float lat);
 
     Point(const Point & other) = default;
 

@@ -4,6 +4,7 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/edges/ch_edge.h"
 #include "routing/edges/length_source.h"
+#include "routing/types.h"
 
 #include "routing/profile/profile.h"
 

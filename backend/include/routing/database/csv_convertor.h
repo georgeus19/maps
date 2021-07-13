@@ -1,6 +1,8 @@
 #ifndef ROUTING_DATABASE_CSV_CONVERTOR_H
 #define ROUTING_DATABASE_CSV_CONVERTOR_H
 
+#include "routing/types.h"
+
 #include <vector>
 #include <set>
 #include <queue>

@@ -1,5 +1,5 @@
-#ifndef BACKEND_WRITER_H
-#define BACKEND_WRITER_H
+#ifndef GRAPH_BUILDER_WRITER_H
+#define GRAPH_BUILDER_WRITER_H
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -112,4 +112,4 @@ private:
 
 
 }
-#endif //BACKEND_WRITER_H
+#endif //GRAPH_BUILDER_WRITER_H

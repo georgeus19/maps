@@ -3,6 +3,7 @@
 
 #include "routing/table_names.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include "routing/edges/length_source.h"
 

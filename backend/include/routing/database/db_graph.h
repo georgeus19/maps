@@ -4,6 +4,7 @@
 #include "routing/utility/point.h"
 #include "routing/database/db_edge_iterator.h"
 #include "routing/database/csv_convertor.h"
+#include "routing/types.h"
 
 #include <vector>
 #include <set>
@@ -98,15 +99,15 @@ public:
 
     std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
         std::string create_table_sql = "CREATE TABLE " + new_table + " ( " \
-				"osm_id BIGINT NOT NULL, " \
-				"uid BIGINT PRIMARY KEY, " \
+				"osm_id INTEGER NOT NULL, " \
+				"uid INTEGER PRIMARY KEY, " \
 				"geog geography(LINESTRING), " \
-				"from_node BIGINT NOT NULL, " \
-				"to_node BIGINT NOT NULL, " \
+				"from_node INTEGER NOT NULL, " \
+				"to_node INTEGER NOT NULL, " \
                 "undirected BOOLEAN NOT NULL, " \
-                "length DOUBLE PRECISION NOT NULL, "
+                "length REAL NOT NULL, "
 				"shortcut BOOLEAN NOT NULL, " \
-				"contracted_vertex BIGINT NOT NULL); ";
+				"contracted_vertex INTEGER NOT NULL); ";
         std::string insert_basic_graph_sql = "INSERT INTO " + new_table + "(osm_id, uid, geog, from_node, to_node, undirected, length, shortcut, contracted_vertex) " \
                 "( " \
                 "SELECT osm_id, uid, geog, from_node, to_node, undirected, length, false, 0 FROM "+ basic_graph_table + " " \

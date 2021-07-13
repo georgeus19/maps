@@ -1,5 +1,6 @@
 #include "routing/profile/peak_distance_index.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 #include "routing/constants.h"
 
 #include <string>
@@ -36,7 +37,7 @@ void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::string& e
 
 void PeakDistanceIndex::Load(database::DatabaseHelper& d, const std::string& peak_index_table) {
     // edge_peak_distances_.assign(max_uid + 1, GreenValue{});
-    double max_distance = kDistanceRadius * 1.5;
+    float max_distance = kDistanceRadius * 1.5;
     std::string sql = 
             "SELECT uid, LEAST(COALESCE(" + kValueColumnName + ", " + std::to_string(max_distance) + "), " + std::to_string(max_distance) + ") "
             "FROM " + peak_index_table + "; ";
@@ -45,16 +46,16 @@ void PeakDistanceIndex::Load(database::DatabaseHelper& d, const std::string& pea
     Normalize();
 }
 
-void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values,
+void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values,
         const std::string& index_table) const {
     impl_.Create(d, index_values, index_table, kValueColumnName);
 }
 
-double PeakDistanceIndex::Get(unsigned_id_type uid) const {
+float PeakDistanceIndex::Get(unsigned_id_type uid) const {
     return impl_.Get(uid);
 }
 
-double PeakDistanceIndex::GetOriginal(unsigned_id_type uid) const {
+float PeakDistanceIndex::GetOriginal(unsigned_id_type uid) const {
     return impl_.GetOriginal(uid);
 }
 

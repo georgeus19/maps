@@ -1,9 +1,5 @@
-//
-// Created by hrubyk on 02.09.20.
-//
-
-#ifndef BACKEND_EDGE_H
-#define BACKEND_EDGE_H
+#ifndef GRAPH_BUILDER_EDGE_H
+#define GRAPH_BUILDER_EDGE_H
 
 #include <string>
 
@@ -91,5 +87,5 @@ namespace graph_builder {
     };
 }
 
-#endif //BACKEND_EDGE_H
+#endif //GRAPH_BUILDER_EDGE_H
 

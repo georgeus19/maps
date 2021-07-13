@@ -1,13 +1,16 @@
 #ifndef ROUTING_QUERY_DIJKSTRA_H
 #define ROUTING_QUERY_DIJKSTRA_H
-#include <vector>
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/exception.h"
+#include "routing/types.h"
+#include "routing/query/route_retriever.h"
+
+#include "tsl/robin_map.h"
+
+#include <vector>
 #include <queue>
 #include <algorithm>
-#include "routing/query/route_retriever.h"
-#include "tsl/robin_map.h"
 
 namespace routing {
 namespace query {
@@ -20,7 +23,7 @@ class Dijkstra {
 public:
     using Vertex = typename G::Vertex;
     using Edge = typename G::Edge;
-    using QueuePair = std::pair<double, unsigned_id_type>;
+    using QueuePair = std::pair<float, unsigned_id_type>;
     using Graph = G;
 
     Dijkstra(G & g);
@@ -47,7 +50,7 @@ public:
 
     bool Run(unsigned_id_type start_node, const std::function<bool(Vertex *)>& end_condition, const std::function<bool(Vertex*)>& ignore);
 
-    double GetPathLength(unsigned_id_type to);
+    float GetPathLength(unsigned_id_type to);
 private:
     struct VertexRoutingProperties;
     /**
@@ -65,12 +68,12 @@ private:
 	 * since a small portion of graph is searched.
 	 */
     struct VertexRoutingProperties {
-        double cost;
+        float cost;
         unsigned_id_type previous;
 
-		VertexRoutingProperties() : cost(std::numeric_limits<double>::max()), previous(0) {}
+		VertexRoutingProperties() : cost(std::numeric_limits<float>::max()), previous(0) {}
 
-        VertexRoutingProperties(double c, unsigned_id_type p) : cost(c), previous(p) {}
+        VertexRoutingProperties(float c, unsigned_id_type p) : cost(c), previous(p) {}
 
         VertexRoutingProperties(const VertexRoutingProperties& other) = default;
         VertexRoutingProperties(VertexRoutingProperties&& other) = default;
@@ -108,7 +111,7 @@ inline std::vector<typename Dijkstra<G>::Edge> Dijkstra<G>::GetRoute() {
 
 template <typename G>
 bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vertex *)>& end_condition, const std::function<bool(Vertex*)>& ignore) {
-    // Priority queue is implemented with Set of pairs of double(=cost) and Vertex*.
+    // Priority queue is implemented with Set of pairs of float(=cost) and Vertex*.
     // This is the default possible implementation of std::pair.
     // So pairs with the same cost can be in the set when they belong to different vertices.
     /*
@@ -141,7 +144,7 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
 }
 
 template <typename G>
-double Dijkstra<G>::GetPathLength(unsigned_id_type to) {
+float Dijkstra<G>::GetPathLength(unsigned_id_type to) {
     return touched_vertices_[to].cost;
 }
 
@@ -151,11 +154,11 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
         unsigned_id_type neighbour_id = edge.get_to();
         Vertex& neighbour = g_.GetVertex(neighbour_id);
         VertexRoutingProperties& neighbour_properties = touched_vertices_[neighbour_id];
-        double new_cost = vertex_properties.cost + edge.get_length();
+        float new_cost = vertex_properties.cost + edge.get_length();
         if (!ignore(&neighbour) && neighbour_properties.cost > new_cost) {
 
             // Only vertices with updated values are in priority queue.
-            if (neighbour_properties.cost != std::numeric_limits<double>::max()) {
+            if (neighbour_properties.cost != std::numeric_limits<float>::max()) {
                 q.erase(std::make_pair(neighbour_properties.cost, neighbour_id));
             }
             neighbour_properties.cost = new_cost;

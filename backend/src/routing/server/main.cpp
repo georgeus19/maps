@@ -11,6 +11,7 @@
 #include "routing/profile/physical_length_index.h"
 #include "routing/table_names.h"
 #include "routing/database/database_helper.h"
+#include "routing/types.h"
 
 #include <ostream>
 #include <iostream>
@@ -95,7 +96,7 @@ static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profil
     // std::cout << "default_profile " << default_profile.GetName() << std::endl; 
     for(auto it = p.begin(); it != p.end(); ++it) {
         std::string index_name = (*it)["name"].s();
-        double importance = static_cast<double>((*it)["importance"].d());
+        float importance = static_cast<float>((*it)["importance"].d());
         profile.AddIndex(default_profile.GetIndex(index_name), importance);
     }
     return profile;

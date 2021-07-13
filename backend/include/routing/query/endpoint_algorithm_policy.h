@@ -1,6 +1,8 @@
 #ifndef ROUTING_QUERY_ENDPOINT_ALGORITHM_POLICY_H
 #define ROUTING_QUERY_ENDPOINT_ALGORITHM_POLICY_H
 
+#include "routing/types.h"
+
 #include <functional>
 
 namespace routing{

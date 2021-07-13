@@ -1,9 +1,12 @@
-#ifndef BACKEND_PREPROCESSING_GRAPH_CONTRACTOR_H
-#define BACKEND_PREPROCESSING_GRAPH_CONTRACTOR_H
+#ifndef ROUTING_PREPROCESSING_GRAPH_CONTRACTOR_H
+#define ROUTING_PREPROCESSING_GRAPH_CONTRACTOR_H
+
 #include "routing/preprocessing/vertex_measures.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/preprocessing/shortcut_finder.h"
+#include "routing/types.h"
+
 #include <vector>
 #include <set>
 #include <queue>
@@ -18,9 +21,9 @@ class GraphContractor {
     using Vertex = Graph::Vertex;
 public:
     using PriorityQueue = std::priority_queue<
-        std::pair<double, unsigned_id_type>,
-        std::vector<std::pair<double, unsigned_id_type>>,
-        std::greater<std::pair<double, unsigned_id_type>>
+        std::pair<float, unsigned_id_type>,
+        std::vector<std::pair<float, unsigned_id_type>>,
+        std::greater<std::pair<float, unsigned_id_type>>
     >;
     GraphContractor<Graph>(Graph& g, const ContractionParameters& parameters, unsigned_id_type free_edge_id);
 
@@ -40,7 +43,7 @@ private:
 
     void AddShortcuts(std::vector<Edge>&& shortcuts);
 
-    double CalculateOverlayGraphAverageDegree() const;
+    float CalculateOverlayGraphAverageDegree() const;
 };
 
 template <typename Graph>
@@ -96,9 +99,9 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
             vertex_id = q.top().second;
             auto&& vertex = g_.GetVertex(vertex_id);
             q.pop();
-            double priority_threshold = q.top().first;
+            float priority_threshold = q.top().first;
             shortcuts = shortcut_finder_.FindShortcuts(vertex);
-            double new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts);
+            float new_priority = vertex_measures_.CalculateContractionAttractivity(vertex, shortcuts);
             if (new_priority <= priority_threshold) {
                 break;
             }
@@ -122,7 +125,7 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
     PriorityQueue q;
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {
-            double attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
+            float attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
             q.push(std::make_pair(attractivity, vertex.get_osm_id()));
         }
         
@@ -140,7 +143,7 @@ void GraphContractor<Graph>::AddShortcuts(std::vector<Edge>&& shortcuts) {
 
 
 template <typename Graph>
-double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
+float GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
     size_t deg = 0;
     size_t count = 0;
     g_.ForEachVertex([&](Vertex& vertex) {
@@ -154,11 +157,11 @@ double GraphContractor<Graph>::CalculateOverlayGraphAverageDegree() const {
         }
         
     });
-    return ((double)deg) / ((double)count);
+    return ((float)deg) / ((float)count);
 }
 
 
 
 }
 }
-#endif //BACKEND_PREPROCESSING_GRAPH_CONTRACTOR_H
+#endif //ROUTING_PREPROCESSING_GRAPH_CONTRACTOR_H

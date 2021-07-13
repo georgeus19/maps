@@ -2,24 +2,25 @@
 #define ROUTING_EDGES_LENGTH_SOURCE_H
 
 #include "routing/profile/profile.h"
+#include "routing/types.h"
 
 namespace routing{
 
 class NumberLengthSource{
 public:
-    NumberLengthSource(double length) : length_(length) {}
+    NumberLengthSource(float length) : length_(length) {}
 
-    double GetLength(unsigned_id_type id) const {
+    float GetLength(unsigned_id_type id) const {
         return length_;
     }
 
 private:
-    double length_;
+    float length_;
 };
 
 class DynamicLengthSource{
 public:
-    virtual double GetLength(unsigned_id_type uid) const = 0;
+    virtual float GetLength(unsigned_id_type uid) const = 0;
 };
 
 class EndpointEdgesLengths : public DynamicLengthSource{
@@ -27,11 +28,11 @@ public:
 
     EndpointEdgesLengths() : lengths_() {}
 
-    double GetLength(unsigned_id_type uid) const override {
+    float GetLength(unsigned_id_type uid) const override {
         return lengths_.at(uid);
     }
 
-    void AddLength(unsigned_id_type id, double length) {
+    void AddLength(unsigned_id_type id, float length) {
         if (id == lengths_.size()) {
             lengths_.push_back(length);
         } else if (id > lengths_.size()) {
@@ -42,7 +43,7 @@ public:
         }
     }
 private:
-    std::vector<double> lengths_;
+    std::vector<float> lengths_;
 };
 
 
@@ -64,7 +65,7 @@ public:
         return profile_;
     }
 
-    double GetLength(unsigned_id_type id) const override {
+    float GetLength(unsigned_id_type id) const override {
         return profile_.GetLength(id);
     }
 private:
@@ -75,7 +76,7 @@ class ProfileLengthSource{
 public:
     ProfileLengthSource(DynamicLengthSource* profile) : profile_(profile) {}
 
-    double GetLength(unsigned_id_type id) const {
+    float GetLength(unsigned_id_type id) const {
         return profile_->GetLength(id);
     }
 

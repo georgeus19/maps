@@ -108,7 +108,7 @@ std::string DatabaseHelper::MakeGeographyPoint(utility::Point p) {
 	return "'SRID=4326;" + MakeSTPoint(p) + "'::geography";
 }
 
-std::string DatabaseHelper::CalculateRadius(utility::Point start, utility::Point end, double mult)  {
+std::string DatabaseHelper::CalculateRadius(utility::Point start, utility::Point end, float mult)  {
 	return " 2000 + " + std::to_string(mult) + " * ST_Distance(" + MakeGeographyPoint(start) + ", " \
 			"" + MakeGeographyPoint(end) + ") ";
 }
@@ -243,7 +243,7 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
 	try {
 	std::string sql = "ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS shortcut boolean; " \
-						"ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS contracted_vertex bigint; " \
+						"ALTER TABLE " + table_name + " ADD COLUMN IF NOT EXISTS contracted_vertex INTEGER; " \
 						"UPDATE " + table_name + " set shortcut = false; " \
 						"UPDATE " + table_name + " set contracted_vertex = 0; ";
 	pqxx::work w(*connection_);
@@ -256,11 +256,11 @@ bool DatabaseHelper::AddShortcutColumns(const std::string& table_name) {
 	
 }
 
-uint64_t DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
+unsigned_id_type DatabaseHelper::GetMaxEdgeId(const std::string& table_name) {
 	std::string sql = "select max(uid) from " + table_name + ";";
 	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(sql)};
-	return (result.begin())[0].as<uint64_t>();
+	return (result.begin())[0].as<unsigned_id_type>();
 }
 
 void DatabaseHelper::DropGeographyIndex(const std::string& table_name) {

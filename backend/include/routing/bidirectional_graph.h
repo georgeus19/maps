@@ -1,17 +1,19 @@
-#ifndef BACKEND_BIDIRECTIONAL_GRAPH_H
-#define BACKEND_BIDIRECTIONAL_GRAPH_H
-#include <unordered_map>
-#include <vector>
-#include <utility>
-#include <functional>
-#include <queue>
-#include <string>
+#ifndef ROUTING_BIDIRECTIONAL_GRAPH_H
+#define ROUTING_BIDIRECTIONAL_GRAPH_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/exception.h"
 #include "routing/adjacency_list_graph.h"
+#include "routing/types.h"
+
+#include <unordered_map>
+#include <vector>
+#include <utility>
+#include <functional>
+#include <queue>
+#include <string>
 #include <set>
 
 namespace routing {
@@ -85,4 +87,4 @@ private:
 
 }
 
-#endif //BACKEND_BIDIRECTIONAL_GRAPH_H
+#endif //ROUTING_BIDIRECTIONAL_GRAPH_H

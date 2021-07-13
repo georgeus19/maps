@@ -1,5 +1,5 @@
-#ifndef BACKEND_LINK_COUNTER_H
-#define BACKEND_LINK_COUNTER_H
+#ifndef GRAPH_BUILDER_LINK_COUNTER_H
+#define GRAPH_BUILDER_LINK_COUNTER_H
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/any_output.hpp>
 #include <string>
@@ -47,4 +47,4 @@ namespace graph_builder {
         void way(const osmium::Way &way);
     };
 }
-#endif //BACKEND_LINK_COUNTER_H
+#endif //GRAPH_BUILDER_LINK_COUNTER_H

@@ -3,7 +3,7 @@
 
 #include "routing/database/database_helper.h"
 #include "routing/edges/basic_edge.h"
-
+#include "routing/types.h"
 #include "routing/exception.h"
 
 #include <utility>
@@ -17,22 +17,22 @@ class PairIndexImplementation{
 public:
     struct Value {
         bool valid;
-        double value;
+        float value;
 
         Value() : valid(false), value(0) {}
-        Value(double val) : valid(true), value(val) {}
+        Value(float val) : valid(true), value(val) {}
     };
 
     PairIndexImplementation();
 
-    void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table,
+    void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values, const std::string& index_table,
         const std::string& value_col_name) const;
 
     void Normalize();
 
-    double Get(unsigned_id_type uid) const;
+    float Get(unsigned_id_type uid) const;
 
-    double GetOriginal(unsigned_id_type uid) const;
+    float GetOriginal(unsigned_id_type uid) const;
 
     std::function<void(const database::DbRow&)> CreateLoadFunction();
 
@@ -40,7 +40,7 @@ public:
 
 private:
     std::vector<Value> values_;
-    double max_;
+    float max_;
 };
 
     

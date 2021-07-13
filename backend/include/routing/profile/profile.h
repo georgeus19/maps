@@ -1,11 +1,12 @@
-#ifndef ROUTING_PROFILE_H
-#define ROUTING_PROFILE_H
+#ifndef ROUTING_PROFILE_PROFILE_H
+#define ROUTING_PROFILE_PROFILE_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include "routing/database/database_helper.h"
 
@@ -26,14 +27,14 @@ public:
 
     Profile(const std::shared_ptr<PreferenceIndex>& base_index);
 
-    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, double importance);
+    void AddIndex(const std::shared_ptr<PreferenceIndex>& index, float importance);
 
     template <typename Graph>
     void Set(Graph& graph);
 
     std::string GetName() const;
 
-    double GetLength(unsigned_id_type uid) const;
+    float GetLength(unsigned_id_type uid) const;
 
     const std::shared_ptr<PreferenceIndex>& GetBaseIndex();
 
@@ -47,9 +48,9 @@ private:
 
     struct Property{
         std::shared_ptr<PreferenceIndex> index;
-        double importance;
+        float importance;
 
-        Property(const std::shared_ptr<PreferenceIndex>& ix, double im) : index(ix), importance(im) {}
+        Property(const std::shared_ptr<PreferenceIndex>& ix, float im) : index(ix), importance(im) {}
     };
 
 };
@@ -67,4 +68,4 @@ void Profile::Set(Graph& graph) {
 
 }
 }
-#endif //ROUTING_PROFILE_H
+#endif //ROUTING_PROFILE_PROFILE_H

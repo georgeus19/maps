@@ -1,7 +1,10 @@
-#ifndef BACKEND_CONTRACTION_PARAMETERS_H
-#define BACKEND_CONTRACTION_PARAMETERS_H
+#ifndef ROUTING_PREPROCESSING_CONTRACTION_PARAMETERS_H
+#define ROUTING_PREPROCESSING_CONTRACTION_PARAMETERS_H
 
 #include "routing/edges/basic_edge.h"
+#include "robin_hood/robin_hood.h"
+#include "routing/types.h"
+
 #include <vector>
 #include <set>
 #include <queue>
@@ -53,4 +56,4 @@ inline int32_t ContractionParameters::get_space_size_coefficient() const {
 }
 }
 
-#endif //BACKEND_CONTRACTION_PARAMETERS_H
+#endif //ROUTING_PREPROCESSING_CONTRACTION_PARAMETERS_H

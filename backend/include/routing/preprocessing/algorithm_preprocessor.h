@@ -2,6 +2,7 @@
 #define ROUTING_PREPROCESSING_ALGORITHM_PREPROCESSOR_H
 
 #include "routing/profile/profile.h"
+#include "routing/types.h"
 
 namespace routing{
 namespace preprocessing{

@@ -1,4 +1,5 @@
 #include "routing/edges/basic_edge.h"
+#include "routing/types.h"
 #include "routing/table_names.h"
 #include "routing/exception.h"
 #include "routing/configuration_parser.h"

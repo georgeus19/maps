@@ -1,5 +1,7 @@
-#ifndef BACKEND_EXCEPTION_H
-#define BACKEND_EXCEPTION_H
+#ifndef ROUTING_EXCEPTION_H
+#define ROUTING_EXCEPTION_H
+
+#include "routing/types.h"
 
 #include <exception>
 #include <string>
@@ -98,4 +100,4 @@ public:
 
 
 }
-#endif //BACKEND_EXCEPTION_H
+#endif //ROUTING_EXCEPTION_H

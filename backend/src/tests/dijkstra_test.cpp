@@ -13,6 +13,8 @@
 #include "routing/vertices/ch_vertex.h"
 #include "routing/edge_ranges/vector_edge_range.h"
 #include "routing/edges/length_source.h"
+#include "routing/types.h"
+
 #include <string>
 #include <vector>
 using namespace std;
@@ -61,20 +63,6 @@ TEST_F(DijkstraTest, RunTwiceExistingPath) {
     };
 
     EXPECT_THAT(path, testing::ElementsAreArray(expected_path));
-}
-
-TEST_F(DijkstraTest, LimitedSearch) {
-    // Dijkstra<G> dijkstra{g_};
-    // double max_cost = 4; // Shortest path found to vertices 1, 2, 3, 4.
-    // dijkstra.Run(1, [=](BasicVertex<Edge>* v) { 
-    //         return v->get_cost() > max_cost;
-    //     }, [](BasicVertex<Edge>*) { return false; });
-    // EXPECT_EQ(dijkstra.GetPathLength(1), 0);
-    // EXPECT_EQ(dijkstra.GetPathLength(2), 2);
-    // EXPECT_EQ(dijkstra.GetPathLength(3), 2);
-    // EXPECT_EQ(dijkstra.GetPathLength(4), 5);
-    // EXPECT_EQ(dijkstra.GetPathLength(5), std::numeric_limits<double>::max());
-    // EXPECT_EQ(dijkstra.GetPathLength(6), 10);
 }
 
 

@@ -1,5 +1,5 @@
-#ifndef BACKEND_CH_DIJKSTRA_H
-#define BACKEND_CH_DIJKSTRA_H
+#ifndef ROUTING_PREPROCESSING_CH_DIJKSTRA_H
+#define ROUTING_PREPROCESSING_CH_DIJKSTRA_H
 #include <vector>
 #include <queue>
 #include <limits>
@@ -11,7 +11,8 @@
 #include "routing/exception.h"
 #include "routing/edges/basic_edge.h"
 #include "routing/vertices/basic_vertex.h"
-#include "robin_hood/robin_hood.h"
+#include "routing/types.h"
+
 #include "tsl/robin_map.h"
 #include "tsl/robin_set.h"
 
@@ -31,10 +32,10 @@ public:
 	using TargetVerticesMap = tsl::robin_map<unsigned_id_type, bool>;
 
     struct SearchRangeLimits {
-        double max_cost;
+        float max_cost;
         size_t max_hop_count;
 		
-		SearchRangeLimits(double c, size_t h) : max_cost(c), max_hop_count(h) {}
+		SearchRangeLimits(float c, size_t h) : max_cost(c), max_hop_count(h) {}
 
     };
 
@@ -54,13 +55,13 @@ public:
 	/**
 	 * Get length of the shortest path to a vertex that was found before by running `Run` function.
 	 */
-    double GetPathLength(unsigned_id_type to) const;
+    float GetPathLength(unsigned_id_type to) const;
 
 	/**
 	 * Perform one hop back search - scan all incoming edges of the target vertex
 	 * and return the length of the path to the target vertex.
 	 */
-	double OneHopBackwardSearch(unsigned_id_type target_vertex_id) const;
+	float OneHopBackwardSearch(unsigned_id_type target_vertex_id) const;
 
 	size_t GetSearchSpaceSize() const {
 		return settled_vertices_;
@@ -94,12 +95,12 @@ private:
 	 * since a small portion of graph is searched.
 	 */
     struct VertexRoutingProperties {
-        double cost;
+        float cost;
         unsigned_id_type previous;
 
-		VertexRoutingProperties() : cost(std::numeric_limits<double>::max()), previous(0) {}
+		VertexRoutingProperties() : cost(std::numeric_limits<float>::max()), previous(0) {}
 
-        VertexRoutingProperties(double c, unsigned_id_type p) : cost(c), previous(p) {}
+        VertexRoutingProperties(float c, unsigned_id_type p) : cost(c), previous(p) {}
 
         VertexRoutingProperties(const VertexRoutingProperties& other) = default;
         VertexRoutingProperties(VertexRoutingProperties&& other) = default;
@@ -112,11 +113,11 @@ private:
 	 * Struct for priority queue used in Run function.
 	 */
 	struct PriorityQueueMember {
-		double cost;
+		float cost;
 		unsigned_id_type vertex_id;
 		size_t hop_count;
 
-		PriorityQueueMember(double c, unsigned_id_type v, size_t h) : cost(c), vertex_id(v), hop_count(h) {}
+		PriorityQueueMember(float c, unsigned_id_type v, size_t h) : cost(c), vertex_id(v), hop_count(h) {}
 
 		PriorityQueueMember(const PriorityQueueMember& other) = default;
         PriorityQueueMember(PriorityQueueMember&& other) = default;
@@ -198,17 +199,17 @@ bool CHDijkstra<G>::Run(unsigned_id_type source_vertex, unsigned_id_type contrac
 }
 
 template <typename G>
-double CHDijkstra<G>::OneHopBackwardSearch(unsigned_id_type target_vertex_id) const {
-	assert(GetPathLength(contracted_vertex_) == std::numeric_limits<double>::max());
+float CHDijkstra<G>::OneHopBackwardSearch(unsigned_id_type target_vertex_id) const {
+	assert(GetPathLength(contracted_vertex_) == std::numeric_limits<float>::max());
 	auto&& end_vertex = g_.GetVertex(target_vertex_id);
 
-	double min_path_length = GetPathLength(target_vertex_id);
+	float min_path_length = GetPathLength(target_vertex_id);
 	end_vertex.ForEachBackwardEdge([&](Edge& backward_edge) {
-		double d = GetPathLength(backward_edge.get_to());
-		if (d == std::numeric_limits<double>::max()) {
+		float d = GetPathLength(backward_edge.get_to());
+		if (d == std::numeric_limits<float>::max()) {
 			return;
 		}
-		double path_length = d + backward_edge.get_length(); 
+		float path_length = d + backward_edge.get_length(); 
 		if (min_path_length > path_length) {
 			min_path_length = path_length;
 		}
@@ -225,7 +226,7 @@ template <typename G>
 void CHDijkstra<G>::UpdateNeighbour(const PriorityQueueMember& min_member, const Edge& edge, PriorityQueue& q, const SearchRangeLimits& limits) {
 	unsigned_id_type neighbour_id = edge.get_to();
 	auto&& neighbour_routing_properties = touched_vertices_[neighbour_id];
-	double update_cost = min_member.cost + edge.get_length();
+	float update_cost = min_member.cost + edge.get_length();
 	if (update_cost < neighbour_routing_properties.cost && !IgnoreNeighbour(g_.GetVertex(neighbour_id)) ) {
 		neighbour_routing_properties.cost = update_cost;
 		neighbour_routing_properties.previous = min_member.vertex_id;
@@ -237,14 +238,14 @@ void CHDijkstra<G>::UpdateNeighbour(const PriorityQueueMember& min_member, const
 }
 
 template <typename G>
-double CHDijkstra<G>::GetPathLength(unsigned_id_type to) const {
+float CHDijkstra<G>::GetPathLength(unsigned_id_type to) const {
 	auto&& it = touched_vertices_.find(to);
 	if (it != touched_vertices_.end()) {
 		return it->second.cost;
 	}
-	return std::numeric_limits<double>::max();
+	return std::numeric_limits<float>::max();
 }
 
 }
 }
-#endif //BACKEND_CH_DIJKSTRA_H
+#endif //ROUTING_PREPROCESSING_CH_DIJKSTRA_H

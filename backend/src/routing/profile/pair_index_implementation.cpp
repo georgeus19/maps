@@ -2,6 +2,7 @@
 
 #include "routing/database/database_helper.h"
 #include "routing/edges/basic_edge.h"
+#include "routing/types.h"
 
 #include <utility>
 #include <vector>
@@ -13,13 +14,13 @@ namespace profile{
 
 PairIndexImplementation::PairIndexImplementation() : max_(1) {}
 
-void PairIndexImplementation::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, double>>& index_values, const std::string& index_table,
+void PairIndexImplementation::Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values, const std::string& index_table,
         const std::string& value_col_name) const {
         
     std::string drop_table = "DROP TABLE IF EXISTS " + index_table + "; ";
     std::string create_table = "CREATE TABLE " + index_table + " ( "
-                                " uid BIGINT PRIMARY KEY, "
-                                " " + value_col_name + " DOUBLE PRECISION NOT NULL); ";
+                                " uid INTEGER PRIMARY KEY, "
+                                " " + value_col_name + " REAL NOT NULL); ";
     
     auto&& current_dir = std::filesystem::current_path();
     std::string data_path{current_dir.string() + "/" + index_table + ".csv"};
@@ -43,7 +44,7 @@ void PairIndexImplementation::Create(database::DatabaseHelper& d, const std::vec
 }
 
 void PairIndexImplementation::Normalize() {
-    double max_value = std::numeric_limits<double>::min();
+    float max_value = std::numeric_limits<float>::min();
     for(auto&& p : values_) {
         if (p.valid) {
             if (max_value < p.value) {
@@ -59,7 +60,7 @@ void PairIndexImplementation::Normalize() {
     }
 }
 
-double PairIndexImplementation::Get(unsigned_id_type uid) const {
+float PairIndexImplementation::Get(unsigned_id_type uid) const {
     assert(uid < values_.size());
     Value v = values_[uid];
     if (v.valid) {
@@ -69,14 +70,14 @@ double PairIndexImplementation::Get(unsigned_id_type uid) const {
     }
 }
 
-double PairIndexImplementation::GetOriginal(unsigned_id_type uid) const {
+float PairIndexImplementation::GetOriginal(unsigned_id_type uid) const {
     return Get(uid) * max_;
 }
 
 std::function<void(const database::DbRow&)> PairIndexImplementation::CreateLoadFunction() {
     return [&](const database::DbRow& row) {
         unsigned_id_type uid = row.get<unsigned_id_type>(0);
-        double value = row.get<double>(1);
+        float value = row.get<float>(1);
         if (uid >= values_.size()) {
             values_.resize(uid + 1);
         }

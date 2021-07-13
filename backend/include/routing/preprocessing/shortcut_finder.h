@@ -1,8 +1,14 @@
-#ifndef BACKEND_SHORTCUT_FINDER_H
-#define BACKEND_SHORTCUT_FINDER_H
+#ifndef ROUTING_PREPROCESSING_SHORTCUT_FINDER_H
+#define ROUTING_PREPROCESSING_SHORTCUT_FINDER_H
 
 #include "routing/edges/basic_edge.h"
 #include "routing/preprocessing/ch_dijkstra.h"
+#include "routing/types.h"
+#include "routing/preprocessing/contraction_parameters.h"
+#include "tsl/robin_set.h"
+#include "tsl/robin_map.h"
+#include "routing/preprocessing/shortcut_filter.h"
+
 #include <vector>
 #include <iterator>
 #include <set>
@@ -18,10 +24,6 @@
 #include <cmath>
 #include <iostream>
 #include <ctime>
-#include "routing/preprocessing/contraction_parameters.h"
-#include "tsl/robin_set.h"
-#include "tsl/robin_map.h"
-#include "routing/preprocessing/shortcut_filter.h"
 
 namespace routing {
 namespace preprocessing {
@@ -46,9 +48,9 @@ private:
     CHDijkstra<Graph> dijkstra_;
     unsigned_id_type temporary_edge_id_counter_;
 
-    double GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
+    float GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex);
 
-    double GetMinTargetsIngoingLength(Vertex& contracted_vertex);
+    float GetMinTargetsIngoingLength(Vertex& contracted_vertex);
 
     typename CHDijkstra<Graph>::TargetVerticesMap GetTargetVertices(Vertex& contracted_vertex);
 };
@@ -80,12 +82,12 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
     if (source_vertex.IsContracted()) {
         return shortcuts;
     }
-    double outgoing_max_length = GetMaxOutgoingLength(source_vertex, contracted_vertex);
+    float outgoing_max_length = GetMaxOutgoingLength(source_vertex, contracted_vertex);
     if (outgoing_max_length < 0) {
         return shortcuts;
     }
-    double ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
-    double max_cost = backward_former_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
+    float ingoing_targets_min_length = GetMinTargetsIngoingLength(contracted_vertex);
+    float max_cost = backward_former_edge.get_length() + outgoing_max_length - ingoing_targets_min_length;
     
     typename CHDijkstra<Graph>::SearchRangeLimits limits{max_cost, parameters_.get_hop_count() - 1};
     typename CHDijkstra<Graph>::TargetVerticesMap target_vertices = GetTargetVertices(contracted_vertex);
@@ -96,8 +98,8 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         if (g_.GetVertex(target_vertex_id).IsContracted()) {
             return;
         }
-        double shortcut_length = backward_former_edge.get_length() + latter_edge.get_length();
-        double path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
+        float shortcut_length = backward_former_edge.get_length() + latter_edge.get_length();
+        float path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
             shortcuts.emplace_back(++temporary_edge_id_counter_, source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
@@ -113,8 +115,8 @@ size_t ShortcutFinder<Graph>::GetSearchSpaceSize() {
 }
 
 template <typename Graph>
-double ShortcutFinder<Graph>::GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex) {
-    double max_length = -1;
+float ShortcutFinder<Graph>::GetMaxOutgoingLength(Vertex& source_vertex, Vertex& contracted_vertex) {
+    float max_length = -1;
     contracted_vertex.ForEachEdge([&](Edge& edge) {
         bool outgoing_vertex_not_contracted = !(g_.GetVertex(edge.get_to()).IsContracted());
         bool not_edge_to_source_vertex = edge.get_to() != source_vertex.get_osm_id();
@@ -127,8 +129,8 @@ double ShortcutFinder<Graph>::GetMaxOutgoingLength(Vertex& source_vertex, Vertex
 }
 
 template <typename Graph>
-double ShortcutFinder<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vertex) {
-    double min_length = std::numeric_limits<double>::max();
+float ShortcutFinder<Graph>::GetMinTargetsIngoingLength(Vertex& contracted_vertex) {
+    float min_length = std::numeric_limits<float>::max();
     contracted_vertex.ForEachEdge([&](Edge& edge) {
         auto&& target_vertex = g_.GetVertex(edge.get_to());
         if (!target_vertex.IsContracted()) {
@@ -159,7 +161,7 @@ typename CHDijkstra<Graph>::TargetVerticesMap ShortcutFinder<Graph>::GetTargetVe
 
 
 
-}
-}
 
-#endif //BACKEND_SHORTCUT_FINDER_H
+}
+}
+#endif //ROUTING_PREPROCESSING_SHORTCUT_FINDER_H

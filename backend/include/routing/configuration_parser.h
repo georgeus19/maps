@@ -3,6 +3,7 @@
 #include "toml11/toml.hpp"
 #include "routing/constants.h"
 #include "routing/exception.h"
+#include "routing/types.h"
 
 #include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
@@ -39,9 +40,9 @@ struct DatabaseConfig{
 struct ProfilePreference {
     std::shared_ptr<profile::PreferenceIndex> index;
     std::string table_name;
-    std::vector<double> options;
+    std::vector<float> options;
 
-    ProfilePreference(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<double>&& o)
+    ProfilePreference(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<float>&& o)
         : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
 };
 
@@ -182,9 +183,9 @@ Configuration ConfigurationParser::Parse() {
             throw ParseException{"Index " + name + " does not exist."};
         }
         std::string table_name = toml::find<std::string>(index, Constants::Input::kTableName);
-        std::vector<double> importance_options;
+        std::vector<float> importance_options;
         for(auto&& importance : toml::find<toml::array>(index, Constants::Input::kImportance)) {
-            importance_options.push_back(static_cast<double>(importance.as_floating()));
+            importance_options.push_back(static_cast<float>(importance.as_floating()));
         }
         profile_preferences.emplace_back(indices[name](), std::move(table_name), std::move(importance_options));
     }
