@@ -27,8 +27,8 @@ namespace routing {
 template <typename Graph>
 class BidirectionalGraph {
 public:
-    using Vertex = Graph::Vertex;
-    using Edge = Graph::Edge;
+    using Vertex = typename Graph::Vertex;
+    using Edge = typename Graph::Edge;
 
     inline BidirectionalGraph() : g_() {}
 

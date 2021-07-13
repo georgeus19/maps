@@ -90,12 +90,12 @@ TEST(BidirectionalDijkstraTestsNotFixture, ExistingPathWithoutShortcuts) {
 
 TEST(BidirectionalDijkstraTestsNotFixture, IngoreDeadQueueMembers) {
     G g{};
-    g.AddEdge(std::move(Edge{0, 1, 5, 20}));
+    g.AddEdge(Edge{0, 1, 5, 20});
 
-    g.AddEdge(std::move(Edge{1, 2, 3, 4}));
-    g.AddEdge(std::move(Edge{2, 2, 4, 1}));
+    g.AddEdge(Edge{1, 2, 3, 4});
+    g.AddEdge(Edge{2, 2, 4, 1});
 
-    g.AddEdge(std::move(Edge{3, 4, 3, 2}));
+    g.AddEdge(Edge{3, 4, 3, 2});
     g.GetVertex(1).set_ordering_rank(1);
     g.GetVertex(2).set_ordering_rank(3);
     g.GetVertex(3).set_ordering_rank(5);

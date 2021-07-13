@@ -38,21 +38,21 @@ using SearchGraph = CHSearchGraph<SearchVertex, Edge>;
 
 TEST(RoutingGraphTests, OverlapVertices) {
     G load_graph;
-	load_graph.AddEdge(std::move(typename G::Edge{0, 1, 2, 2, G::Edge::EdgeType::forward}));
-    load_graph.AddEdge(std::move(typename G::Edge{1, 1, 3, 3, G::Edge::EdgeType::twoway}));
-	load_graph.AddEdge(std::move(typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward}));
-	load_graph.AddEdge(std::move(typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway}));
-	load_graph.AddEdge(std::move(typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway}));
-	load_graph.AddEdge(std::move(typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward}));
-	load_graph.AddEdge(std::move(typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward}));
-	load_graph.AddEdge(std::move(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward}));
+	load_graph.AddEdge(typename G::Edge{0, 1, 2, 2, G::Edge::EdgeType::forward});
+    load_graph.AddEdge(typename G::Edge{1, 1, 3, 3, G::Edge::EdgeType::twoway});
+	load_graph.AddEdge(typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward});
+	load_graph.AddEdge(typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway});
+	load_graph.AddEdge(typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway});
+	load_graph.AddEdge(typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward});
+	load_graph.AddEdge(typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward});
+	load_graph.AddEdge(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward});
 
 	// Shortcuts.
-	load_graph.AddEdge(std::move(typename G::Edge{8, 1, 4, 3, G::Edge::EdgeType::twoway, 3}));
-	load_graph.AddEdge(std::move(typename G::Edge{9, 1, 5, 8, G::Edge::EdgeType::twoway, 4}));
-	load_graph.AddEdge(std::move(typename G::Edge{10, 1, 6, 11, G::Edge::EdgeType::forward, 4}));
-	load_graph.AddEdge(std::move(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward, 1}));
-	load_graph.AddEdge(std::move(typename G::Edge{12, 2, 5, 15, G::Edge::EdgeType::forward, 6}));
+	load_graph.AddEdge(typename G::Edge{8, 1, 4, 3, G::Edge::EdgeType::twoway, 3});
+	load_graph.AddEdge(typename G::Edge{9, 1, 5, 8, G::Edge::EdgeType::twoway, 4});
+	load_graph.AddEdge(typename G::Edge{10, 1, 6, 11, G::Edge::EdgeType::forward, 4});
+	load_graph.AddEdge(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward, 1});
+	load_graph.AddEdge(typename G::Edge{12, 2, 5, 15, G::Edge::EdgeType::forward, 6});
 
 	load_graph.GetVertex(1).set_ordering_rank(10);   
 	load_graph.GetVertex(2).set_ordering_rank(7);   
@@ -99,16 +99,16 @@ TEST(RoutingGraphTests, OverlapVertices) {
 
 TEST(RoutingGraphTests, AdditionalVertices) {
     G load_graph;
-	load_graph.AddEdge(std::move(typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward}));
-	load_graph.AddEdge(std::move(typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway}));
-	load_graph.AddEdge(std::move(typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway}));
-	load_graph.AddEdge(std::move(typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward}));
-	load_graph.AddEdge(std::move(typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward}));
-	load_graph.AddEdge(std::move(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward}));
+	load_graph.AddEdge(typename G::Edge{2, 2, 6, 12, G::Edge::EdgeType::forward});
+	load_graph.AddEdge(typename G::Edge{3, 3, 4, 2, G::Edge::EdgeType::twoway});
+	load_graph.AddEdge(typename G::Edge{4, 4, 5, 3, G::Edge::EdgeType::twoway});
+	load_graph.AddEdge(typename G::Edge{5, 4, 6, 6, G::Edge::EdgeType::forward});
+	load_graph.AddEdge(typename G::Edge{6, 5, 6, 2, G::Edge::EdgeType::forward});
+	load_graph.AddEdge(typename G::Edge{7, 6, 5, 3, G::Edge::EdgeType::forward});
 
 	// Shortcuts.
-	load_graph.AddEdge(std::move(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward, 1}));
-	load_graph.AddEdge(std::move(typename G::Edge{12, 2, 5, 15, G::Edge::EdgeType::forward, 6}));
+	load_graph.AddEdge(typename G::Edge{11, 5, 2, 10, G::Edge::EdgeType::forward, 1});
+	load_graph.AddEdge(typename G::Edge{12, 2, 5, 15, G::Edge::EdgeType::forward, 6});
 
 	load_graph.GetVertex(2).set_ordering_rank(7);   
 	load_graph.GetVertex(3).set_ordering_rank(3);   

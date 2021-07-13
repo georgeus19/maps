@@ -28,6 +28,8 @@ namespace database {
 class DbEdgeIterator {
 public:
 
+    virtual ~DbEdgeIterator() = default;
+
     inline void Inc() {
         ++it_;
     }

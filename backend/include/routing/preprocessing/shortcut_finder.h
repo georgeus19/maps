@@ -30,8 +30,8 @@ namespace preprocessing {
 
 template <typename Graph>
 class ShortcutFinder {
-    using Vertex = Graph::Vertex;
-    using Edge = Graph::Edge;
+    using Vertex = typename Graph::Vertex;
+    using Edge = typename Graph::Edge;
 public:
     ShortcutFinder(Graph& g, const ContractionParameters& p);
 

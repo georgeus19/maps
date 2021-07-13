@@ -18,8 +18,8 @@ namespace query {
 template <typename Graph, typename VertexRoutingProperties>
 class RouteRetriever {
 public:
-    using Vertex = Graph::Vertex;
-    using Edge = Graph::Edge;
+    using Vertex = typename Graph::Vertex;
+    using Edge = typename Graph::Edge;
 
     RouteRetriever(Graph& g);
 
@@ -194,7 +194,7 @@ std::vector<typename RouteRetriever<Graph, VertexRoutingProperties>::Edge> Route
 }
 
 template <typename Graph, typename VertexRoutingProperties>
-inline RouteRetriever<Graph, VertexRoutingProperties>::Edge& RouteRetriever<Graph, VertexRoutingProperties>::GetUnderlyingEdge(
+inline typename RouteRetriever<Graph, VertexRoutingProperties>::Edge& RouteRetriever<Graph, VertexRoutingProperties>::GetUnderlyingEdge(
     GraphInfo* graph_info, unsigned_id_type source_vertex_id, unsigned_id_type target_vertex_id, bool normal_edge) {
     if (normal_edge) {
         return graph_info->FindEdge(g_.GetVertex(source_vertex_id), target_vertex_id);

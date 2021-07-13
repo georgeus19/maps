@@ -29,7 +29,7 @@ class CHSearchGraph {
 public:
     using Vertex = V;
     using Edge = E;
-    using EdgeIterator = std::vector<E>::iterator;
+    using EdgeIterator = typename std::vector<E>::iterator;
 
     CHSearchGraph();
 
@@ -150,7 +150,7 @@ unsigned_id_type CHSearchGraph<V, E>::GetMaxEdgeId() {
 
 template <typename V, typename E>
 template <typename Graph>
-CHSearchGraph<V, E>::Capacities CHSearchGraph<V, E>::PrecomputeCapacities(Graph& graph) {
+typename CHSearchGraph<V, E>::Capacities CHSearchGraph<V, E>::PrecomputeCapacities(Graph& graph) {
     size_t max_vertex_id = 0;
     size_t edges = 0;
     graph.ForEachVertex([&](typename Graph::Vertex& vertex) {

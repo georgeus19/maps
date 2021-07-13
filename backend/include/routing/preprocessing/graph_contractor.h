@@ -17,8 +17,8 @@ namespace preprocessing {
 template <typename Graph>
 class GraphContractor {
     
-    using Edge = Graph::Edge;
-    using Vertex = Graph::Vertex;
+    using Edge = typename Graph::Edge;
+    using Vertex = typename Graph::Vertex;
 public:
     using PriorityQueue = std::priority_queue<
         std::pair<float, unsigned_id_type>,
@@ -121,7 +121,7 @@ void GraphContractor<Graph>::ContractMinVertex(GraphContractor<Graph>::PriorityQ
 }
 
 template <typename Graph>
-GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContractionPriority() {
+typename GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContractionPriority() {
     PriorityQueue q;
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {

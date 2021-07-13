@@ -12,9 +12,9 @@ public:
 
     VectorEdgeRange(std::vector<Edge>&& e);
 
-    std::vector<Edge>::iterator begin();
+    typename std::vector<Edge>::iterator begin();
 
-    std::vector<Edge>::iterator end();
+    typename std::vector<Edge>::iterator end();
 
     void AddEdge(Edge&& edge);
 
@@ -31,12 +31,12 @@ template <typename Edge>
 inline VectorEdgeRange<Edge>::VectorEdgeRange(std::vector<Edge>&& e) : edges_(std::move(e)) {}
 
 template <typename Edge>
-inline std::vector<Edge>::iterator VectorEdgeRange<Edge>::begin() {
+inline typename std::vector<Edge>::iterator VectorEdgeRange<Edge>::begin() {
     return edges_.begin();
 }
 
 template <typename Edge>
-inline std::vector<Edge>::iterator VectorEdgeRange<Edge>::end() {
+inline typename std::vector<Edge>::iterator VectorEdgeRange<Edge>::end() {
     return edges_.end();
 }
 
