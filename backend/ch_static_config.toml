@@ -19,14 +19,14 @@ space_size = 0
 base_index = "length"
 base_index_table = "czedges_length_index"
 
-# [[preferences.indices]]
-# name = "green"
-# table_name = "czedges_green_index"
-# importance = [ 0.0, -0.30, -0.60, -1.0 ]
-# [[preferences.indices]]
-# name = "peak"
-# table_name = "czedges_peak_index"
-# importance = [ 0.0, 0.5, 1.0 ]
+[[preferences.indices]]
+name = "green"
+table_name = "czedges_green_index"
+importance = [ 0.0, -0.5, -1.0 ]
+[[preferences.indices]]
+name = "peak"
+table_name = "czedges_peak_index"
+importance = [ 0.0, 1.0 ]
 [[preferences.indices]]
 name = "road_type"
 table_name = "czedges_road_type_index"

@@ -6,16 +6,9 @@ host = "127.0.0.1"
 port = "5432"
 
 [algorithm]
-# name = "ch"
 name = "dijkstra"
 base_graph_table = "czedges"
 mode = "dynamic_profile"
-# mode = "static_profile"
-[algorithm.parameters]
-hop_count = 5
-edge_difference = 190
-deleted_neighbours = 120
-space_size = 0
 
 [preferences]
 base_index = "length"
@@ -28,4 +21,8 @@ importance = [ 0.0, -0.2, -0.4, -0.6, -0.8, -1.0 ]
 [[preferences.indices]]
 name = "peak"
 table_name = "czedges_peak_index"
+importance = [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ]
+[[preferences.indices]]
+name = "road_type"
+table_name = "czedges_road_type_index"
 importance = [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ]
