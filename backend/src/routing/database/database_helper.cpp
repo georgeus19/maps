@@ -1,6 +1,7 @@
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 using namespace std;
+namespace routing {
 namespace database {
 
 DatabaseHelper::DatabaseHelper(const string & db_name, const string & user, const string & password,
@@ -292,4 +293,5 @@ std::string DatabaseHelper::GetGeographyIndexName(const std::string& table_name)
 
 
 
+}
 }

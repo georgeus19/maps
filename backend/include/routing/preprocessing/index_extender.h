@@ -1,7 +1,7 @@
 #ifndef ROUTING_PREPROCESSING_INDEX_EXTENDER_H
 #define ROUTING_PREPROCESSING_INDEX_EXTENDER_H
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include "routing/profile/preference_index.h"
 

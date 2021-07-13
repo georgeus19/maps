@@ -2,7 +2,7 @@
 #define ROUTING_PROFILE_PREFERENCE_INDEX_H
 
 #include "routing/edges/basic_edge.h"
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <string>
 #include <vector>

@@ -9,7 +9,7 @@
 #include <queue>
 #include <cassert>
 #include "routing/preprocessing/contraction_parameters.h"
-#include "utility/comparison.h"
+#include "routing/utility/comparison.h"
 
 namespace routing {
 namespace preprocessing {

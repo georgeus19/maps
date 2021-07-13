@@ -1,7 +1,7 @@
 #ifndef ROUTING_PROFILE_PAIR_INDEX_IMPLEMENTATION_H
 #define ROUTING_PROFILE_PAIR_INDEX_IMPLEMENTATION_H
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 #include "routing/edges/basic_edge.h"
 
 #include "routing/exception.h"

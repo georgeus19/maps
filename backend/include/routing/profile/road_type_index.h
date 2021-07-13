@@ -2,7 +2,7 @@
 #define ROUTING_PROFILE_ROAD_TYPE_INDEX_H
 
 #include "routing/edges/basic_edge.h"
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 #include "routing/profile/preference_index.h"
 #include "routing/profile/pair_index_implementation.h"
 

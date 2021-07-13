@@ -1,6 +1,6 @@
 #include "routing/profile/pair_index_implementation.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 #include "routing/edges/basic_edge.h"
 
 #include <utility>

@@ -11,7 +11,7 @@
 #include "routing/profile/road_type_index.h"
 #include "routing/profile/profile_generator.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <functional>
 #include <iostream>

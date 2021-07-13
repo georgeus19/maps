@@ -1,7 +1,7 @@
 #ifndef ROUTING_CH_SEARCH_EDGE_H
 #define ROUTING_CH_SEARCH_EDGE_H
 #include <string>
-#include "database/db_edge_iterator.h"
+#include "routing/database/db_edge_iterator.h"
 #include "routing/edges/basic_edge.h"
 #include <iostream>
 

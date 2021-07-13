@@ -5,7 +5,7 @@
 #include "routing/profile/preference_index.h"
 #include "routing/profile/green_index.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <exception>
 #include <string>

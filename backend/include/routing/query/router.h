@@ -7,10 +7,8 @@
 #include "routing/algorithm.h"
 #include "routing/query/dijkstra.h"
 #include "routing/exception.h"
-#include "database/database_helper.h"
-#include "database/db_graph.h"
-#include "database/db_edge_iterator.h"
-#include "utility/point.h"
+#include "routing/database/database_helper.h"
+#include "routing/utility/point.h"
 #include "routing/bidirectional_graph.h"
 #include "routing/query/bidirectional_dijkstra.h"
 #include "routing/edges/ch_edge.h"
@@ -22,6 +20,9 @@
 #include "routing/query/endpoint_edges_creator.h"
 #include "routing/query/endpoints_creator.h"
 #include "routing/query/route.h"
+
+#include "routing/database/db_graph.h"
+#include "routing/database/db_edge_iterator.h"
 
 #include <string>
 #include <memory>

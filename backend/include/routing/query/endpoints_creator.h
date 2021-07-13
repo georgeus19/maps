@@ -4,7 +4,7 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/exception.h"
 
-#include "utility/point.h"
+#include "routing/utility/point.h"
 
 #include <utility>
 #include <string>

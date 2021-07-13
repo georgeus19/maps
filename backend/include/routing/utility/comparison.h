@@ -1,8 +1,9 @@
-#ifndef BACKEND_UTILITY_COMPARISON_H
-#define BACKEND_UTILITY_COMPARISON_H
+#ifndef ROUTING_UTILITY_COMPARISON_H
+#define ROUTING_UTILITY_COMPARISON_H
 
 #include <utility>
 
+namespace routing {
 namespace utility {
 
 template <typename Float>
@@ -11,6 +12,7 @@ bool AreEqual(Float a, Float b) {
     return a + eps > b && a - eps < b;
 }
 
-}
 
-#endif //BACKEND_UTILITY_COMPARISON_H
+}
+}
+#endif //ROUTING_UTILITY_COMPARISON_H

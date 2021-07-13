@@ -73,6 +73,7 @@
         "cfenv": "cpp",
         "*.ipp": "cpp",
         "charconv": "cpp",
-        "csetjmp": "cpp"
+        "csetjmp": "cpp",
+        "pqxx": "cpp"
     }
 }

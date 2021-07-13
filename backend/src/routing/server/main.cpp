@@ -1,6 +1,6 @@
 #include "crow/crow_all.h"
 #include "routing/query/algorithm_factory.h"
-#include "utility/point.h"
+#include "routing/utility/point.h"
 #include "routing/query/router.h"
 #include "routing/query/routing_mode.h"
 #include "routing/configuration_parser.h"
@@ -10,7 +10,7 @@
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/table_names.h"
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <ostream>
 #include <iostream>

@@ -16,7 +16,7 @@
 #include "routing/profile/peak_distance_index.h"
 #include "routing/profile/road_type_index.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include "toml11/toml.hpp"
 
@@ -29,8 +29,8 @@
 #include <iostream>
 
 using namespace std;
-using namespace database;
 using namespace routing;
+using namespace database;
 using namespace preprocessing;
 using namespace profile;
 

@@ -7,7 +7,7 @@
 #include "routing/profile/physical_length_index.h"
 #include "routing/exception.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <string>
 #include <vector>

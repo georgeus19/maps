@@ -1,5 +1,9 @@
-#ifndef BACKEND_DB_GRAPH_H
-#define BACKEND_DB_GRAPH_H
+#ifndef ROUTING_DATABASE_DB_GRAPH_H
+#define ROUTING_DATABASE_DB_GRAPH_H
+
+#include "routing/utility/point.h"
+#include "routing/database/db_edge_iterator.h"
+#include "routing/database/csv_convertor.h"
 
 #include <vector>
 #include <set>
@@ -20,9 +24,8 @@
 #include <functional>
 #include <utility>
 #include <memory>
-#include "utility/point.h"
-#include "database/db_edge_iterator.h"
-#include "database/csv_convertor.h"
+
+namespace routing {
 namespace database {
 
 class DbGraph {
@@ -134,5 +137,5 @@ public:
 
 
 }
-
-#endif //BACKEND_DB_GRAPH_H
+}
+#endif //ROUTING_DATABASE_DB_GRAPH_H

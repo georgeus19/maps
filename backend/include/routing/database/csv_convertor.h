@@ -1,5 +1,5 @@
-#ifndef DATABASE_CSV_CONVERTOR_H
-#define DATABASE_CSV_CONVERTOR_H
+#ifndef ROUTING_DATABASE_CSV_CONVERTOR_H
+#define ROUTING_DATABASE_CSV_CONVERTOR_H
 
 #include <vector>
 #include <set>
@@ -9,6 +9,8 @@
 #include <cassert>
 #include <functional>
 #include <string_view>
+
+namespace routing {
 namespace database {
 
 class CsvConvertor {
@@ -94,6 +96,7 @@ void CsvConvertor::SaveOrderingRank(const Vertex& vertex) {
 
 
 
-}
 
-#endif //DATABASE_CSV_CONVERTOR_H
+}
+}
+#endif //ROUTING_DATABASE_CSV_CONVERTOR_H

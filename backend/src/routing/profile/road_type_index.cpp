@@ -2,7 +2,7 @@
 #include "routing/exception.h"
 #include "routing/constants.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 
 #include <string>

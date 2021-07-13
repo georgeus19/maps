@@ -15,7 +15,7 @@
 
 #include "routing/profile/profile.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <functional>
 

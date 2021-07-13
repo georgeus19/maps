@@ -11,9 +11,10 @@
 #include <exception>
 #include <functional>
 #include <utility>
-#include "utility/point.h"
-#include "database/csv_convertor.h"
+#include "routing/utility/point.h"
+#include "routing/database/csv_convertor.h"
 
+namespace routing {
 namespace database {
 
 /**
@@ -144,5 +145,6 @@ public:
 
 
 
+}
 }
 #endif //BACKEND_DB_EDGE_ITERATOR_H

@@ -1,7 +1,7 @@
 #ifndef BACKEND_ROUTING_ADJACENCY_GRAPH_H
 #define BACKEND_ROUTING_ADJACENCY_GRAPH_H
 #include "routing/edges/basic_edge.h"
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 #include "routing/vertices/basic_vertex.h"
 #include "routing/exception.h"
 

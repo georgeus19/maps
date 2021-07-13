@@ -2,7 +2,7 @@
  * File used for testing how libraries, other components work.
  * It is not used in the main project - it is safe to ignore this file.
  */
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 #include <iostream>
 #include <string>
 #include <mapnik/map.hpp>

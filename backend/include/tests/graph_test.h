@@ -6,8 +6,8 @@
 #include "routing/vertices/basic_vertex.h"
 #include "routing/query/dijkstra.h"
 #include "routing/exception.h"
-#include "database/database_helper.h"
-#include "utility/point.h"
+#include "routing/database/database_helper.h"
+#include "routing/utility/point.h"
 
 #include "routing/edges/ch_edge.h"
 #include "routing/edges/length_source.h"

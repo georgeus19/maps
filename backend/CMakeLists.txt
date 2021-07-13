@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-Wall")
 file(GLOB OsmGraphBuilderGlob src/graph_builder/*.cpp include/graph_builder/*.h)
 
-file(GLOB DatabaseHelperGlob src/database/*.cpp include/database/*.h)
+file(GLOB DatabaseGlob src/routing/database/*.cpp include/routing/database/*.h)
 
-file(GLOB UtilityGlob src/utility/*.cpp include/utility/*.h)
+file(GLOB UtilityGlob src/routing/utility/*.cpp include/routing/utility/*.h)
 
 file(GLOB RoutingGlob src/routing/*.cpp include/routing/*.h)
 file(GLOB RoutingVertexGlob src/routing/vertices/*.cpp include/routing/vertices/*.h src/routing/edge_ranges/*.cpp include/routing/edge_ranges/*.h)
@@ -28,7 +28,7 @@ file(GLOB RoutingPreprocessorGlob src/routing/preprocessor/*.cpp include/routing
 
 # libraries
 add_library(routing ${RoutingGlob} ${RoutingVertexGlob} ${RoutingEdgeGlob} ${RoutingQueryGlob} ${RoutingPreprocessingGlob} ${RoutingProfileGlob}
-                    ${DatabaseHelperGlob} ${UtilityGlob})
+                    ${DatabaseGlob} ${UtilityGlob})
 
 # tools
 add_executable(graph_builder ${OsmGraphBuilderGlob})

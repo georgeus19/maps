@@ -4,8 +4,8 @@
 #include "routing/edges/basic_edge.h"
 #include "routing/exception.h"
 
-#include "database/database_helper.h"
-#include "database/db_graph.h"
+#include "routing/database/database_helper.h"
+#include "routing/database/db_graph.h"
 
 #include <unordered_map>
 #include <string>

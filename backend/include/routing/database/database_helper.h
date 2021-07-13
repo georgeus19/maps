@@ -1,5 +1,5 @@
-#ifndef BACKEND_DATABASEHELPER_H
-#define BACKEND_DATABASEHELPER_H
+#ifndef ROUTING_DATABASE_DATABASE_HELPER_H
+#define ROUTING_DATABASE_DATABASE_HELPER_H
 #include <string>
 #include <string_view>
 #include <pqxx/pqxx>
@@ -12,15 +12,14 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include "utility/point.h"
+#include "routing/utility/point.h"
 #include <filesystem>
-#include "database/csv_convertor.h"
-#include "database/db_graph.h"
-#include "database/db_edge_iterator.h"
+#include "routing/database/csv_convertor.h"
+#include "routing/database/db_graph.h"
+#include "routing/database/db_edge_iterator.h"
 
+namespace routing {
 namespace database {
-
-
 
 /**
  * DbRow provides an interface to read a row of data from database
@@ -459,4 +458,5 @@ void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_
 
 
 }
-#endif //BACKEND_DATABASEHELPER_H
+}
+#endif //ROUTING_DATABASE_DATABASE_HELPER_H

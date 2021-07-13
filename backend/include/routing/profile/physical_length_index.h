@@ -5,7 +5,7 @@
 #include "routing/profile/preference_index.h"
 #include "routing/profile/pair_index_implementation.h"
 
-#include "database/database_helper.h"
+#include "routing/database/database_helper.h"
 
 #include <string>
 #include <vector>
