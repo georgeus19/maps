@@ -414,10 +414,9 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     std::string data_path{current_dir.string() + "/" + table_name + ".csv"};
     std::string drop_table_sql = "DROP TABLE IF EXISTS " + table_name + "; ";
     std::string create_table_sql = "CREATE TABLE " + table_name + "("  \
-        "osm_id INTEGER PRIMARY KEY, " \
+        "uid INTEGER PRIMARY KEY, " \
         "ordering_rank INTEGER NOT NULL); ";
     std::string copy_sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV; ";
-    // string create_index = "CREATE INDEX " + table_name + "_osm_id_idx ON " + table_name + " (osm_id);";
     CsvConvertor convertor{data_path};
     convertor.SaveVertexOrdering(graph);
     std::string sql = drop_table_sql + create_table_sql + " " + copy_sql;
@@ -426,28 +425,9 @@ void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& gra
     w.commit();
 }
 
-// template <typename Graph>
-// void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_table, Graph& g) {
-//     std::string select_sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
-//     std::string where_condition = " WHERE false = true ";
-//     g.ForEachVertex([&](typename Graph::Vertex& v) {
-//         where_condition += " or osm_id = ";
-//         where_condition += std::to_string(v.get_osm_id());
-//     });
-//     where_condition += " ";
-//     std::string sql = select_sql + where_condition;
-//     pqxx::nontransaction n{*connection_};
-//     pqxx::result result{n.exec(sql)};
-//     for (auto&& it = result.begin(); it != result.end(); ++it) {
-//         unsigned_id_type vertex_id = it[0].as<unsigned_id_type>();
-//         auto&& vertex = g.GetVertex(vertex_id);
-//         vertex.set_ordering_rank(it[1].as<unsigned_id_type>());
-//     }
-// }
-
 template <typename Graph>
 void DatabaseHelper::LoadAdditionalVertexProperties(const std::string& vertices_table, Graph& g) {
-    std::string sql = " SELECT osm_id, ordering_rank FROM " + vertices_table;
+    std::string sql = " SELECT uid, ordering_rank FROM " + vertices_table;
     pqxx::nontransaction n{*connection_};
     pqxx::result result{n.exec(sql)};
     for (auto&& it = result.begin(); it != result.end(); ++it) {

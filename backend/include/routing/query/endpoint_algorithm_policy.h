@@ -58,7 +58,7 @@ public:
             std::vector<typename Graph::Edge> neighbour_edges{};
             neighbour_edges.insert(neighbour_edges.end(), immutable_neighbour.get_edges().begin(), immutable_neighbour.get_edges().end());
             neighbour_edges.push_back(std::move(edge));
-            typename Graph::Vertex neighbour{immutable_neighbour.get_osm_id(), edge_range_policy_.CreateEdgeRange(std::move(neighbour_edges))};
+            typename Graph::Vertex neighbour{immutable_neighbour.get_uid(), edge_range_policy_.CreateEdgeRange(std::move(neighbour_edges))};
             graph_.get().AddVertex(std::move(neighbour));
         }
         typename Graph::Vertex target_vertex{target_id, edge_range_policy_.CreateEdgeRange(std::vector<typename Graph::Edge>{})}; 

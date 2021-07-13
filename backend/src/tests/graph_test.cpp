@@ -173,7 +173,7 @@ INSTANTIATE_TEST_CASE_P(
 TEST_P(GraphGetVertexTests, GetVertexTest) {
     unsigned_id_type vertex_id = GetParam();
     auto&& vertex = g_.GetVertex(vertex_id);
-    std::cout << "vertex.id = " << vertex.get_osm_id() << ", expected id = " << vertex_id << std::endl;
-    EXPECT_EQ(vertex.get_osm_id(), vertex_id);
+    std::cout << "vertex.id = " << vertex.get_uid() << ", expected id = " << vertex_id << std::endl;
+    EXPECT_EQ(vertex.get_uid(), vertex_id);
 
 }

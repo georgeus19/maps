@@ -57,7 +57,7 @@ void RoutingGraph<Graph>::AddVertex(Vertex&& vertex) {
 template <typename Graph>
 inline typename Graph::Vertex& RoutingGraph<Graph>::GetVertex(unsigned_id_type id) {
     for(auto&& vertex : additional_vertices_) {
-        if (vertex.get_osm_id() == id) {
+        if (vertex.get_uid() == id) {
             return vertex;
         }
     }

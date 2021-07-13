@@ -15,12 +15,12 @@ template <typename Edge, typename EdgeRange>
 class BasicVertex {
 
 public:
-    inline unsigned_id_type get_osm_id() const {
-        return osm_id_;
+    inline unsigned_id_type get_uid() const {
+        return uid_;
     } 
 
-    inline void set_osm_id(unsigned_id_type osm_id) {
-        osm_id_ = osm_id;
+    inline void set_uid(unsigned_id_type osm_id) {
+        uid_ = osm_id;
     } 
 
     inline EdgeRange& get_edges() {
@@ -64,7 +64,7 @@ protected:
     /**
      * Unique id.
      */
-    unsigned_id_type osm_id_;
+    unsigned_id_type uid_;
 
     /**
      * Edges to all neighbours.
@@ -73,11 +73,11 @@ protected:
 };
 
 template <typename Edge, typename EdgeRange>
-BasicVertex<Edge, EdgeRange>::BasicVertex() : osm_id_(0), edges_() {}
+BasicVertex<Edge, EdgeRange>::BasicVertex() : uid_(0), edges_() {}
 
 template <typename Edge, typename EdgeRange>
 BasicVertex<Edge, EdgeRange>::BasicVertex(unsigned_id_type osm_id, EdgeRange&& edges)
-        : osm_id_(osm_id), edges_(std::move(edges)) {}
+        : uid_(osm_id), edges_(std::move(edges)) {}
 
 
 template <typename Edge, typename EdgeRange>
@@ -139,7 +139,7 @@ inline Edge& BasicVertex<Edge, EdgeRange>::FindBackwardEdge(const std::function<
 
 template <typename Edge, typename EdgeRange>
 inline bool BasicVertex<Edge, EdgeRange>::operator==(const BasicVertex<Edge, EdgeRange>& other) const {
-    return osm_id_ == other.osm_id_;
+    return uid_ == other.uid_;
 }
 
 template <typename Edge, typename EdgeRange>

@@ -219,7 +219,7 @@ float CHDijkstra<G>::OneHopBackwardSearch(unsigned_id_type target_vertex_id) con
 
 template <typename G>
 inline bool CHDijkstra<G>::IgnoreNeighbour(const Vertex& neighbour) {
-	return neighbour.IsContracted() || neighbour.get_osm_id() == contracted_vertex_;
+	return neighbour.IsContracted() || neighbour.get_uid() == contracted_vertex_;
 }
 
 template <typename G>

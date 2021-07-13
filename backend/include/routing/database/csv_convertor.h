@@ -91,7 +91,7 @@ void CsvConvertor::SaveEdge(const Edge& edge) {
 
 template <typename Vertex>
 void CsvConvertor::SaveOrderingRank(const Vertex& vertex) {
-    f_ << std::to_string(vertex.get_osm_id()) << ";"
+    f_ << std::to_string(vertex.get_uid()) << ";"
         << std::to_string(vertex.get_ordering_rank());
     f_ << std::endl;
 }

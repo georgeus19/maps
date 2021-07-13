@@ -100,7 +100,9 @@ public:
     void WriteFinishSql(const std::string& table_name) override;
 
 private:
-    std::string GetCreateEdgesTable(const std::string& table_name) const;
+    std::string GetCreateTemporaryEdgesTable(const std::string& table_name) const;
+
+    std::string GetCreateFinalEdgesTable(const std::string& table_name) const;
 
     std::string GetCreateVertexIdMappingTable(const std::string& edges_table, const std::string& mapping_table) const;
 

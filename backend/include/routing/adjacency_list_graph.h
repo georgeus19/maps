@@ -95,7 +95,7 @@ inline V& AdjacencyListGraph<V, E>::GetVertex(unsigned_id_type id) {
 template <typename V, typename E>
 void AdjacencyListGraph<V, E>::ForEachVertex(const std::function<void(V&)>& f) {
     for (auto&& vertex : vertices_) {
-        if (vertex.get_osm_id() != 0) {
+        if (vertex.get_uid() != 0) {
             f(vertex);
         }
     }
@@ -158,7 +158,7 @@ unsigned_id_type AdjacencyListGraph<V, E>::GetMaxEdgeId() {
 template <typename V, typename E>
 void AdjacencyListGraph<V, E>::SetOsmId(unsigned_id_type vertex_id) {
     auto&& vertex = GetVertex(vertex_id);
-    vertex.set_osm_id(vertex_id);
+    vertex.set_uid(vertex_id);
 }
 
 

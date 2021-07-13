@@ -119,8 +119,8 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
                 }
                 auto&& coordinates = crow::json::load(coor);
                 Profile profile = ParseProfile(crow::json::load(prof), mode.GetDefaultProfile());
-                utility::Point source{coordinates[0]["lon"].d(), coordinates[0]["lat"].d()};
-                utility::Point target{coordinates[1]["lon"].d(), coordinates[1]["lat"].d()};
+                utility::Point source{static_cast<float>(coordinates[0]["lon"].d()), static_cast<float>(coordinates[0]["lat"].d())};
+                utility::Point target{static_cast<float>(coordinates[1]["lon"].d()), static_cast<float>(coordinates[1]["lat"].d())};
                 std::cout << req.url_params << std::endl;
                 auto&& router = mode.GetRouter(std::move(profile));
                 DatabaseHelper d{cfg.database.name, cfg.database.user, cfg.database.password, cfg.database.host, cfg.database.port};

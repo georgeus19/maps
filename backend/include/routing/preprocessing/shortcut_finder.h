@@ -91,7 +91,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
     
     typename CHDijkstra<Graph>::SearchRangeLimits limits{max_cost, parameters_.get_hop_count() - 1};
     typename CHDijkstra<Graph>::TargetVerticesMap target_vertices = GetTargetVertices(contracted_vertex);
-    dijkstra_.Run(source_vertex_id, contracted_vertex.get_osm_id(), limits, target_vertices);
+    dijkstra_.Run(source_vertex_id, contracted_vertex.get_uid(), limits, target_vertices);
 
     contracted_vertex.ForEachEdge([&](Edge& latter_edge) {
         unsigned_id_type target_vertex_id = latter_edge.get_to();
@@ -102,7 +102,7 @@ std::vector<typename ShortcutFinder<Graph>::Edge> ShortcutFinder<Graph>::FindSho
         float path_length = dijkstra_.OneHopBackwardSearch(target_vertex_id);
         
         if (shortcut_length < path_length) {
-            shortcuts.emplace_back(++temporary_edge_id_counter_, source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_osm_id());
+            shortcuts.emplace_back(++temporary_edge_id_counter_, source_vertex_id, target_vertex_id, shortcut_length, contracted_vertex.get_uid());
         }
     });
 
@@ -119,7 +119,7 @@ float ShortcutFinder<Graph>::GetMaxOutgoingLength(Vertex& source_vertex, Vertex&
     float max_length = -1;
     contracted_vertex.ForEachEdge([&](Edge& edge) {
         bool outgoing_vertex_not_contracted = !(g_.GetVertex(edge.get_to()).IsContracted());
-        bool not_edge_to_source_vertex = edge.get_to() != source_vertex.get_osm_id();
+        bool not_edge_to_source_vertex = edge.get_to() != source_vertex.get_uid();
         bool bigger_length = edge.get_length() > max_length;
         if (outgoing_vertex_not_contracted && bigger_length && not_edge_to_source_vertex) {
             max_length = edge.get_length();

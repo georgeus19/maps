@@ -28,7 +28,7 @@ public:
         GraphInfo(RouteRetriever& retriever, VertexRoutingProperties& tv) : retriever_(retriever), touched_vertices_(tv) {}
 
         unsigned_id_type GetPrevious(const Vertex& vertex) const {
-            return touched_vertices_[vertex.get_osm_id()].previous;
+            return touched_vertices_[vertex.get_uid()].previous;
         }
 
         virtual Edge& FindEdge(Vertex& vertex, unsigned_id_type target_vertex_id) = 0;

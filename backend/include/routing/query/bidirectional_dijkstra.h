@@ -192,15 +192,15 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
         PriorityQueueMember min_member = GetMin(forward_queue, backward_queue);
         Vertex& vertex = g_.GetVertex(min_member.vertex_id);
         Direction* direction = min_member.direction;
-        VertexRoutingProperties vertex_routing_properties = direction->GetRoutingProperties(vertex.get_osm_id());
+        VertexRoutingProperties vertex_routing_properties = direction->GetRoutingProperties(vertex.get_uid());
         bool queue_member_is_dead = vertex_routing_properties.cost < min_member.cost_priority;
         if (queue_member_is_dead) {
             continue; // The element already has lower cost - dead element in queue (was added multiple time with diff costs).
         }
-        float path_length = GetSummedCosts(forward_touched_vertices_[vertex.get_osm_id()].cost, backward_touched_vertices_[vertex.get_osm_id()].cost);
+        float path_length = GetSummedCosts(forward_touched_vertices_[vertex.get_uid()].cost, backward_touched_vertices_[vertex.get_uid()].cost);
         if (path_length < min_path_length) {
             min_path_length = path_length;
-            settled_vertex_ = vertex.get_osm_id();
+            settled_vertex_ = vertex.get_uid();
         }
         // if vertex->backward_cost, vertex->forward_cost settled - update path length.
 
@@ -211,7 +211,7 @@ void BidirectionalDijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type
             VertexRoutingProperties& neighbour_routing_properties = direction->GetRoutingProperties(neighbour_id);
             if (vertex.get_ordering_rank() < neighbour.get_ordering_rank() && new_cost < neighbour_routing_properties.cost) {
                 neighbour_routing_properties.cost = new_cost;
-                neighbour_routing_properties.previous = vertex.get_osm_id();
+                neighbour_routing_properties.previous = vertex.get_uid();
                 direction->Enqueue(new_cost, neighbour_id);
             }
         });

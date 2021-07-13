@@ -92,7 +92,7 @@ template <typename G>
 void Dijkstra<G>::Run(unsigned_id_type start_node, unsigned_id_type end_node) {
     start_node_ = start_node;
     end_node_ = end_node;
-    if (!Run(start_node, [=](Dijkstra<G>::Vertex* v) { return v->get_osm_id() == end_node; }, [](Dijkstra<G>::Vertex*) { return false; })) {
+    if (!Run(start_node, [=](Dijkstra<G>::Vertex* v) { return v->get_uid() == end_node; }, [](Dijkstra<G>::Vertex*) { return false; })) {
         throw RouteNotFoundException("Route from " + std::to_string(start_node) + " to " + std::to_string(end_node) + " could not be found");
     }
 }
@@ -137,7 +137,7 @@ bool Dijkstra<G>::Run(unsigned_id_type start_node, const std::function<bool(Vert
         if (end_condition(&v)) {
             return true;
         }
-        VertexRoutingProperties vertex_properties = touched_vertices_[v.get_osm_id()];
+        VertexRoutingProperties vertex_properties = touched_vertices_[v.get_uid()];
         UpdateNeighbours(v, vertex_properties, q, ignore);
     }
     return false;
@@ -162,7 +162,7 @@ void Dijkstra<G>::UpdateNeighbours(Vertex& v, VertexRoutingProperties& vertex_pr
                 q.erase(std::make_pair(neighbour_properties.cost, neighbour_id));
             }
             neighbour_properties.cost = new_cost;
-            neighbour_properties.previous = v.get_osm_id();
+            neighbour_properties.previous = v.get_uid();
             q.insert(std::make_pair(neighbour_properties.cost, neighbour_id));
         }
     });

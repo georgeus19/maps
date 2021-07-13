@@ -98,7 +98,7 @@ void CHSearchGraph<V, E>::Load(Graph& graph) {
 template <typename V, typename E>
 inline V& CHSearchGraph<V, E>::GetVertex(unsigned_id_type id) {
     assert(id < vertices_.size());
-    assert(id == vertices_[id].get_osm_id());
+    assert(id == vertices_[id].get_uid());
     return vertices_[id];
 }
 
@@ -159,8 +159,8 @@ CHSearchGraph<V, E>::Capacities CHSearchGraph<V, E>::PrecomputeCapacities(Graph&
                 ++edges;
             }
         }
-        if (vertex.get_osm_id() > max_vertex_id) {
-            max_vertex_id = vertex.get_osm_id();
+        if (vertex.get_uid() > max_vertex_id) {
+            max_vertex_id = vertex.get_uid();
         }
     });
     return Capacities{max_vertex_id + 1, edges};
@@ -179,7 +179,7 @@ void CHSearchGraph<V, E>::LoadEdges(Graph& graph) {
                 ++edges_end_it;
             }
         }
-        vertices_[vertex.get_osm_id()] = V{vertex.get_osm_id(), typename V::EdgeRange{edges_begin_it, edges_end_it}, vertex.get_ordering_rank()};
+        vertices_[vertex.get_uid()] = V{vertex.get_uid(), typename V::EdgeRange{edges_begin_it, edges_end_it}, vertex.get_ordering_rank()};
     });
 }
 

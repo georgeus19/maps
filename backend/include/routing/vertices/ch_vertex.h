@@ -1,10 +1,12 @@
-#ifndef BACKEND_CH_VERTEX_H
-#define BACKEND_CH_VERTEX_H
+#ifndef ROUTING_VERTICES_CH_VERTEX_H
+#define ROUTING_VERTICES_CH_VERTEX_H
 #include "routing/edges/basic_edge.h"
+#include "routing/exception.h"
+#include "routing/types.h"
+
 #include <vector>
 #include <limits>
 #include <functional>
-#include "routing/exception.h"
 
 namespace routing {
 
@@ -54,4 +56,4 @@ CHVertex<Edge, ERange>::CHVertex(unsigned_id_type osm_id, ERange&& edges)
 
 }
 
-#endif //BACKEND_CH_VERTEX_H
+#endif //ROUTING_VERTICES_CH_VERTEX_H

@@ -126,7 +126,7 @@ GraphContractor<Graph>::PriorityQueue GraphContractor<Graph>::CalculateContracti
     g_.ForEachVertex([&](Vertex& vertex) {
         if (!vertex.IsContracted()) {
             float attractivity = vertex_measures_.CalculateContractionAttractivity(vertex);
-            q.push(std::make_pair(attractivity, vertex.get_osm_id()));
+            q.push(std::make_pair(attractivity, vertex.get_uid()));
         }
         
     });
