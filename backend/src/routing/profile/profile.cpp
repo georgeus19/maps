@@ -15,7 +15,16 @@ std::string Profile::GetName() const {
     std::string name = "";
     for(auto&& prop : properties_) {
         name += prop.index->GetName();
-        name += std::to_string(prop.importance);
+        std::string importance = std::to_string(prop.importance);
+        for(auto&& d : importance) {
+            if (d == '.') {
+                d = 'd';
+            }
+            if (d == '-') {
+                d = '_';
+            }
+        }
+        name += std::move(importance);
     }
     return name;
 }

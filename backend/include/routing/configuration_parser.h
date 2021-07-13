@@ -8,6 +8,7 @@
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/profile/peak_distance_index.h"
+#include "routing/profile/road_type_index.h"
 #include "routing/profile/profile_generator.h"
 
 #include "database/database_helper.h"
@@ -81,8 +82,9 @@ struct ProfilePreferences{
     }
 
     void LoadIndices(database::DatabaseHelper& d, const std::string& table_name_prefix = std::string{}) {
-        std::cout << "Load base index from " << base_index_table << std::endl;
-        base_index->Load(d, base_index_table);
+        std::string base_index_complete_table = table_name_prefix + base_index_table;
+        std::cout << "Load base index from " << base_index_complete_table << std::endl;
+        base_index->Load(d, base_index_complete_table);
         for(auto&& prop : properties) {
             std::string index_table = table_name_prefix + prop.table_name;
             std::cout << "Load index from " << index_table << std::endl;
@@ -93,11 +95,11 @@ struct ProfilePreferences{
 
 struct Configuration {
     DatabaseConfig database;
-    ProfilePreferences profile_properties;
+    ProfilePreferences profile_preferences;
     std::unique_ptr<AlgorithmConfig> algorithm;
 
     Configuration(DatabaseConfig&& db, ProfilePreferences&& pp, std::unique_ptr<AlgorithmConfig> alg)
-        : database(std::move(db)), profile_properties(std::move(pp)), algorithm(std::move(alg)) {}
+        : database(std::move(db)), profile_preferences(std::move(pp)), algorithm(std::move(alg)) {}
 };
 
 class ConfigurationParser {
@@ -161,7 +163,8 @@ Configuration ConfigurationParser::Parse() {
     std::unordered_map<std::string, std::function<std::shared_ptr<profile::PreferenceIndex>()>> indices{
         {Constants::IndexNames::kGreenIndex, [](){ return std::make_shared<profile::GreenIndex>(); }},
         {Constants::IndexNames::kPeakDistanceIndex, [](){ return std::make_shared<profile::PeakDistanceIndex>(); }},
-        {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }}
+        {Constants::IndexNames::kLengthIndex, [](){ return std::make_shared<profile::PhysicalLengthIndex>(); }},
+        {Constants::IndexNames::kRoadTypeIndex, [](){ return std::make_shared<profile::RoadTypeIndex>(); }}
     };
 
     auto&& preferences = toml::find(data_, Constants::Input::TableNames::kPreferences);

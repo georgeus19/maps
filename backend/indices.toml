@@ -19,3 +19,7 @@ index_table = "czedges_peak_index"
 name = "length"
 edges_table = "czedges"
 index_table = "czedges_length_index"
+[[indices]]
+name = "road_type"
+edges_table = "czedges"
+index_table = "czedges_road_type_index"

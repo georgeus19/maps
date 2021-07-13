@@ -47,7 +47,7 @@ void IndexExtender<Graph>::ExtendIndex(std::shared_ptr<profile::PreferenceIndex>
             if (edge.IsShortcut()) {
                 extended_index.emplace_back(edge.get_uid(), CalculateIndexValue(data_index, edge));
             } else {
-                extended_index.emplace_back(edge.get_uid(), data_index->Get(edge.get_uid()));
+                extended_index.emplace_back(edge.get_uid(), data_index->GetOriginal(edge.get_uid()));
             }
         }
     });
@@ -66,7 +66,7 @@ double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::Prefer
                 return e.get_to() == edge.get_contracted_vertex(); 
             });
         } else {
-            index_value += data_index->Get(edge.get_uid());
+            index_value += data_index->GetOriginal(edge.get_uid());
             edge = shortcut_stack.top();
             shortcut_stack.pop();
             // Do nothing with the shortcut itself - just get right child edge.
@@ -77,7 +77,7 @@ double IndexExtender<Graph>::CalculateIndexValue(std::shared_ptr<profile::Prefer
         }
     }
     // Last non-shortcut edge was not added due to empty stack and not being a shortcut.
-    index_value += data_index->Get(edge.get_uid());
+    index_value += data_index->GetOriginal(edge.get_uid());
     return index_value;
 }
 

@@ -56,6 +56,7 @@ struct Constants{
         static inline const std::string kGreenIndex = "green";
         static inline const std::string kLengthIndex = "length";
         static inline const std::string kPeakDistanceIndex = "peak";
+        static inline const std::string kRoadTypeIndex = "road_type";
     };
 
     struct ModeNames{

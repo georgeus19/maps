@@ -14,6 +14,7 @@
 #include "routing/profile/green_index.h"
 #include "routing/profile/physical_length_index.h"
 #include "routing/profile/peak_distance_index.h"
+#include "routing/profile/road_type_index.h"
 
 #include "database/database_helper.h"
 
@@ -114,8 +115,8 @@ static void StaticModePreprocessing(DatabaseHelper& d, Configuration& cfg) {
     std::unordered_map<std::string, std::function<void(DatabaseHelper&, Configuration&, Profile&)>> algorithms{
         {Constants::AlgorithmNames::kContractionHierarchies, CHPreprocessing}
     };
-    cfg.profile_properties.LoadIndices(d);
-    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+    cfg.profile_preferences.LoadIndices(d);
+    auto&& gen = cfg.profile_preferences.GetProfileGenerator();
     for(auto&& profile : gen.Generate()) {
         auto it = algorithms.find(cfg.algorithm->name);
         if (it != algorithms.end()) {
@@ -130,8 +131,8 @@ static void DynamicModePreprocessing(DatabaseHelper& d, Configuration& cfg) {
     std::unordered_map<std::string, std::function<void(DatabaseHelper&, Configuration&, Profile&)>> algorithms{
         {Constants::AlgorithmNames::kContractionHierarchies, CHPreprocessing}
     };
-    cfg.profile_properties.LoadIndices(d);
-    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+    cfg.profile_preferences.LoadIndices(d);
+    auto&& gen = cfg.profile_preferences.GetProfileGenerator();
     Profile profile = gen.GetFrontProfile();
 
     auto it = algorithms.find(cfg.algorithm->name);
@@ -145,11 +146,13 @@ static void DynamicModePreprocessing(DatabaseHelper& d, Configuration& cfg) {
 template <typename Graph>
 static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d) {
     IndexExtender<Graph> extender{d, graph};
-    for(auto&& prop : cfg.profile_properties.properties) {
-        std::shared_ptr<PreferenceIndex> index =  profile.GetIndex(prop.index->GetName());
-        if (!index) {
-            throw InvalidValueException{"Index " + prop.table_name + " not in profile when up for extension."};
-        }
+    auto&& base_index = profile.GetBaseIndex();
+    std::string new_base_index_table = table_names->GetIndexTablePrefix() + cfg.profile_preferences.base_index_table;
+    std::cout << "Extend base index " << cfg.profile_preferences.base_index_table << " to table " << new_base_index_table << std::endl;
+    extender.ExtendIndex(base_index, new_base_index_table);
+    
+    for(auto&& prop : cfg.profile_preferences.properties) {
+        auto&& index =  profile.GetIndex(prop.index->GetName());
         std::string new_index_table = table_names->GetIndexTablePrefix() + prop.table_name;
         std::cout << "Extend index " << prop.table_name << " to table " << new_index_table << std::endl;
         extender.ExtendIndex(index, new_index_table);
@@ -187,6 +190,16 @@ static void CreateIndices(const std::string& path) {
             Constants::IndexNames::kLengthIndex,
             [&](const toml::value& table){
                 PhysicalLengthIndex index{};
+                index.Create(d,
+                    toml::find<std::string>(table, Constants::Input::Indices::kEdgesTable),
+                    toml::find<std::string>(table, Constants::Input::Indices::kIndexTable)
+                );
+            }
+        },
+         {
+            Constants::IndexNames::kRoadTypeIndex,
+            [&](const toml::value& table){
+                RoadTypeIndex index{};
                 index.Create(d,
                     toml::find<std::string>(table, Constants::Input::Indices::kEdgesTable),
                     toml::find<std::string>(table, Constants::Input::Indices::kIndexTable)

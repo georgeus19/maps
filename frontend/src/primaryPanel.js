@@ -360,7 +360,7 @@ function Profile(props) {
     const [allProperties, setAllProperties] = useState([]);
 
     const getProfileProperties = () => {
-        fetch('/profile_properties', {
+        fetch('/profile_preferences', {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8'
@@ -375,11 +375,11 @@ function Profile(props) {
         .then((data) => {
             console.log(data);
             if (data.ok) {
-                console.log('properties', data.profile_properties);
-                props.dispatchProfile({type:'set', value:data.profile_properties.map((property) => {
+                console.log('properties', data.profile_preferences);
+                props.dispatchProfile({type:'set', value:data.profile_preferences.map((property) => {
                     return {name:property.name, importance:property.importance_options[0]};
                 })});
-                setAllProperties(data.profile_properties.map((property) => {
+                setAllProperties(data.profile_preferences.map((property) => {
                     return {name:property.name, importanceOptions:property.importance_options};
                 }));
                 console.log('profile', props.profile);

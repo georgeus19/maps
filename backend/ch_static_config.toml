@@ -8,7 +8,7 @@ port = "5432"
 [algorithm]
 name = "ch"
 base_graph_table = "czedges"
-mode = "dynamic_profile"
+mode = "static_profile"
 [algorithm.parameters]
 hop_count = 5
 edge_difference = 190
@@ -19,12 +19,16 @@ space_size = 0
 base_index = "length"
 base_index_table = "czedges_length_index"
 
+# [[preferences.indices]]
+# name = "green"
+# table_name = "czedges_green_index"
+# importance = [ 0.0, -0.30, -0.60, -1.0 ]
+# [[preferences.indices]]
+# name = "peak"
+# table_name = "czedges_peak_index"
+# importance = [ 0.0, 0.5, 1.0 ]
 [[preferences.indices]]
-name = "green"
-table_name = "czedges_green_index"
-importance = [ 0.0, -0.2, -0.4, -0.6, -0.8, -1.0 ]
-[[preferences.indices]]
-name = "peak"
-table_name = "czedges_peak_index"
-importance = [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ]
+name = "road_type"
+table_name = "czedges_road_type_index"
+importance = [ 0.0, 0.5, 1.0 ]
 

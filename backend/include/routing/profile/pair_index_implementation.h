@@ -37,6 +37,7 @@ public:
     std::function<void(const database::DbRow&)> CreateLoadFunction();
 
     void ForEachValue(const std::function<void(Value&)>& f);
+
 private:
     std::vector<Value> values_;
     double max_;

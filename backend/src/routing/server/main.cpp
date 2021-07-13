@@ -43,8 +43,8 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile,
                 [&](){
-                    cfg.profile_properties.LoadIndices(d);
-                    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+                    cfg.profile_preferences.LoadIndices(d);
+                    auto&& gen = cfg.profile_preferences.GetProfileGenerator();
                     Profile profile = gen.GetFrontProfile();
                     DynamicProfileMode<DijkstraFactory> m{d, std::make_unique<DijkstraTableNames>(cfg.algorithm->base_graph_table), std::move(profile)};
                     std::cout << Constants::AlgorithmNames::kDijkstra + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
@@ -55,9 +55,10 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile,
                 [&](){
-                    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+                    auto&& gen = cfg.profile_preferences.GetProfileGenerator();
                     std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
                     StaticProfileMode<CHStaticFactory> m{};
+                    cfg.profile_preferences.base_index->Load(d, cfg.profile_preferences.base_index_table);
                     for(auto&& profile : gen.Generate()) {
                         m.AddRouter(d, std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile), profile);
                     }
@@ -68,11 +69,11 @@ int main(int argc, const char ** argv) {
             {
                 Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kDynamicProfile,
                 [&](){
-                    auto&& gen = cfg.profile_properties.GetProfileGenerator();
+                    auto&& gen = cfg.profile_preferences.GetProfileGenerator();
                     Profile profile = gen.GetFrontProfile();
                     std::unique_ptr<TableNames> table_names = std::make_unique<CHTableNames>(cfg.algorithm->base_graph_table, profile);
-                    cfg.profile_properties.LoadIndices(d, table_names->GetIndexTablePrefix());
-                    std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kStaticProfile << " run mode" << std::endl;
+                    cfg.profile_preferences.LoadIndices(d, table_names->GetIndexTablePrefix());
+                    std::cout << Constants::AlgorithmNames::kContractionHierarchies + Constants::ModeNames::kDynamicProfile << " run mode" << std::endl;
                     DynamicProfileMode<CHDynamicFactory> m{d, std::move(table_names), std::move(profile)};
                     d.DisconnectIfOpen();
                     RunServer<CHDynamicFactory, DynamicProfileMode<CHDynamicFactory>>(cfg, m, config_path);
@@ -135,20 +136,20 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
     });
 
 
-    CROW_ROUTE(app, "/profile_properties")([&](const crow::request& req) {
+    CROW_ROUTE(app, "/profile_preferences")([&](const crow::request& req) {
             crow::json::wvalue response;
 
             ConfigurationParser parser{config_path};
             auto&& cfg = parser.Parse();
             std::vector<crow::json::wvalue> result;
-            for(auto&& prop : cfg.profile_properties.properties) {
+            for(auto&& prop : cfg.profile_preferences.properties) {
                 crow::json::wvalue json_prop;
                 json_prop["name"] = prop.index->GetName();
                 json_prop["importance_options"] = prop.options;
                 result.push_back(std::move(json_prop));
             }
             
-            response["profile_properties"] = std::move(result);
+            response["profile_preferences"] = std::move(result);
             response["ok"] = "true";
             return response;
     });
