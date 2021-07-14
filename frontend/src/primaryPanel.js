@@ -163,6 +163,7 @@ function RoutingTab(props) {
         const unordered_coordinates = routes.flat(1).map((linestring) => {
             return linestring.coordinates;
         });
+        console.log(unordered_coordinates);
         const equals = (a, b) => { const eps = 0.00001; return (a + eps >= b) && (a - eps <= b)};
         const coordinatesEqual = (former, latter) => {
             return equals(former[0], latter[0]) && equals(former[1], latter[1]); 
@@ -182,6 +183,7 @@ function RoutingTab(props) {
                 unordered_coordinates[i + 1] = latter.reverse();
             }
         }
+        console.log(unordered_coordinates);
         return unordered_coordinates.flat(1);
     }
 

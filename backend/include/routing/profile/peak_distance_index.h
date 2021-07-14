@@ -35,7 +35,7 @@ private:
 
     static inline const std::string kValueColumnName = "peak_distance";
 
-    static inline const float kDistanceRadius = 500;
+    static inline const float kDistanceRadius = 1000;
 
     void Normalize() override;
 };

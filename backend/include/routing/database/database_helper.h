@@ -210,12 +210,12 @@ std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const 
     }
     std::string geojson = "";
     for(auto&& edge : edges) {
-        auto&& nh = geometries.extract(edge.get_uid());
-        if (!nh.empty()) {
-            geojson += std::move(nh.mapped());
+        auto it = geometries.find(edge.get_uid());
+        if (it != geometries.end()) {
+            geojson += std::move(it->second);
             geojson += ",";
         } else {
-            std::cout << edge.get_uid() << " not found in czedges but is part of routing result." << std::endl;
+            std::cout << edge.get_uid() << " not found in edge table but is part of routing result." << std::endl;
         }
     }
     return geojson;
