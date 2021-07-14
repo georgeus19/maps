@@ -36,10 +36,9 @@ void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::string& e
 }
 
 void PeakDistanceIndex::Load(database::DatabaseHelper& d, const std::string& peak_index_table) {
-    // edge_peak_distances_.assign(max_uid + 1, GreenValue{});
     float max_distance = kDistanceRadius * 1.5;
     std::string sql = 
-            "SELECT uid, LEAST(COALESCE(" + kValueColumnName + ", " + std::to_string(max_distance) + "), " + std::to_string(max_distance) + ") "
+            "SELECT uid, LEAST(COALESCE(" + kValueColumnName + ", 0), " + std::to_string(max_distance) + ") "
             "FROM " + peak_index_table + "; ";
     auto&& load = impl_.CreateLoadFunction();
     d.RunNontransactional(sql, load);

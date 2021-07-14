@@ -48,7 +48,6 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 }
 
 void GreenIndex::Load(database::DatabaseHelper& d, const std::string& green_index_table) {
-    // edge_green_values_.assign(max_uid + 1, GreenValue{});
     std::string sql = 
             "SELECT uid, COALESCE(" + kValueColumnName + ", 0) "
             "FROM " + green_index_table + "; ";
