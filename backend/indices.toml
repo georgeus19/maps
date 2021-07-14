@@ -5,21 +5,21 @@ password = "wtz2trln"
 host = "127.0.0.1"
 port = "5432"
 
-# [[indices]]
-# name = "green"
-# edges_table = "czedges"
-# polygon_table = "planet_osm_polygon"
-# index_table = "czedges_green_index"
-# [[indices]]
-# name = "peak"
-# edges_table = "czedges"
-# point_table = "planet_osm_point"
-# index_table = "czedges_peak_index"
+[[indices]]
+name = "green"
+edges_table = "czedges"
+polygon_table = "planet_osm_polygon"
+index_table = "czedges_green_index"
+[[indices]]
+name = "peak"
+edges_table = "czedges"
+point_table = "planet_osm_point"
+index_table = "czedges_peak_index"
 [[indices]]
 name = "length"
 edges_table = "czedges"
 index_table = "czedges_length_index"
-# [[indices]]
-# name = "road_type"
-# edges_table = "czedges"
-# index_table = "czedges_road_type_index"
+[[indices]]
+name = "road_type"
+edges_table = "czedges"
+index_table = "czedges_road_type_index"

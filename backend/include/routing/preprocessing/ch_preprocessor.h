@@ -17,6 +17,7 @@
 #include "routing/profile/profile.h"
 
 #include "routing/database/database_helper.h"
+#include "routing/database/csv_convertor.h"
 
 #include <functional>
 
@@ -55,15 +56,12 @@ public:
         database::CHDbGraph ch_db_graph{};
         std::string ch_edges_table{table_names_->GetEdgesTable()};
         std::string ch_vertex_table{table_names_->GetVerticesTable()};
-        d_.get().CreateGraphTable(table_names_->GetBaseTableName(), ch_edges_table, &ch_db_graph);
-        d_.get().DropGeographyIndex(ch_edges_table);
-        std::cout << "Geography index dropped." << std::endl;
-        d_.get().AddShortcuts(ch_edges_table, g);
-        std::cout << "Shortcuts added to " + ch_edges_table << "."<< std::endl;
+        d_.get().SaveEdges(ch_edges_table, table_names_->GetBaseTableName(), g, database::CHEdgeConvertor<Graph::Edge>{}, &ch_db_graph);
+        std::cout << "Graph saved to " + ch_edges_table << "."<< std::endl;
         d_.get().CreateGeographyIndex(ch_edges_table);
-        std::cout << "Geography index restored." << std::endl;
-        d_.get().AddVertexOrdering(ch_vertex_table, g);
-        std::cout << "Vertex ordering saved to " << ch_vertex_table << "." << std::endl;
+        std::cout << "Geography index created." << std::endl;
+        d_.get().SaveVertices(ch_vertex_table, g, database::CHVertexConvertor<Graph::Vertex>{}, &ch_db_graph);
+        std::cout << "Vertices saved to " << ch_vertex_table << "." << std::endl;
     }
 private:
     std::reference_wrapper<database::DatabaseHelper> d_;

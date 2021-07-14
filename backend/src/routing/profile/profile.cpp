@@ -31,11 +31,9 @@ std::string Profile::GetName() const {
 }
 
 float Profile::GetLength(unsigned_id_type uid) const {
-    // std::cout << "PROFILE GET LENGTH:" << std::endl;
-    float base_index_value = base_index_->Get(uid);
-    // std::cout << base_index_->GetName() << " " << base_index_->Get(uid) << " " << base_index_->GetInverted(uid) << std::endl;
+    float base_index_value = base_index_->Get(uid);// * 1000;
     float length = base_index_value;
-
+    
     for(auto&& property : properties_) {
         float index_value;
         float importance;
@@ -46,8 +44,6 @@ float Profile::GetLength(unsigned_id_type uid) const {
             index_value = property.index->GetInverted(uid);
             importance = -property.importance;
         }
-        // std::cout << property.index->GetName() << " " << property.index->Get(uid) << " " << property.index->GetInverted(uid) << " " << property.importance << " " << std::endl;
-        
         length += importance * index_value * base_index_value;
     }
     return length;

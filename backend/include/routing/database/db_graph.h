@@ -34,9 +34,10 @@ public:
     DbGraph() {}
     virtual std::string GetEdgeSelect(const std::string& table_alias = "") const = 0;
     virtual std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const = 0;
-    virtual std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const = 0;
+    virtual std::string GetCreateGraphTable(const std::string& table_name) const = 0;
     virtual std::string GetEndpointEdgeCondition(const std::string& table_alias = "") const = 0;
     virtual std::string GetVertexSelect(const std::string& table_alias = "") const = 0;
+    virtual std::string GetCreateVertexTable(const std::string& table_name) const = 0;
  
 protected:
     std::string GetAliasExpression(const std::string& alias) const {
@@ -67,8 +68,16 @@ public:
         return std::make_unique<UnpreprocessedDbEdgeIterator>(begin, end);
     }
 
-    std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
-        return "CREATE TABLE " + new_table + " AS SELECT * FROM " + basic_graph_table + ";";
+    std::string GetCreateGraphTable(const std::string& table_name) const override {
+        std::string create_table = "CREATE TABLE " + table_name + " ( " \
+				"osm_id BIGINT NOT NULL, " \
+				"uid INTEGER PRIMARY KEY, " \
+				"geog geography(LINESTRING), " \
+				"from_node INTEGER NOT NULL, " \
+				"to_node INTEGER NOT NULL, " \
+                "undirected BOOLEAN NOT NULL, " \
+                "length REAL NOT NULL); ";
+        return create_table;
     }
 
     std::string GetEndpointEdgeCondition(const std::string& table_alias = "") const override {
@@ -77,6 +86,12 @@ public:
 
     std::string GetVertexSelect(const std::string& table_alias = "") const override {
         return " SELECT * ";
+    }
+
+    std::string GetCreateVertexTable(const std::string& table_name) const override {
+        std::string create_table = "CREATE TABLE " + table_name + "("  \
+            "uid INTEGER PRIMARY KEY); ";
+        return create_table;
     }
 
 };
@@ -97,22 +112,18 @@ public:
         + alias_expression + "contracted_vertex ";
     }
 
-    std::string GetCreateGraphTable(const std::string& basic_graph_table, const std::string& new_table) const override {
-        std::string create_table_sql = "CREATE TABLE " + new_table + " ( " \
+    std::string GetCreateGraphTable(const std::string& table_name) const override {
+        std::string create_table = "CREATE TABLE " + table_name + " ( " \
 				"osm_id BIGINT NOT NULL, " \
 				"uid INTEGER PRIMARY KEY, " \
 				"geog geography(LINESTRING), " \
 				"from_node INTEGER NOT NULL, " \
 				"to_node INTEGER NOT NULL, " \
                 "undirected BOOLEAN NOT NULL, " \
-                "length REAL NOT NULL, "
+                "length REAL NOT NULL, " \
 				"shortcut BOOLEAN NOT NULL, " \
 				"contracted_vertex INTEGER NOT NULL); ";
-        std::string insert_basic_graph_sql = "INSERT INTO " + new_table + "(osm_id, uid, geog, from_node, to_node, undirected, length, shortcut, contracted_vertex) " \
-                "( " \
-                "SELECT osm_id, uid, geog, from_node, to_node, undirected, length, false, 0 FROM "+ basic_graph_table + " " \
-                "); ";
-        return create_table_sql + insert_basic_graph_sql;
+        return create_table;
     }
 
     std::unique_ptr<DbEdgeIterator> GetEdgeIterator(pqxx::result::const_iterator begin, pqxx::result::const_iterator end) const override {
@@ -129,6 +140,13 @@ public:
         return " SELECT "
             + alias_expression + "osm_id, "
             + alias_expression + "ordering_rank ";
+    }
+
+    std::string GetCreateVertexTable(const std::string& table_name) const override {
+        std::string create_table = "CREATE TABLE " + table_name + "("  \
+            "uid INTEGER PRIMARY KEY, " \
+            "ordering_rank INTEGER NOT NULL); ";
+        return create_table;
     }
 };
 

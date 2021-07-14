@@ -131,20 +131,15 @@ public:
     /**
      * Appends shortcuts of the graph to the given table - needs to have appropriate columns.
      */ 
-    template <typename Graph>
-    void AddShortcuts(const std::string& table_name, Graph& graph);
+    template <typename Graph, typename EdgeConvertor>
+    void SaveEdges(const std::string& table_name, const std::string& geom_table, Graph& graph, const EdgeConvertor& edge_convertor, DbGraph* db_graph);
 
-    /**
-     * Creates a table with vertex ordering of the graph. Indexed by vertex ids.
-     */ 
-    template <typename Graph>
-    void AddVertexOrdering(const std::string& table_name, Graph& graph);
+    template <typename Graph, typename VertexConvertor>
+    void SaveVertices(const std::string& table_name, Graph& graph, const VertexConvertor& vertex_convertor, DbGraph* db_graph);
 
     void DropGeographyIndex(const std::string& table_name);
 
     void CreateGeographyIndex(const std::string& table_name);
-
-    void CreateGraphTable(const std::string& graph_table_name, const std::string& new_table_name, DbGraph* db_graph);
 
     template <typename Graph>
     void LoadAdditionalVertexProperties(const std::string& vertices_table, Graph&g);  
@@ -241,38 +236,47 @@ void DatabaseHelper::LoadGraphEdges(const std::string& table_name, Graph& graph,
     }
 }
 
-template <typename Graph>
-void DatabaseHelper::AddShortcuts(const std::string& table_name, Graph& graph) {
+template <typename Graph, typename EdgeConvertor>
+void DatabaseHelper::SaveEdges(const std::string& table_name, const std::string& geom_table, Graph& graph, const EdgeConvertor& edge_convertor, DbGraph* db_graph) {
     auto&& current_dir = std::filesystem::current_path();
-    std::string data_path{current_dir.string() + "/shortcuts.csv"};
-    std::string sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV NULL 'null';";
+    std::string data_path{current_dir.string() + "/graph.csv"};
+
+    std::string drop_table = "DROP TABLE IF EXISTS " + table_name + "; ";
+					
+	std::string create_table = db_graph->GetCreateGraphTable(table_name);
+
+    std::string copy = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV NULL 'null'; ";
+    std::string copy_geometry =
+                "UPDATE " + table_name + " as new_table " \
+                "SET geog = geom_table.geog " \
+                "FROM " + geom_table + " as geom_table " \
+                "WHERE geom_table.uid = new_table.uid; ";
+
     CsvConvertor convertor{data_path};
-    convertor.SaveEdges(graph, [](const typename Graph::Edge& edge) {
+    convertor.SaveEdges(graph, edge_convertor, [](const typename Graph::Edge& edge) {
         bool twoway_condition = true;
         bool forward_or_twoway = edge.IsTwoway() || edge.IsForward();
         if (edge.IsTwoway()) {
             twoway_condition = edge.get_from() < edge.get_to();
         }
-        return forward_or_twoway && edge.IsShortcut() && twoway_condition;
+        return forward_or_twoway && twoway_condition;
     });
-
+    std::string sql = drop_table + create_table + copy + copy_geometry;
     pqxx::work w(*connection_);
     w.exec(sql);
     w.commit();
 }
 
-template <typename Graph>
-void DatabaseHelper::AddVertexOrdering(const std::string& table_name, Graph& graph) {
+template <typename Graph, typename VertexConvertor>
+void DatabaseHelper::SaveVertices(const std::string& table_name, Graph& graph, const VertexConvertor& vertex_convertor, DbGraph* db_graph) {
     auto&& current_dir = std::filesystem::current_path();
     std::string data_path{current_dir.string() + "/" + table_name + ".csv"};
-    std::string drop_table_sql = "DROP TABLE IF EXISTS " + table_name + "; ";
-    std::string create_table_sql = "CREATE TABLE " + table_name + "("  \
-        "uid INTEGER PRIMARY KEY, " \
-        "ordering_rank INTEGER NOT NULL); ";
-    std::string copy_sql = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV; ";
+    std::string drop_table = "DROP TABLE IF EXISTS " + table_name + "; ";
+    std::string create_table = db_graph->GetCreateVertexTable(table_name);
+    std::string copy = "COPY " + table_name + " FROM '" + data_path + "' DELIMITER ';' CSV; ";
     CsvConvertor convertor{data_path};
-    convertor.SaveVertexOrdering(graph);
-    std::string sql = drop_table_sql + create_table_sql + " " + copy_sql;
+    convertor.SaveVertices(graph, vertex_convertor);
+    std::string sql = drop_table + create_table + " " + copy;
     pqxx::work w(*connection_);
     w.exec(sql);
     w.commit();

@@ -191,16 +191,6 @@ void DatabaseHelper::CreateGeographyIndex(const std::string& table_name) {
 	w.commit();
 }
 
-void DatabaseHelper::CreateGraphTable(const std::string& graph_table_name, const std::string& new_table_name, DbGraph* db_graph) {
-	std::string drop_table_sql = "DROP TABLE IF EXISTS " + new_table_name + "; ";
-					
-	std::string create_table_sql = db_graph->GetCreateGraphTable(graph_table_name, new_table_name);
-	std::string sql = drop_table_sql + create_table_sql;
-	pqxx::work w(*connection_);
-	w.exec(sql);
-	w.commit();
-}
-
 std::string DatabaseHelper::GetGeographyIndexName(const std::string& table_name) {
 	return table_name + "_gix";
 }
