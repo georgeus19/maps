@@ -20,7 +20,7 @@ void PeakDistanceIndex::Create(database::DatabaseHelper& d, const std::string& e
             "CREATE TABLE " + peak_index_table + " AS "
             "SELECT e.uid, SUM( "
             "    " + std::to_string(kDistanceRadius) + " - ST_Distance(e.original_geom, p.geom) "
-            ") AS " + kValueColumnName + " "
+            ")::REAL AS " + kValueColumnName + " "
             "FROM (SELECT uid, "
             "ST_Buffer(ST_Transform(geog::geometry, 3857), " + std::to_string(kDistanceRadius) + ") AS geom, "
             "ST_Transform(geog::geometry, 3857) as original_geom "

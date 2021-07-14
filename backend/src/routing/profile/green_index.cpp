@@ -25,7 +25,7 @@ void GreenIndex::Create(database::DatabaseHelper& d, const std::string& edges_ta
 			"	edges.uid, "
 			"    SUM( "
 			"        ST_Area(ST_Intersection(edges.geom, green.way)) / ST_Area(edges.geom) "
-			"    ) AS " + kValueColumnName + " "
+			"    )::REAL AS " + kValueColumnName + " "
 			"FROM  "
 			"( "
 			"	SELECT uid, ST_Buffer(ST_Transform(geog::geometry, 3857), 30) as geom "
