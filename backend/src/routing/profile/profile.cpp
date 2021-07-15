@@ -31,7 +31,7 @@ std::string Profile::GetName() const {
 }
 
 float Profile::GetLength(unsigned_id_type uid) const {
-    float base_index_value = base_index_->Get(uid);// * 1000;
+    float base_index_value = base_index_->Get(uid) * 1000;
     float length = base_index_value;
     
     for(auto&& property : properties_) {
