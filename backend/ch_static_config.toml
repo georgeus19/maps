@@ -23,12 +23,18 @@ base_index_table = "czedges_length_index"
 name = "green"
 table_name = "czedges_green_index"
 importance = [ 0.0, -0.5, -1.0 ]
+display_name = "Green areas"
+display_importance = [ "disabled", "prefer green areas 50%", "prefer green areas 100%" ]
 [[preferences.indices]]
 name = "peak"
 table_name = "czedges_peak_index"
 importance = [ 0.0, -1.0 ]
+display_name = "Peak distance"
+display_importance = [ "disabled", "prefer peaks"]
 [[preferences.indices]]
 name = "road_type"
 table_name = "czedges_road_type_index"
 importance = [ 0.0, 0.5, 1.0 ]
+display_name = "Road types"
+display_importance = [ "disabled", "prefer small roads 50%", "prefer small roads 100%" ]
 

@@ -147,6 +147,8 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
                 crow::json::wvalue json_prop;
                 json_prop["name"] = prop.index->GetName();
                 json_prop["importance_options"] = prop.options;
+                json_prop["display_name"] = prop.display_name;
+                json_prop["display_importance_options"] = prop.option_display_names;
                 result.push_back(std::move(json_prop));
             }
             

@@ -33,6 +33,8 @@ struct Constants{
         static inline const std::string kName = "name";
         static inline const std::string kTableName = "table_name";
         static inline const std::string kImportance = "importance";
+        static inline const std::string kDisplayName = "display_name";
+        static inline const std::string kDisplayImportance = "display_importance";
         static inline const std::string kBaseGraphTable = "base_graph_table";
         static inline const std::string kBaseIndex = "base_index";
         static inline const std::string kBaseIndexTable = "base_index_table";

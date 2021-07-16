@@ -382,7 +382,8 @@ function Profile(props) {
                     return {name:property.name, importance:property.importance_options[0]};
                 })});
                 setAllProperties(data.profile_preferences.map((property) => {
-                    return {name:property.name, importanceOptions:property.importance_options};
+                    return {name:property.name, importanceOptions:property.importance_options,
+                        displayName:property.display_name, displayImportanceOptions:property.display_importance_options};
                 }));
                 console.log('profile', props.profile);
             } else {
@@ -406,17 +407,19 @@ function Profile(props) {
         let importance;
         if (index < props.profile.length) {
             importance = property.importanceOptions.indexOf(props.profile[index].importance);
-            importanceLabel = props.profile[index].importance;
+            importanceLabel = property.displayImportanceOptions[importance];
         } else {
             importance = property.importanceOptions[0];
-            importanceLabel = 0;
+            importanceLabel = property.displayImportanceOptions[0];
         }
-        return {name:property.name, importance:importance, importanceLabel:importanceLabel, importanceOptions:property.importanceOptions}
+        return {name:property.name, displayName:property.displayName, importance:importance,
+                importanceLabel:importanceLabel, importanceOptions:property.importanceOptions}
     }).filter((property) => {
         return property.importanceOptions.length > 1;
     }).map((property) => {
-        return <ProfileProperty name={property.name} importance={property.importance} importanceLabel={property.importanceLabel}
-            importanceOptions={property.importanceOptions} dispatchProfile={props.dispatchProfile} ></ProfileProperty>
+        return <ProfileProperty name={property.name} displayName={property.displayName} importance={property.importance}
+            importanceLabel={property.importanceLabel} importanceOptions={property.importanceOptions} dispatchProfile={props.dispatchProfile} >
+            </ProfileProperty>
     });
 
     return (
@@ -430,8 +433,6 @@ function Profile(props) {
  * @param {*} props 
  */
 function ProfileProperty(props) {
-    const [initial, ...rest] = props.name;
-    const name = [initial.toUpperCase(), ...rest].join('');
 
     const onChange = (e) => {
         props.dispatchProfile({type:'update', value:{name:props.name, importance:props.importanceOptions[e.target.value]}});
@@ -439,8 +440,8 @@ function ProfileProperty(props) {
     return (
         <div className="ProfileProperty">
             <Form>
-            <Form.Group controlId={name}>
-                <Form.Label className="Label">{name} importance {props.importanceLabel}%</Form.Label>
+            <Form.Group controlId={props.displayName}>
+                <Form.Label className="Label">{props.displayName}: {props.importanceLabel}</Form.Label>
                 <Form.Control type='range' min='0' max={props.importanceOptions.length - 1} value={props.importance} onChange={onChange} step='1' />
             </Form.Group>
             </Form>

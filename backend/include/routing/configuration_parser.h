@@ -41,9 +41,13 @@ struct ProfilePreference {
     std::shared_ptr<profile::PreferenceIndex> index;
     std::string table_name;
     std::vector<float> options;
+    std::string display_name;
+    std::vector<std::string> option_display_names;
 
-    ProfilePreference(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<float>&& o)
-        : index(std::move(i)), table_name(std::move(t)), options(std::move(o)) {}
+
+    ProfilePreference(std::shared_ptr<profile::PreferenceIndex>&& i, std::string&& t, std::vector<float>&& o,
+        std::string&& dn, std::vector<std::string>&& odn)
+        : index(std::move(i)), table_name(std::move(t)), options(std::move(o)), display_name(std::move(dn)), option_display_names(std::move(odn)) {}
 };
 
 
@@ -187,7 +191,15 @@ Configuration ConfigurationParser::Parse() {
         for(auto&& importance : toml::find<toml::array>(index, Constants::Input::kImportance)) {
             importance_options.push_back(static_cast<float>(importance.as_floating()));
         }
-        profile_preferences.emplace_back(indices[name](), std::move(table_name), std::move(importance_options));
+        
+        std::string display_name = toml::find<std::string>(index, Constants::Input::kDisplayName);
+        std::vector<std::string> importance_options_display_names;
+        for(auto&& importance_display_name : toml::find<toml::array>(index, Constants::Input::kDisplayImportance)) {
+            importance_options_display_names.push_back(static_cast<std::string>(importance_display_name.as_string()));
+        }
+
+        profile_preferences.emplace_back(indices[name](), std::move(table_name), std::move(importance_options), std::move(display_name),
+            std::move(importance_options_display_names));
     }
 
     ProfilePreferences pref{ 
