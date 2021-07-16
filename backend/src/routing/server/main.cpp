@@ -157,6 +157,12 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
             return response;
     });
 
-    app.port(18080).multithreaded().run();
+    // In dynamic profile, the profile of the road graph is changed; threfore,
+    // only singlethreaded server is possible.
+    if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
+        app.port(18080).concurrency(1).run();
+    } else {
+        app.port(18080).multithreaded.run();
+    }
 }
 
