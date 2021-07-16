@@ -28,7 +28,7 @@ display_importance = [ "disabled", "prefer green areas 20%", "prefer green areas
 [[preferences.indices]]
 name = "peak"
 table_name = "czedges_peak_index"
-importance = [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ]
+importance = [ 0.0, -0.2, -0.4, -0.6, -0.8, -1.0 ]
 display_name = "Peak distance"
 display_importance = [ "disabled", "prefer peaks 20%", "prefer peaks 40%", "prefer peaks 60%", "prefer peaks 80%", "prefer peaks 100%" ]
 [[preferences.indices]]
