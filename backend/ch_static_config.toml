@@ -26,7 +26,7 @@ importance = [ 0.0, -0.5, -1.0 ]
 [[preferences.indices]]
 name = "peak"
 table_name = "czedges_peak_index"
-importance = [ 0.0, -1.0, 1.0 ]
+importance = [ 0.0, -1.0 ]
 [[preferences.indices]]
 name = "road_type"
 table_name = "czedges_road_type_index"
