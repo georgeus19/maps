@@ -80,7 +80,7 @@ function MapSection(props) {
         if (coordinates.length === 0) {
 
         } else if (coordinates.length === 1) {
-            setViewport({center:coordinates[0] , zoom:16})
+            setViewport({center:coordinates[0] , zoom:12})
         } else {
             setBounds(calculateMaxBounds(coordinates));
         }
