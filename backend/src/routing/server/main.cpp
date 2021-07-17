@@ -162,7 +162,7 @@ static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_
     if (cfg.algorithm->mode == Constants::ModeNames::kDynamicProfile) {
         app.port(18080).concurrency(1).run();
     } else {
-        app.port(18080).multithreaded.run();
+        app.port(18080).multithreaded().run();
     }
 }
 
