@@ -29,6 +29,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <chrono>
 
 namespace routing {
 namespace query {
@@ -50,10 +51,10 @@ public:
     ~Router() = default;
 
     Route<typename AlgorithmFactory::Algorithm::Edge> CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target) {
-        std::cout << "Routing on " << table_names_->GetEdgesTable() << std::endl;
         if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
             throw RouteNotFoundException("Start and end point are the same.");
         }
+        
         RoutingGraph<typename AlgorithmFactory::Graph> routing_graph{base_graph_};
         auto&& db_graph = alg_factory_.CreateDbGraph();
 
@@ -66,30 +67,27 @@ public:
         endpoints_creator.AddSourceEndpoint(table_names_->GetEdgesTable(), source_vertex_id, source);
         endpoints_creator.AddTargetEndpoint(table_names_->GetEdgesTable(), target_vertex_id, target);
 
-
-            auto start_run = std::chrono::high_resolution_clock::now();
         Algorithm<typename AlgorithmFactory::Algorithm> alg{routing_graph};
-        alg.Run(source_vertex_id, target_vertex_id);
-            auto finish_run = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<float> elapsed_run = finish_run - start_run;
-            std::cout << "Elapsed time - run alg: " << elapsed_run.count() << " s\n";
+        alg.Run(source_vertex_id, target_vertex_id);            
 
         std::vector<typename AlgorithmFactory::Algorithm::Edge> route = alg.GetRoute();
-        std::cout << "Get route done." << std::endl;
         auto&& geom = GetRouteGeometry(d, endpoints_creator, route);
         return Route<typename AlgorithmFactory::Algorithm::Edge>{std::move(route), std::move(geom)};
     }
 
     std::string GetRouteGeometry(database::DatabaseHelper& d, EC& endpoints_creator,
-        std::vector<typename AlgorithmFactory::Algorithm::Edge> route) {
-        auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route[0].get_uid());
-        auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route[route.size() - 1].get_uid());
-        route.pop_back();
-        route.erase(route.begin());
-        auto&& geojson_array = d.GetRouteCoordinates(route, table_names_->GetEdgesTable());
+        const std::vector<typename AlgorithmFactory::Algorithm::Edge>& route) {
+        auto&& route_begin = route.cbegin();
+        auto&& route_end = route.cend();
+        --route_end;
+        auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route_begin->get_uid());
+        auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route_end->get_uid());
+        ++route_begin;
+        // The first and the last edge geometries already retrieved so
+        // inc route_begin and dec route_end was done.
+        auto&& geojson_array = d.GetRouteCoordinates<typename AlgorithmFactory::Algorithm::Edge>(route_begin, route_end, table_names_->GetEdgesTable());
 
         std::string final_array = "[" + first_edge_geometry + "," + geojson_array + last_edge_geometry + "]";
-        std::cout << "Routing done." << std::endl;
         return final_array;
     }
 

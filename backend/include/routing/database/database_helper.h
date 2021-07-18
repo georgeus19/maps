@@ -120,7 +120,7 @@ public:
      * @return String of geometries in geoJSON format.
      */
     template <typename Edge>
-    std::string GetRouteCoordinates(std::vector<Edge>& edges, const std::string& table_name);
+    std::string GetRouteCoordinates(std::vector<Edge>::const_iterator begin, std::vector<Edge>::const_iterator end, const std::string& table_name);
 
     /**
      * Load the entire graph from the database table (edgelist)
@@ -181,18 +181,18 @@ private:
 };
 
 template <typename Edge>
-std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const std::string & table_name) {
+std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>::const_iterator begin, std::vector<Edge>::const_iterator end, const std::string& table_name) {
 
     std::string sql_start = " SELECT uid, ST_AsGeoJSON(geog) " \
                             " FROM " + table_name + " WHERE ";
     // Define fold function for std::accumulate.
-    auto fold = [](std::string a, Edge e) {
+    auto fold = [](const std::string& a, const Edge& e) {
         return std::move(a) + " or uid = " + std::to_string(e.get_uid());
     };
 
     // WHERE clause looks like: WHERE uid=3 or uid=42 ...
-    std::string first_cond = " uid = " + std::to_string((edges.begin())->get_uid());
-    std::string cond = std::accumulate(edges.begin(), edges.end(), first_cond, fold);
+    std::string first_cond = " uid = " + std::to_string(begin->get_uid());
+    std::string cond = std::accumulate(begin, end, first_cond, fold);
     std::string sql_end = " ;";
     std::string complete_sql = sql_start + cond + sql_end;
 
@@ -204,14 +204,16 @@ std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>& edges, const 
         geometries.emplace(it[0].as<unsigned_id_type>(), it[1].as<std::string>());
     }
     std::string geojson = "";
-    for(auto&& edge : edges) {
-        auto it = geometries.find(edge.get_uid());
-        if (it != geometries.end()) {
-            geojson += std::move(it->second);
+    for(auto it = begin; it != end; ++it) {
+        auto&& edge = *it;
+        auto geom_it = geometries.find(edge.get_uid());
+        if (geom_it != geometries.end()) {
+            geojson += std::move(geom_it->second);
             geojson += ",";
         } else {
             std::cout << edge.get_uid() << " not found in edge table but is part of routing result." << std::endl;
         }
+
     }
     return geojson;
 }
