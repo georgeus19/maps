@@ -4,7 +4,7 @@ import { Map, Marker, Popup, TileLayer, GeoJSON, GeoJSONProps } from 'react-leaf
 import L from 'leaflet'   
 import 'leaflet/dist/leaflet.css';
 import { findPlaceInformation } from './nominatim.js'
-import marker from './marker.svg'
+import marker from './marker.png'
 const TabEnum = Object.freeze({"searchTab":1, "routeTab":2, "exportTab":3})
 
 /**
