@@ -2,7 +2,6 @@
 #define ROUTING_PREPROCESSING_CONTRACTION_PARAMETERS_H
 
 #include "routing/edges/basic_edge.h"
-#include "robin_hood/robin_hood.h"
 #include "routing/types.h"
 
 #include <vector>
