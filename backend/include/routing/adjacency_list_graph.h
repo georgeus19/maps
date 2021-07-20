@@ -32,6 +32,9 @@ public:
 
     AdjacencyListGraph();
 
+    /**
+     * Graphs are typically large so no copying allowed as a precaution.
+     */
     AdjacencyListGraph(const AdjacencyListGraph& other) = delete;
     AdjacencyListGraph(AdjacencyListGraph&& other) = default;
     AdjacencyListGraph& operator=(const AdjacencyListGraph& other) = delete;
@@ -61,10 +64,6 @@ public:
     unsigned_id_type GetMaxEdgeId();
 
 private:
-    /**
-     * Internal graph representations. Unfortunately, even though the ids
-     * are number they are too high to index using std::vector.
-     */
     std::vector<V> vertices_;
 
     void SetOsmId(unsigned_id_type vertex_id);

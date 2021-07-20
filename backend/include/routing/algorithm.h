@@ -9,7 +9,7 @@
 namespace routing {
 
     /**
-     * Class Algorithm provides routing functionality. It forwards all calls to Implementation class.
+     * Class Algorithm defines interface for routing algorithms that can be used in @see Router.
      *
      * @tparam Implementation Implementation of routing algorithm that all methods are forwarded to.
      */
