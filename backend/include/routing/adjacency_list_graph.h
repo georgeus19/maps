@@ -19,7 +19,7 @@
 namespace routing {
 
 /**
- * Routing graph which can be used for any edge and vertex types.
+ * Adjacency list graph representation which can be used for any edge and vertex types.
  * However, Vertex and Edge must be valid with respect to each other.
  * @tparam Vertex Type of vertex in the graph.
  * @tparam Edge Type of edge in the graph.
