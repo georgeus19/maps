@@ -33,6 +33,9 @@ public:
 private:
     PairIndexImplementation impl_;
 
+    /**
+     * Name of column with preference values in database table
+     */
     static inline const std::string kValueColumnName = "highway";
 
     void Normalize() override;

@@ -17,12 +17,19 @@ namespace query {
 
 /**
  * Implementation of dijkstra's routing algorithm.
+ * 
+ * It does not change any properties of vertices or edge of graph
+ * it runs on. Any information such as current costs of vertices is stored
+ * inside this class.
  */
 template <typename G>
 class Dijkstra {
 public:
     using Vertex = typename G::Vertex;
     using Edge = typename G::Edge;
+    /**
+     * Type of member in priority queue
+     */
     using QueuePair = std::pair<float, unsigned_id_type>;
     using Graph = G;
 

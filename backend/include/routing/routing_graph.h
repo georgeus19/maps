@@ -19,10 +19,12 @@
 namespace routing {
 
 /**
- * Routing graph which can be used for any edge and vertex types.
- * However, Vertex and Edge must be valid with respect to each other.
- * @tparam Vertex Type of vertex in the graph.
- * @tparam Edge Type of edge in the graph.
+ * RoutingGraph is built on top of any graph.
+ * It provides an interface which allows adding vertices and edges to the underlying graph 
+ * and simulates the behaviour as if they were adde to the graph.
+ * However, they are instead stored in this instance and the underlying graph is uncahnged.
+ * 
+ * This is useful for adding temporary vertices and their edges.
  */
 template <typename Graph>
 class RoutingGraph {
@@ -34,11 +36,6 @@ public:
 
     void AddVertex(Vertex&& vertex);
 
-    /**
-     * Return point to vertex with `id`.
-     * @param id Id of vertex to which Vertex* points.
-     * @return Pointer to vetex or nullptr if it is not found.
-     */
     Vertex& GetVertex(unsigned_id_type id);
 
 private:
@@ -67,6 +64,6 @@ inline typename Graph::Vertex& RoutingGraph<Graph>::GetVertex(unsigned_id_type i
 
 
 
-}
 
+}
 #endif //ROUTING_QUERY_ROUTING_GRAPH_H

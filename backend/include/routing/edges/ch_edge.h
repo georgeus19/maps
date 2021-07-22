@@ -7,7 +7,9 @@
 #include <iostream>
 
 namespace routing {
-
+/**
+ * Edge for ContractionHierarchies algorithm.
+ */
 template <typename LS>
 class CHEdge : public BasicEdge<LS> {
 public:

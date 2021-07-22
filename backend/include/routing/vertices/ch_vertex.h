@@ -10,6 +10,9 @@
 
 namespace routing {
 
+/**
+ * Vertex for ContractionHierarchies algorithm.
+ */
 template <typename Edge, typename ERange>
 class CHVertex : public BasicVertex<Edge, ERange> {
 public:

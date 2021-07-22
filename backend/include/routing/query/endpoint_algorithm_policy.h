@@ -8,6 +8,14 @@
 namespace routing{
 namespace query{
 
+/**
+ * EndpointAlgorithmPolicyContractionHierarchies is a policy class that defines how endpoint vertices
+ * and their edges should be added to a road graph.
+ * 
+ * Since CH uses Bidirectional Dijkstra as query algorithm,
+ * the target endpoint vertex must have backward edges so that
+ * backward search in Bidirectional Dijkstra can reach its neighbours.
+ */
 template <typename Graph, typename EdgeRangePolicy>
 class EndpointAlgorithmPolicyContractionHierarchies{
 public:
@@ -36,6 +44,13 @@ private:
     EdgeRangePolicy edge_range_policy_;
 };
 
+/**
+ * EndpointAlgorithmPolicyDijkstra is a policy class that defines how endpoint vertices
+ * and their edges should be added to a road graph.
+ * 
+ * Adding target endpoint vertex requires that its edges are added to its neighbours
+ * so that it can be reach from source.
+ */
 template <typename Graph, typename EdgeRangePolicy>
 class EndpointAlgorithmPolicyDijkstra{
 public:

@@ -48,6 +48,9 @@ public:
     }
 };
 
+/**
+ * CsvConvertor convertes vertex list and edge lists to csv files.
+ */
 class CsvConvertor {
 public:
 

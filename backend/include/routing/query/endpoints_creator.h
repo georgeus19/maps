@@ -11,10 +11,15 @@
 #include <string>
 #include <algorithm>
 
-
 namespace routing{
 namespace query{
 
+/**
+ * EndpointsCreator creates endpoints (source and target) for routing and stores their edges.
+ * 
+ * @tparam EndpointAlgorithmPolicy Specify how to add endpoints and its edges to road graph.
+ * @tparam EndpointEdgesCreator Define how to create endpoint and their geometries.
+ */
 template <typename EndpointAlgorithmPolicy, typename EndpointEdgesCreator>
 class EndpointsCreator {
 public:
@@ -74,7 +79,7 @@ private:
 
 
 
-}
-}
 
+}
+}
 #endif // ROUTING_QUERY_ENDPOINTS_CREATOR_H

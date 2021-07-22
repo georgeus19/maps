@@ -33,6 +33,12 @@
 namespace routing {
 namespace query {
 
+/**
+ * AlgorithmFactory for Dijkstra's algorithm.
+ * Dijkstra has no preprocessing so it is always used with DynamicProfileMode.
+ * That means that road graph edge lengths must be based on a profile so that
+ * they can be swapped at moments notice by swapping the underlying profile.
+ */
 class DijkstraFactory {
 public:
     using EdgeFactory = BasicProfileEdgeFactory;
@@ -48,6 +54,9 @@ public:
 
     DijkstraFactory() : endpoint_edges_lengths_() {}
 
+    /**
+     * Load graph from database.
+     */
     static Graph CreateGraph(database::DatabaseHelper& d, TableNames* table_names, DynamicLengthSource* length_source) {
         Graph g{};
         DbGraph db_graph{};
@@ -71,6 +80,12 @@ private:
     EndpointEdgesLengths endpoint_edges_lengths_;
 };
 
+/**
+ * AlgorithmFactory for Contraction Hierarchies algorithm use with StaticProfileMode.
+ * It uses graphs whose lengths are set in stone. No profiles and their preference
+ * indices that contain actual values need to be loaded to do routing.
+ * It saves memory.
+ */
 class CHStaticFactory {
 public:
     using EdgeFactory = CHNumberEdgeFactory;
@@ -88,6 +103,10 @@ public:
 
     CHStaticFactory() {}
 
+    /**
+     * Load graph from database and then create an immutable search graph with is more 
+     * memory efficient (has only half edges).
+     */
     static Graph CreateGraph(database::DatabaseHelper& d, TableNames* table_names) {
         TemporaryGraph g{};
         DbGraph db_graph{};
@@ -112,6 +131,11 @@ public:
     }
 };
 
+/**
+ * AlgorithmFactory for Contraction Hiearchies algorithm used with DynamicProfileMode.
+ * That means that road graph edge lengths must be based on a profile so that
+ * they can be swapped at moments notice by swapping the underlying profile.
+ */
 class CHDynamicFactory {
 public:
     using EdgeFactory = CHProfileEdgeFactory;
@@ -129,6 +153,10 @@ public:
 
     CHDynamicFactory() : endpoint_edges_lengths_() {}
 
+    /**
+     * Load graph from database and then create an immutable search graph with is more 
+     * memory efficient (has only half edges).
+     */
     static Graph CreateGraph(database::DatabaseHelper& d, TableNames* table_names, DynamicLengthSource* length_source) {
         TemporaryGraph g{};
         DbGraph db_graph{};

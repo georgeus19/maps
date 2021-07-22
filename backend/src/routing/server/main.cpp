@@ -26,7 +26,14 @@ using namespace profile;
 using namespace query;
 using namespace database;
 
+/**
+ * Parse profile that was received as a part of a routing request.
+ */
 static Profile ParseProfile(const crow::json::rvalue& p, Profile& default_profile);
+
+/**
+ * Run routing server with the selected Profile mode. This methods never returns.
+ */
 template <typename Setup, typename Mode>
 static void RunServer(Configuration& cfg, Mode& mode, const std::string& config_path);
 

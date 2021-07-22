@@ -16,6 +16,17 @@
 namespace routing {
 namespace profile {
 
+/**
+ * PhysicalLengthIndex represents real distances (lengths) of edges. 
+ * 
+ * Note that there are edges with distances of hunderds of meters
+ * and edges with distances of a few meters. If this index is normalized and
+ * added to other prefences via addition operation, the routing does not work
+ * very well due to the big relative range of values. 
+ * 
+ * This index works much better if it serves as a base index and values of 
+ * other prefence indicies are instead multiplied with it.
+ */
 class PhysicalLengthIndex : public PreferenceIndex{
 public:
     PhysicalLengthIndex();

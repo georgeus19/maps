@@ -14,6 +14,9 @@
 namespace routing {
 namespace preprocessing {
 
+/**
+ * GraphContractor contracts all vertices.
+ */
 template <typename Graph>
 class GraphContractor {
     
@@ -31,6 +34,9 @@ public:
 
     void ContractVertex(Vertex & vertex);
 
+    /**
+     * Contract the least important vertex.
+     */
     void ContractMinVertex(PriorityQueue& q);
 
     PriorityQueue CalculateContractionPriority();
@@ -61,17 +67,8 @@ void GraphContractor<Graph>::ContractGraph() {
     });
     while(!q.empty()) {
         if (count % 10000 == 0) {
-            std::cout << count << " vertices left, average degree = " << std::endl; //CalculateOverlayGraphAverageDegree() << std::endl;
+            std::cout << count << " vertices left." << std::endl;
         } 
-        // if (count < 50000 && count % 1000 == 0) {
-        //     std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
-        // } 
-        // if (count < 1000 && count % 10 == 0) {
-        //     std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
-        // }
-        // if (count < 10) {
-        //     std::cout << count << " vertices left, average degree = " << CalculateOverlayGraphAverageDegree() << std::endl;
-        // }
         ContractMinVertex(q);
         --count;
     }

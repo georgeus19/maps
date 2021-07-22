@@ -19,6 +19,17 @@
 namespace routing {
 namespace query {
 
+/**
+ * BidirectionalDijkstra is the query algorithm for Contraction Hierachies.
+ * Can be currently be used only with CH graphs.
+ * 
+ * The algorithm runs forward Dijkstra from a source and backward
+ * Dijkstra from a target. So there are two priority queues etc.. 
+ * 
+ * It does not change any properties of vertices or edge of graph
+ * it runs on. Any information such as current costs of vertices is stored
+ * inside this class.
+ */
 template <typename G>
 class BidirectionalDijkstra {
 public:
@@ -39,7 +50,7 @@ public:
     void Run(unsigned_id_type start_node, unsigned_id_type end_node);
 
     /**
-     * Get shortest route from the node the algorithm was run to.
+     * Get the optimal route from the node the algorithm was run to.
      * @return Vector of edges which represent the found route. Empty if no path found.
      */
     std::vector<Edge> GetRoute();
@@ -73,7 +84,7 @@ private:
 
     /**
 	 * Stores information from the search. It is memory & performance inefficient to store it in vertices
-	 * since a small portion of graph is searched.
+	 * since a small portion of graph is searched. 
 	 */
     struct VertexRoutingProperties {
         float cost;

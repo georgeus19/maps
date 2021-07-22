@@ -10,8 +10,12 @@ namespace routing {
 
 
 /**
- * BasicEdge is a graph edge with only most general properties which can be
- * used only in simple algorithms.
+ * BasicEdge is a graph edge with only most general properties.
+ * 
+ * An edge can be forward, backward or twoway. Normal edges are forward,
+ * backward edge means that the edge is based on a forward edge that
+ * has reversed from and to vertices,
+ * twoway means that the edge is undirected.
  */
 template <typename LS>
 class BasicEdge {
@@ -84,24 +88,12 @@ public:
 protected:
     using id_type = unsigned_id_type;
 
-    /**
-     * Unique id of the edge.
-     */
     unsigned_id_type uid_;
 
-    /**
-     * Origin of the edge.
-     */
     unsigned_id_type from_;
 
-    /**
-     * Destination of the edge.
-     */
     unsigned_id_type to_;
 
-    /**
-     * Length of the edge.
-     */
     LS length_;
 
     EdgeType type_;

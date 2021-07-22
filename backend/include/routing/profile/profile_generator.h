@@ -16,22 +16,39 @@
 namespace routing {
 namespace profile{
 
+/**
+ * ProfileGenerator receives an array of prefences indices each with importance (weight) options.
+ * It generates a profile for each combination of weights (profile always has one weight of each
+ * index' importance options and the index).
+ */
 class ProfileGenerator {
 public:
 
     ProfileGenerator(const std::shared_ptr<PreferenceIndex>& index);
 
+    /**
+     * Add index and its importance(ie weight) options.
+     */
     void AddIndex(const std::shared_ptr<PreferenceIndex>& index, std::vector<float>&& importance_options);
 
     std::vector<Profile> Generate();
 
+    /**
+     * Front profile is the profile with weights of all indices at index 0.
+     */
     Profile GetFrontProfile();
 
 private:
     struct IndexInfo;
 
+    /**
+     * Base index to be added to all profiles.
+     */
     std::shared_ptr<PreferenceIndex> base_index_;
 
+    /**
+     * Registered preference indices.
+     */
     std::vector<IndexInfo> indices_;
 
     struct IndexInfo{
@@ -41,6 +58,9 @@ private:
         IndexInfo(std::shared_ptr<PreferenceIndex> i, std::vector<float> im) : index(i), importance_options(std::move(im)) {}
     };
 
+    /**
+     * Generate all combinations of weights.
+     */
     std::vector<std::vector<float>> GetAllImportances(std::vector<IndexInfo>::iterator it, std::vector<IndexInfo>::iterator end);
 
 };

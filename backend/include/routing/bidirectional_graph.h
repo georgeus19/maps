@@ -19,10 +19,10 @@
 namespace routing {
 
 /**
- * Routing graph which can be used for any edge and vertex types.
- * However, Vertex and Edge must be valid with respect to each other.
- * @tparam Vertex Type of vertex in the graph.
- * @tparam Edge Type of edge in the graph.
+ * Bidirectional graph ensures that from one vertex its ingoing (= reversed backward) edges
+ * and outgoing edge can be accessed.
+ * 
+ * It can be used on top of any graph.
  */
 template <typename Graph>
 class BidirectionalGraph {
@@ -38,6 +38,12 @@ public:
     BidirectionalGraph& operator=(BidirectionalGraph&& other) = default;
     ~BidirectionalGraph() = default;
 
+    /**
+     * If the edge is forward, then the edge is added but additionally
+     * a new edge reverse to the edge is with the same other properties 
+     * is added to the graph as well. It is also set backward to imply that
+     * the edge is reversed.
+     */
     inline void AddEdge(Edge&& edge) {
         assert(!edge.IsBackward());
         if (edge.IsTwoway()) {

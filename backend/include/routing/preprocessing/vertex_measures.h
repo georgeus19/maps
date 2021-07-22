@@ -16,6 +16,9 @@
 namespace routing {
 namespace preprocessing {
 
+/**
+ * VertexMeasures calculates any measures necessary in preprocessing of CH.
+ */
 template <typename Graph>
 class VertexMeasures {
     using Vertex = typename Graph::Vertex;

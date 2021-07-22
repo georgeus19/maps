@@ -11,6 +11,9 @@
 namespace routing{
 namespace query{
 
+/**
+ * EdgeRangePolicyVectorIterator creates IteratorEdgeRange from vector of edges.
+ */
 template <typename Edge>
 class EdgeRangePolicyVectorIterator{
 public:
@@ -26,6 +29,9 @@ private:
     std::vector<std::vector<Edge>> edges_;
 };
 
+/**
+ * EdgeRangePolicyVector creates VectorEdgeRange from vector of edges.
+ */
 template <typename Edge>
 class EdgeRangePolicyVector{
 public:

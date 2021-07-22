@@ -15,6 +15,9 @@
 namespace routing {
 namespace profile {
 
+/**
+ * PeakDistanceIndex represents distance of edges to surrounding peaks. The closer peaks are, the higher value.
+ */
 class PeakDistanceIndex : public PreferenceIndex{
 public:
     PeakDistanceIndex();
@@ -33,8 +36,14 @@ public:
 private:
     PairIndexImplementation impl_;
 
+    /**
+     * Name of column with preference values in database table
+     */
     static inline const std::string kValueColumnName = "peak_distance";
 
+    /**
+     * How nearby peaks are considered in meters.
+     */
     static inline const float kDistanceRadius = 1000;
 
     void Normalize() override;

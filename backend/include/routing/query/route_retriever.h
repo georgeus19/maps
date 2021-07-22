@@ -15,6 +15,14 @@
 namespace routing {
 namespace query {
 
+/**
+ * The main responsibility of RouteRetriever is to retrieve a list of edges representing
+ * the found route after running routing algorithm on a graph.
+ * 
+ * It can be 
+ * 
+ * @tparam VertexRoutingProperties It provides routing information about vertices - e.g. previous vertex. 
+ */
 template <typename Graph, typename VertexRoutingProperties>
 class RouteRetriever {
 public:

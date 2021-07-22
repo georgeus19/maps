@@ -8,9 +8,6 @@
 
 namespace routing {
 
-/**
- * RouteNotFoundException is thrown when it is impossible to find the best route.
- */
 class RouteNotFoundException : public std::exception {
     std::string message_;
 public:
@@ -21,9 +18,6 @@ public:
     const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
 
-/**
- * NotImplementedException is thrown when it is impossible to find the best route.
- */
 class NotImplementedException : public std::exception {
     std::string message_;
 public:

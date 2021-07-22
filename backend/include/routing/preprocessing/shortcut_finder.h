@@ -28,6 +28,9 @@
 namespace routing {
 namespace preprocessing {
 
+/**
+ * ShortcutFinder finds shortcuts that should be added if a vertex were to be contracted.
+ */
 template <typename Graph>
 class ShortcutFinder {
     using Vertex = typename Graph::Vertex;
@@ -35,12 +38,17 @@ class ShortcutFinder {
 public:
     ShortcutFinder(Graph& g, const ContractionParameters& p);
 
+    /**
+     * Find shortcuts that should be added if a vertex were to be contracted.
+     */
     std::vector<Edge> FindShortcuts(Vertex& vertex);
 
+    /**
+     * Find shortcuts that should be added if a vertex were to be contracted that would go though backward_former_edge edge.
+     */
     std::vector<Edge> FindShortcuts(Vertex& contracted_vertex, const Edge& backward_former_edge); 
 
     size_t GetSearchSpaceSize();
-
 
 private:
     Graph& g_;

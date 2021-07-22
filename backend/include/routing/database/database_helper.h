@@ -120,7 +120,7 @@ public:
      * @return String of geometries in geoJSON format.
      */
     template <typename Edge>
-    std::string GetRouteCoordinates(std::vector<Edge>::const_iterator begin, std::vector<Edge>::const_iterator end, const std::string& table_name);
+    std::string GetRouteCoordinates(typename std::vector<Edge>::const_iterator begin, typename std::vector<Edge>::const_iterator end, const std::string& table_name);
 
     /**
      * Load the entire graph from the database table (edgelist)
@@ -181,7 +181,7 @@ private:
 };
 
 template <typename Edge>
-std::string DatabaseHelper::GetRouteCoordinates(std::vector<Edge>::const_iterator begin, std::vector<Edge>::const_iterator end, const std::string& table_name) {
+std::string DatabaseHelper::GetRouteCoordinates(typename std::vector<Edge>::const_iterator begin, typename std::vector<Edge>::const_iterator end, const std::string& table_name) {
 
     std::string sql_start = " SELECT uid, ST_AsGeoJSON(geog) " \
                             " FROM " + table_name + " WHERE ";

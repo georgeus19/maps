@@ -11,6 +11,9 @@
 
 namespace routing{
 
+/**
+ * TableNames provides an interface for creating table names for algorithm tables.
+ */
 class TableNames{
 public:
     TableNames() {}
@@ -19,7 +22,7 @@ public:
     TableNames(const TableNames& other) = delete;
     TableNames& operator=(TableNames&& other) = delete;
     TableNames& operator=(const TableNames& other) = delete;
-    ~TableNames() = default;
+    virtual ~TableNames() = default;
 
     virtual const std::string& GetBaseTableName() const = 0;
 

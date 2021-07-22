@@ -83,11 +83,10 @@ target_link_libraries(tests gtest_main gmock_main)
 add_test(NAME dijkstra_test COMMAND dijkstra_test)
 
 include_directories(include/)
+include_directories(lib)
 
 target_link_libraries(graph_builder -lpthread -lz -lexpat -lbz2)
 
-include_directories(/usr/include/python3.8/)
-include_directories(lib)
 
 include_directories(/usr/local/include)
 include_directories(/usr/local/include/mapnik/agg /usr/local/include/mapnik)
@@ -105,5 +104,3 @@ target_link_libraries(routing pq)
 target_link_libraries(routing_preprocessor routing)
 
 SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O2")
-# SET(CMAKE_CXX_FLAGS_BUILD "-g -pg -O2")
-# set (CMAKE_CXX_FLAGS "-std=c++17 -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -DMAJOR_VERSION=1 -DMINOR_VERSION=0")

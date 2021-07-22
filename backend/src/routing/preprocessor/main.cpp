@@ -5,7 +5,6 @@
 #include "routing/configuration_parser.h"
 #include "routing/constants.h"
 
-#include "routing/preprocessing/algorithm_preprocessor.h"
 #include "routing/preprocessing/ch_preprocessor.h"
 #include "routing/preprocessing/contraction_parameters.h"
 #include "routing/preprocessing/index_extender.h"
@@ -35,12 +34,32 @@ using namespace database;
 using namespace preprocessing;
 using namespace profile;
 
+/**
+ * Main entrypoint for any algorithm preprocessing.
+ */
 static void RunAlgorithmPreprocessing(const std::string& config_path);
+/**
+ * Run preprocessing for StaticProfileMode based on the configuration.
+ */
 static void StaticModePreprocessing(DatabaseHelper& d, Configuration& cfg);
+
+/**
+ * Run preprocessing for DynamicProfileMode based on the configuration.
+ */
 static void DynamicModePreprocessing(DatabaseHelper& d, Configuration& cfg);
+
+/**
+ * Preprocessing of routing algorithms such as CH create additional edges. Compute preference values for these new
+ * edges and save them along with the old one to database table.
+ */
 template <typename Graph>
 static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& profile, TableNames* table_names, DatabaseHelper& d);
+
+/**
+ * Main entrypoint for creating preference indices.
+ */
 static void CreateIndices(const std::string& path);
+
 static void PrintHelp();
 
 // Run options.
@@ -52,6 +71,7 @@ int main(int argc, const char** argv) {
         PrintHelp();
         return 1;
     }
+
     std::unordered_map<std::string, std::function<void()>> run_options{
         {kCreateIndex, [=](){
             CreateIndices(argv[2]);
@@ -161,6 +181,7 @@ static void ExtendProfileIndices(Configuration& cfg, Graph& graph, Profile& prof
 }
 
 static void CreateIndices(const std::string& path) {
+    std::cout << "If you kill this process, restart PostgreSQL database." << std::endl;
     auto&& data = toml::parse(path);
     DatabaseConfig db_cfg{toml::find(data, Constants::Input::TableNames::kDatabase)};
     DatabaseHelper d{db_cfg.name, db_cfg.user, db_cfg.password, db_cfg.host, db_cfg.port};

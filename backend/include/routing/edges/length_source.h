@@ -6,6 +6,9 @@
 
 namespace routing{
 
+/**
+ * NumberLengthSource provides a length value for an edge.
+ */
 class NumberLengthSource{
 public:
     NumberLengthSource(float length) : length_(length) {}
@@ -18,11 +21,21 @@ private:
     float length_;
 };
 
+/**
+ * DynamicLengthSource is abstract class for providing length to an edge.
+ * The idea is that lengths of one edge can be redefined dynamically.
+ */
 class DynamicLengthSource{
 public:
     virtual float GetLength(unsigned_id_type uid) const = 0;
 };
 
+/**
+ * Provide edge lengths for endpoint edges which are only temporary
+ * and definitely not parts of any profile.
+ * 
+ * This class is used in combination with ProfileLengthSource.
+ */
 class EndpointEdgesLengths : public DynamicLengthSource{
 public:
 
@@ -46,16 +59,13 @@ private:
     std::vector<float> lengths_;
 };
 
-
+/**
+ * ProfileEnvelope is a container for profile instance which can be referenced by edges.
+ * Edge lentgths can be changed by switching the profile member.
+ */
 class ProfileEnvelope : public DynamicLengthSource{
 public:
     ProfileEnvelope(profile::Profile&& profile) : profile_(std::move(profile)) {}
-
-    // ProfileEnvelope(const ProfileEnvelope& other) = delete;
-    // ProfileEnvelope(ProfileEnvelope&& other) = delete;
-    // ProfileEnvelope& operator=(const ProfileEnvelope& other) = delete;
-    // ProfileEnvelope& operator=(ProfileEnvelope&& other) = delete;
-    // ~ProfileEnvelope() = default;
 
     void SwitchProfile(profile::Profile&& profile) {
         profile_ = std::move(profile);
@@ -72,6 +82,10 @@ private:
     profile::Profile profile_;
 };
 
+/**
+ * ProfileLengthSource provides lengths for edges based on a profile
+ * which can be dynamically changed.
+ */ 
 class ProfileLengthSource{
 public:
     ProfileLengthSource(DynamicLengthSource* profile) : profile_(profile) {}

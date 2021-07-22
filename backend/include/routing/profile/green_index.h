@@ -15,6 +15,10 @@
 namespace routing {
 namespace profile {
 
+/**
+ * GreenIndex represents green preference. Due to the calculation, the greener an edge, the higher value.
+ * If green edges are to be preferred, this index must be used as inverted (see Profile class in profile.h).
+ */
 class GreenIndex : public PreferenceIndex{
 public:
     GreenIndex();
@@ -33,6 +37,9 @@ public:
 private:
     PairIndexImplementation impl_;
 
+    /**
+     * Name of column with preference values in database table
+     */
     static inline const std::string kValueColumnName = "green_value";
 
     void Normalize() override;

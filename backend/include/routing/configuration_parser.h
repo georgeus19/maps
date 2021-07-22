@@ -20,6 +20,10 @@
 #include <memory>
 #include <string>
 
+/**
+ * The whole configuration data is loaded to matching classes before any special events are done.
+ */ 
+
 namespace routing {
 
 struct DatabaseConfig{
@@ -111,6 +115,9 @@ class ConfigurationParser {
 public:
     ConfigurationParser(const std::string& config_path);
 
+    /**
+     * Parse configuration file and return a class representing everything in the configuration file.
+     */
     Configuration Parse();
 
 
@@ -212,6 +219,6 @@ Configuration ConfigurationParser::Parse() {
 }
 
 
-}
 
+}
 #endif //ROUTING_CONFIGURATION_PARSER_H

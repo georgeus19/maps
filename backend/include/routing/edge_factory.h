@@ -10,10 +10,15 @@
 
 namespace routing{
 
+/**
+ * This file contains factories for all types of edges for each LengthSource: NumberLengthSource and ProfileLengthSource.
+ * They generally require a template input class that provides all properties necessary for given edge type.
+ */
+
 template <typename LS>
 class EdgeTypeResolver{
 public:
-    BasicEdge<LS>::EdgeType GetEdgeType(bool undirected) {
+    typename BasicEdge<LS>::EdgeType GetEdgeType(bool undirected) {
         if (undirected) {
             return BasicEdge<LS>::EdgeType::twoway;
         } else {

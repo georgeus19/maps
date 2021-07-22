@@ -1,0 +1,40 @@
+[database]
+name = "gis"
+user = "postgres"
+password = "wtz2trln"
+host = "127.0.0.1"
+port = "5432"
+
+[algorithm]
+name = "ch"
+base_graph_table = "czedges"
+mode = "static_profile"
+[algorithm.parameters]
+hop_count = 5
+edge_difference = 190
+deleted_neighbours = 120
+space_size = 0
+
+[preferences]
+base_index = "length"
+base_index_table = "czedges_length_index"
+
+[[preferences.indices]]
+name = "green"
+table_name = "czedges_green_index"
+importance = [ 0.0, -1.0 ]
+display_name = "Green areas"
+display_importance = [ "disabled", "prefer green areas 100%" ]
+[[preferences.indices]]
+name = "peak"
+table_name = "czedges_peak_index"
+importance = [ 0.0, -1.0 ]
+display_name = "Peak distance"
+display_importance = [ "disabled", "prefer peaks"]
+[[preferences.indices]]
+name = "road_type"
+table_name = "czedges_road_type_index"
+importance = [ 0.0, 1.0 ]
+display_name = "Road types"
+display_importance = [ "disabled", "prefer small roads 100%" ]
+

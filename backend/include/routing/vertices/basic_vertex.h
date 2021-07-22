@@ -10,6 +10,8 @@ namespace routing {
 
 /**
  * BasicVertex is a routing graph vertex with only the most general properties.
+ * 
+ * @tparam EdgeRange Provides access to edges of a vertex.
  */
 template <typename Edge, typename EdgeRange>
 class BasicVertex {

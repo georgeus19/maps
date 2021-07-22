@@ -14,6 +14,9 @@
 namespace routing{
 namespace preprocessing{
 
+/**
+ * IndexExtender extends a preference index to
+ */
 template <typename Graph>
 class IndexExtender{
     struct IndexValue;

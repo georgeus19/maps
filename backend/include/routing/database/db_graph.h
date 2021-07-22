@@ -29,6 +29,9 @@
 namespace routing {
 namespace database {
 
+/**
+ * DbGraph is an abstract class declaring methods for loading and saving different types of graphs to/from database.
+ */
 class DbGraph {
 public:
     DbGraph() {}

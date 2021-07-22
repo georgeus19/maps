@@ -19,10 +19,9 @@
 namespace routing {
 
 /**
- * Routing graph which can be used for any edge and vertex types.
- * However, Vertex and Edge must be valid with respect to each other.
- * @tparam Vertex Type of vertex in the graph.
- * @tparam Edge Type of edge in the graph.
+ * Optimized memory efficient immutable search graph for Contraction Hierarchies.
+ * 
+ * It contains only edges that lead to a vertex with higher ordering rank.
  */
 template <typename V, typename E>
 class CHSearchGraph {
@@ -33,13 +32,14 @@ public:
 
     CHSearchGraph();
 
+    /**
+     * Copy vertices and edges from a graph to this graph. Only edges leading to vertices with higher
+     * ordering rank are copied. It is required that the graph ahs the same type of edge and a vertex
+     * that contain its ordering rank.
+     */
     template <typename Graph>
     void Load(Graph& graph);
-    /**
-     * Return point to vertex with `id`.
-     * @param id Id of vertex to which Vertex* points.
-     * @return Pointer to vetex or nullptr if it is not found.
-     */
+
     V& GetVertex(unsigned_id_type id);
 
     void ForEachVertex(const std::function<void(V&)>& f);
@@ -67,6 +67,9 @@ private:
         Capacities(size_t vc, size_t ec) : vertices_capacity(vc), edges_capacity(ec) {}
     };
 
+    /**
+     * Compute how many vertices and edges will be in the final graph.
+     */
     template <typename Graph>
     Capacities PrecomputeCapacities(Graph& graph);
 
@@ -112,8 +115,6 @@ void CHSearchGraph<V, E>::ForEachVertex(const std::function<void(V&)>& f) {
 template <typename V, typename E>
 void CHSearchGraph<V, E>::ForEachEdge(const std::function<void(E&)>& f) {
     for (auto&& edge : edges_) {
-        // vertex.ForEachEdge(f);
-        // vertex.ForEachBackwardEdge(f);
         f(edge);
     }
 }

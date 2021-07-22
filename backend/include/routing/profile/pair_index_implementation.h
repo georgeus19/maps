@@ -13,6 +13,12 @@
 namespace routing{
 namespace profile{
 
+/**
+ * Preferences usually contain a float for each edge so only a pair of values is stored for
+ * each edge - edge id and preference value.
+ * 
+ * Therefore, this class provides basic implementation of such pair oriented preference indices.
+ */
 class PairIndexImplementation{
 public:
     struct Value {
@@ -25,6 +31,9 @@ public:
 
     PairIndexImplementation();
 
+    /**
+     * Save new index values to database table.
+     */
     void Create(database::DatabaseHelper& d, const std::vector<std::pair<unsigned_id_type, float>>& index_values, const std::string& index_table,
         const std::string& value_col_name) const;
 

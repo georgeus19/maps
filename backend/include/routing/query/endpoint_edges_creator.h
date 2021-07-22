@@ -17,13 +17,11 @@ namespace routing{
 namespace query{
 
 /**
- * EndpointEdgesCreator handles creating edges from endpoint to closest intersection - Splitting
- * the closest edge to multiple segments so that routing is done more accurately.
- *
- * It also stores the segments' geometries which can be later queried for to construct
- * the geometry of the whole route.
- *
- * This is the implementation of EndpointHandler for graph with BasicEdge edges.
+ * EndpointEdgesCreator handles creating edges from endpoint (defined by lat loncoordinates)
+ * to closest intersection (ie vertex). 
+ * 
+ * It finds the geographically closest edge to the endpoint and splits it into two to 
+ * create edges to endpoint vertex. It also creates geometries for these edges.
  */
 template <typename EdgeFactory>
 class EndpointEdgesCreator {
@@ -42,10 +40,7 @@ public:
      * to multiple segments. Geometries of new segments are saved and new edges are created from segments
      * and returned in vector.
      *
-     * @param p Endpoint of the route - start/ end.
-     * @param table_name Table where edges are stored.
-     * @param d DatabaseHandler instance which is used to fetch data.
-     * @return Vector of edges created from new segments.
+     * @return vector of new edges and their geometries.
      */
     std::pair<std::vector<typename EdgeFactory::Edge>, std::vector<std::pair<unsigned_id_type, std::string>>> CalculateEndpointEdges(
         const std::string& table_name, unsigned_id_type endpoint_id, utility::Point p, unsigned_id_type free_edge_id);
@@ -58,6 +53,9 @@ private:
 
     EdgeFactory edge_factory_;
 
+    /**
+     * Indices to the output of the SQL query used to retrieve the closest edge, etc..
+     */
     static const size_t kAdjEdgeFrom = 0;
     static const size_t kAdjEdgeTo = 1;
     static const size_t kClosestEdgeFrom = 2;
@@ -117,8 +115,8 @@ private:
      * @param endpoint_id Node id which is free to use and which is one endpoint of the segment.
      * @param intersection_id Id of original intersection that will serve as the other endpoint.
      */
-void SaveEdge(database::DbRow r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
-    unsigned_id_type endpoint_id, unsigned_id_type intersection_id, unsigned_id_type free_edge_id);
+    void SaveEdge(database::DbRow r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
+        unsigned_id_type endpoint_id, unsigned_id_type intersection_id, unsigned_id_type free_edge_id);
 };
 
 template <typename EdgeFactory>

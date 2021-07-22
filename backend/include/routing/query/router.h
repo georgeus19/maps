@@ -34,6 +34,13 @@
 namespace routing {
 namespace query {
 
+/**
+ * Router finds shortest routes between two points specified by latitude and longitude.
+ * The routes are shortest with respect to edge lengths of stored routing graph.
+ * 
+ * @tparam AlgorithmFactory Factory creates algorithm related classes.
+ */
+
 template <typename AlgorithmFactory>
 class Router {
     using EC = EndpointsCreator<typename AlgorithmFactory::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename AlgorithmFactory::EndpointEdgeFactory>>;
@@ -50,46 +57,11 @@ public:
     Router operator=(const Router& other) = delete;
     ~Router() = default;
 
-    Route<typename AlgorithmFactory::Algorithm::Edge> CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target) {
-        if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
-            throw RouteNotFoundException("Start and end point are the same.");
-        }
-        
-        RoutingGraph<typename AlgorithmFactory::Graph> routing_graph{base_graph_};
-        auto&& db_graph = alg_factory_.CreateDbGraph();
+    /**
+     * Calculate the shortest path between two points speficied by lat and lon in the member graph. 
+     */
+    Route<typename AlgorithmFactory::Algorithm::Edge> CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target);
 
-        EC endpoints_creator{
-            alg_factory_.CreateEndpointAlgorithmPolicy(routing_graph),
-            alg_factory_.CreateEndpointEdgesCreator(d, &db_graph)
-        };
-        unsigned_id_type source_vertex_id = base_graph_max_vertex_id_ + 1;
-        unsigned_id_type target_vertex_id = base_graph_max_vertex_id_ + 2;
-        endpoints_creator.AddSourceEndpoint(table_names_->GetEdgesTable(), source_vertex_id, source);
-        endpoints_creator.AddTargetEndpoint(table_names_->GetEdgesTable(), target_vertex_id, target);
-
-        Algorithm<typename AlgorithmFactory::Algorithm> alg{routing_graph};
-        alg.Run(source_vertex_id, target_vertex_id);            
-
-        std::vector<typename AlgorithmFactory::Algorithm::Edge> route = alg.GetRoute();
-        auto&& geom = GetRouteGeometry(d, endpoints_creator, route);
-        return Route<typename AlgorithmFactory::Algorithm::Edge>{std::move(route), std::move(geom)};
-    }
-
-    std::string GetRouteGeometry(database::DatabaseHelper& d, EC& endpoints_creator,
-        const std::vector<typename AlgorithmFactory::Algorithm::Edge>& route) {
-        auto&& route_begin = route.cbegin();
-        auto&& route_end = route.cend();
-        --route_end;
-        auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route_begin->get_uid());
-        auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route_end->get_uid());
-        ++route_begin;
-        // The first and the last edge geometries already retrieved so
-        // inc route_begin and dec route_end was done.
-        auto&& geojson_array = d.GetRouteCoordinates<typename AlgorithmFactory::Algorithm::Edge>(route_begin, route_end, table_names_->GetEdgesTable());
-
-        std::string final_array = "[" + first_edge_geometry + "," + geojson_array + last_edge_geometry + "]";
-        return final_array;
-    }
 
 private:
     AlgorithmFactory alg_factory_;
@@ -97,7 +69,53 @@ private:
     std::unique_ptr<TableNames> table_names_;
     unsigned_id_type base_graph_max_vertex_id_;
     unsigned_id_type base_graph_max_edge_id_;
+    
+    std::string GetRouteGeometry(database::DatabaseHelper& d, EC& endpoints_creator,
+        const std::vector<typename AlgorithmFactory::Algorithm::Edge>& route);
 };
+
+template <typename AlgorithmFactory>
+Route<typename AlgorithmFactory::Algorithm::Edge> Router<AlgorithmFactory>::CalculateShortestRoute(database::DatabaseHelper& d, utility::Point source, utility::Point target) {
+    if (source.lat_ == target.lat_ && source.lon_ == target.lon_) {
+        throw RouteNotFoundException("Start and end point are the same.");
+    }
+    
+    RoutingGraph<typename AlgorithmFactory::Graph> routing_graph{base_graph_};
+    auto&& db_graph = alg_factory_.CreateDbGraph();
+
+    EC endpoints_creator{
+        alg_factory_.CreateEndpointAlgorithmPolicy(routing_graph),
+        alg_factory_.CreateEndpointEdgesCreator(d, &db_graph)
+    };
+    unsigned_id_type source_vertex_id = base_graph_max_vertex_id_ + 1;
+    unsigned_id_type target_vertex_id = base_graph_max_vertex_id_ + 2;
+    endpoints_creator.AddSourceEndpoint(table_names_->GetEdgesTable(), source_vertex_id, source);
+    endpoints_creator.AddTargetEndpoint(table_names_->GetEdgesTable(), target_vertex_id, target);
+
+    Algorithm<typename AlgorithmFactory::Algorithm> alg{routing_graph};
+    alg.Run(source_vertex_id, target_vertex_id);            
+
+    std::vector<typename AlgorithmFactory::Algorithm::Edge> route = alg.GetRoute();
+    auto&& geom = GetRouteGeometry(d, endpoints_creator, route);
+    return Route<typename AlgorithmFactory::Algorithm::Edge>{std::move(route), std::move(geom)};
+}
+
+template <typename AlgorithmFactory>
+std::string Router<AlgorithmFactory>::GetRouteGeometry(database::DatabaseHelper& d, EC& endpoints_creator,
+    const std::vector<typename AlgorithmFactory::Algorithm::Edge>& route) {
+    auto&& route_begin = route.cbegin();
+    auto&& route_end = route.cend();
+    --route_end;
+    auto&& first_edge_geometry = endpoints_creator.GetSourceGeometry(route_begin->get_uid());
+    auto&& last_edge_geometry = endpoints_creator.GetTargetGeometry(route_end->get_uid());
+    ++route_begin;
+    // The first and the last edge geometries already retrieved so
+    // inc route_begin and dec route_end was done.
+    auto&& geojson_array = d.GetRouteCoordinates<typename AlgorithmFactory::Algorithm::Edge>(route_begin, route_end, table_names_->GetEdgesTable());
+
+    std::string final_array = "[" + first_edge_geometry + "," + geojson_array + last_edge_geometry + "]";
+    return final_array;
+}
 
 
 
