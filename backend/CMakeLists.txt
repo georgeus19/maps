@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(backend)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 # set (CMAKE_CXX_FLAGS "-std=c++17 -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -DMAJOR_VERSION=1 -DMINOR_VERSION=0")
 set(CMAKE_CXX_FLAGS "-Wall")
 file(GLOB OsmGraphBuilderGlob src/graph_builder/*.cpp include/graph_builder/*.h)

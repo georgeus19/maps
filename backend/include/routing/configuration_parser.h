@@ -167,8 +167,8 @@ Configuration ConfigurationParser::Parse() {
 
     auto&& algorithm = toml::find(data_, Constants::Input::TableNames::kAlgorithm);
     std::string alg_name = toml::find<std::string>(algorithm, Constants::Input::kName);
-    if (!algorithms.contains(alg_name)) {
-        alg_name = default_algorithm;
+    if (algorithms.find(alg_name) == algorithms.end()) {
+        throw ParseException{"Algorithm " + alg_name + " does not exist."};
     } 
     std::unique_ptr<AlgorithmConfig> alg = algorithms[alg_name](algorithm.as_table());
     
@@ -181,7 +181,7 @@ Configuration ConfigurationParser::Parse() {
 
     auto&& preferences = toml::find(data_, Constants::Input::TableNames::kPreferences);
     std::string base_index = toml::find<std::string>(preferences, Constants::Input::kBaseIndex);
-    if (!indices.contains(base_index)) {
+    if (indices.find(base_index) == indices.end()) {
         throw ParseException{"Base index " + base_index + " does not exist."};
     }
     std::string base_index_table = toml::find<std::string>(preferences, Constants::Input::kBaseIndexTable);
@@ -190,7 +190,7 @@ Configuration ConfigurationParser::Parse() {
     for(auto&& index : toml::find<toml::array>(preferences, Constants::Input::TableNames::kIndices)) {
         
         std::string name = toml::find<std::string>(index, Constants::Input::kName);
-        if (!indices.contains(name)) {
+        if (indices.find(name) == indices.end()) {
             throw ParseException{"Index " + name + " does not exist."};
         }
         std::string table_name = toml::find<std::string>(index, Constants::Input::kTableName);
