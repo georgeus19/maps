@@ -113,6 +113,8 @@ private:
      */
     void SaveEdge(database::DbRow& r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
         typename Graph::Edge& closest_edge, unsigned_id_type endpoint_id, unsigned_id_type intersection_id, unsigned_id_type free_edge_id);
+
+    typename Graph::Edge& GetEdge(unsigned_id_type edge_id, unsigned_id_type edge_from, unsigned_id_type edge_to);
 };
 
 template <typename EdgeFactory, typename Graph>
@@ -157,11 +159,7 @@ std::pair<std::vector<typename EdgeFactory::Edge>, std::vector<std::pair<unsigne
         adjacent_intersection = closest_edge_to; 
     }
     
-    
-    auto&& v = graph_.get().GetVertex(closest_edge_from);
-    auto&& closest_edge = v.FindEdge([=](const typename Graph::Edge& edge){
-        return closest_edge_uid == edge.get_uid();
-    });
+    auto&& closest_edge = GetEdge(closest_edge_uid, closest_edge_from, closest_edge_to);
 
     SaveEdge(segment_row, result_edges, result_geometries, closest_edge, endpoint_id, adjacent_intersection, free_edge_id);
     ++free_edge_id;
@@ -188,6 +186,24 @@ void EndpointEdgesCreator<EdgeFactory, Graph>::SaveEdge(database::DbRow& r, std:
     result_geometries.push_back(std::make_pair(free_edge_id, geometry));
 }
 
+template <typename EdgeFactory, typename Graph>
+typename Graph::Edge& EndpointEdgesCreator<EdgeFactory, Graph>::GetEdge(unsigned_id_type edge_id, unsigned_id_type edge_from, unsigned_id_type edge_to) {
+    auto&& from_vertex = graph_.get().GetVertex(edge_from);
+    for(auto&& edge : from_vertex.get_edges()) {
+        if (edge_id == edge.get_uid()) {
+            return edge;
+        }
+    }
+
+    auto&& to_vertex = graph_.get().GetVertex(edge_to);
+    for(auto&& edge : to_vertex.get_edges()) {
+        if (edge_id == edge.get_uid()) {
+            return edge;
+        }
+    }
+
+    throw EdgeNotFoundException{"Closest edge not in graph"};
+}
 
 
 
