@@ -99,7 +99,7 @@ segments_final as (
 SELECT segments.geog, ST_Intersects(adjacent.geog, segments.geog) as intersects_adjacent
 FROM adjacent, segments
 	)
-SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s.geog), s.intersects_adjacent, s.geog, adjacent.seg_len
+SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, (ST_Length(s.geog) / ST_Length(e.geog)), s.intersects_adjacent, s.geog
 FROM segments_final as s, closest_edge as e, adjacent
 	*/
 vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string& table_name, DbGraph* db_graph) {
@@ -169,8 +169,8 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 					"SELECT segments.geog, ST_Intersects(adjacent.geog, segments.geog) as intersects_adjacent " \
 					"FROM adjacent, segments " \
 					"	) " \
-					"SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s.geog), ST_AsGeoJSON(s.geog), s.intersects_adjacent, adjacent.seg_len " \
-					"  FROM segments_final as s, closest_edge as e, adjacent " ;
+					"SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, e.uid, (ST_Length(s.geog) / ST_Length(e.geog)), ST_AsGeoJSON(s.geog), s.intersects_adjacent " \
+					"  FROM segments_final as s, closest_edge as e, adjacent" ;
 
 	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(sql)};

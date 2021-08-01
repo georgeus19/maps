@@ -65,8 +65,8 @@ public:
         return g;
     }
 
-    EndpointEdgesCreator<EndpointEdgeFactory> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
-        return EndpointEdgesCreator<EndpointEdgeFactory>{d, db_graph, EndpointEdgeFactory{&endpoint_edges_lengths_}};
+    EndpointEdgesCreator<EndpointEdgeFactory, Graph> CreateEndpointEdgesCreator(Graph& graph, database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<EndpointEdgeFactory, Graph>{graph, d, db_graph, EndpointEdgeFactory{&endpoint_edges_lengths_}};
     }
 
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
@@ -122,8 +122,8 @@ public:
         return DbGraph{};
     }
 
-    EndpointEdgesCreator<EndpointEdgeFactory> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
-        return EndpointEdgesCreator<EndpointEdgeFactory>{d, db_graph, EndpointEdgeFactory{}};
+    EndpointEdgesCreator<EndpointEdgeFactory, Graph> CreateEndpointEdgesCreator(Graph& graph, database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<EndpointEdgeFactory, Graph>{graph, d, db_graph, EndpointEdgeFactory{}};
     }
 
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {
@@ -172,8 +172,8 @@ public:
         return DbGraph{};
     }
 
-    EndpointEdgesCreator<EndpointEdgeFactory> CreateEndpointEdgesCreator(database::DatabaseHelper& d, database::DbGraph* db_graph) {
-        return EndpointEdgesCreator<EndpointEdgeFactory>{d, db_graph, EndpointEdgeFactory{&endpoint_edges_lengths_}};
+    EndpointEdgesCreator<EndpointEdgeFactory, Graph> CreateEndpointEdgesCreator(Graph& graph, database::DatabaseHelper& d, database::DbGraph* db_graph) {
+        return EndpointEdgesCreator<EndpointEdgeFactory, Graph>{graph, d, db_graph, EndpointEdgeFactory{&endpoint_edges_lengths_}};
     }
 
     EndpointAlgorithmPolicy CreateEndpointAlgorithmPolicy(RoutingGraph<Graph>& routing_graph) {

@@ -43,7 +43,10 @@ namespace query {
 
 template <typename AlgorithmFactory>
 class Router {
-    using EC = EndpointsCreator<typename AlgorithmFactory::EndpointAlgorithmPolicy, EndpointEdgesCreator<typename AlgorithmFactory::EndpointEdgeFactory>>;
+    using EC = EndpointsCreator<
+                typename AlgorithmFactory::EndpointAlgorithmPolicy,
+                EndpointEdgesCreator<typename AlgorithmFactory::EndpointEdgeFactory, typename AlgorithmFactory::Graph>
+            >;
 public:
     Router() : alg_factory_(), base_graph_(), table_names_(), base_graph_max_vertex_id_(), base_graph_max_edge_id_() {}
 
@@ -85,7 +88,7 @@ Route<typename AlgorithmFactory::Algorithm::Edge> Router<AlgorithmFactory>::Calc
 
     EC endpoints_creator{
         alg_factory_.CreateEndpointAlgorithmPolicy(routing_graph),
-        alg_factory_.CreateEndpointEdgesCreator(d, &db_graph)
+        alg_factory_.CreateEndpointEdgesCreator(base_graph_, d, &db_graph)
     };
     unsigned_id_type source_vertex_id = base_graph_max_vertex_id_ + 1;
     unsigned_id_type target_vertex_id = base_graph_max_vertex_id_ + 2;
