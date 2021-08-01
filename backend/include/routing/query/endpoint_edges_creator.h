@@ -8,6 +8,8 @@
 #include "routing/database/database_helper.h"
 #include "routing/database/db_graph.h"
 
+#include "routing/utility/comparison.h"
+
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -60,10 +62,10 @@ private:
     static const size_t kAdjEdgeTo = 1;
     static const size_t kClosestEdgeFrom = 2;
     static const size_t kClosestEdgeTo = 3;
-    static const size_t kLength = 4;
-    static const size_t kGeometry = 5;
-    static const size_t kSelectedSegmentLength = 6;
-    static const size_t kMaxUid = 7;
+    static const size_t kSegmentLength = 4;
+    static const size_t kSegmentGeometry = 5;
+    static const size_t kSegmentIntersectsAdjacent = 6;
+    static const size_t kAdjacentSegmentLength = 7;
 
     class EdgeInputData{
     public:
@@ -99,14 +101,6 @@ private:
     };
 
     /**
-     * Determine which segment was used when adjacent edge was looked for in db and return its index (0 or 1).
-     *
-     * @param rows Rows representing segments.
-     * @return Index of the segment that was used when adjacent edge was looked for in db and return its index (0 or 1).
-     */
-    size_t CalculateSelectedSegmentIndex(std::vector<database::DbRow>& rows);
-
-    /**
      * Create new edges from segment and add them to `result_edges` vector.
      *
      * @param r Db row representing segment.
@@ -115,7 +109,7 @@ private:
      * @param endpoint_id Node id which is free to use and which is one endpoint of the segment.
      * @param intersection_id Id of original intersection that will serve as the other endpoint.
      */
-    void SaveEdge(database::DbRow r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
+    void SaveEdge(database::DbRow& r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
         unsigned_id_type endpoint_id, unsigned_id_type intersection_id, unsigned_id_type free_edge_id);
 };
 
@@ -136,33 +130,30 @@ std::pair<std::vector<typename EdgeFactory::Edge>, std::vector<std::pair<unsigne
     std::vector<typename EdgeFactory::Edge> result_edges{};
     std::vector<std::pair<unsigned_id_type, std::string>> result_geometries{};
 
-    unsigned_id_type selected_segment_index;
-    // If closest point to endpoint is an endpoint of the closest edge then
-    // there is only one segment.
-    // Otherwise find the segment id in db rows that intersects adjacent edge from sql query.
+    unsigned_id_type segment_intersecting_adjacent_index = 0;
     if (rows.size() > 1) {
-        selected_segment_index = CalculateSelectedSegmentIndex(rows);
-    } else {
-        selected_segment_index = 0;
+        segment_intersecting_adjacent_index = ((rows[0].get<bool>(kSegmentIntersectsAdjacent)) ? 0 : 1);
     }
 
     // Create edges from the segment that intersects adjacent edge from sql query.
-    database::DbRow selected_seg_row = rows[selected_segment_index];
-    unsigned_id_type adj_edge_from = selected_seg_row.get<unsigned_id_type>(kAdjEdgeFrom);
-    unsigned_id_type adj_edge_to = selected_seg_row.get<unsigned_id_type>(kAdjEdgeTo);
-    unsigned_id_type closest_edge_from = selected_seg_row.get<unsigned_id_type>(kClosestEdgeFrom);
-    unsigned_id_type closest_edge_to = selected_seg_row.get<unsigned_id_type>(kClosestEdgeTo);
+    auto&& segment_row = rows[segment_intersecting_adjacent_index];
+    unsigned_id_type adj_edge_from = segment_row.get<unsigned_id_type>(kAdjEdgeFrom);
+    unsigned_id_type adj_edge_to = segment_row.get<unsigned_id_type>(kAdjEdgeTo);
+    unsigned_id_type closest_edge_from = segment_row.get<unsigned_id_type>(kClosestEdgeFrom);
+    unsigned_id_type closest_edge_to = segment_row.get<unsigned_id_type>(kClosestEdgeTo);
 
-    // Determine the segment's endpoint osm id (it is one of closest edge intersections)
+    // Determine the segment's endpoint uid (it is one of closest edge intersections)
     // The other endpoint is newly created point (split point).
     bool closest_edge_from_used = false;
-    unsigned_id_type segment_original_intersection = 0;
-    if (adj_edge_from == closest_edge_from) { segment_original_intersection = adj_edge_from; closest_edge_from_used = true; }
-    if (adj_edge_from == closest_edge_to) { segment_original_intersection = adj_edge_from; }
-    if (adj_edge_to == closest_edge_from) { segment_original_intersection = adj_edge_to; closest_edge_from_used = true; }
-    if (adj_edge_to == closest_edge_to) { segment_original_intersection = adj_edge_to; }
+    unsigned_id_type adjacent_intersection = 0;
+    if (closest_edge_from == adj_edge_from || closest_edge_from ==  adj_edge_to) {
+        closest_edge_from_used = true;
+        adjacent_intersection = closest_edge_from;
+    } else {
+        adjacent_intersection = closest_edge_to; 
+    }
 
-    SaveEdge(selected_seg_row, result_edges, result_geometries, endpoint_id, segment_original_intersection, free_edge_id);
+    SaveEdge(segment_row, result_edges, result_geometries, endpoint_id, adjacent_intersection, free_edge_id);
     ++free_edge_id;
 
     if (rows.size() == 1) {
@@ -170,45 +161,19 @@ std::pair<std::vector<typename EdgeFactory::Edge>, std::vector<std::pair<unsigne
     }
 
     // Create edges for the other segment.
-    size_t other_index = (selected_segment_index == 0) ? 1 : 0;
+    unsigned_id_type other_segment_index = 1 - segment_intersecting_adjacent_index;
 
-    unsigned_id_type other_intersection = closest_edge_from_used ? closest_edge_to : closest_edge_from;
-    SaveEdge(rows[other_index], result_edges, result_geometries, endpoint_id, other_intersection, free_edge_id);
+    unsigned_id_type other_intersection = ((closest_edge_from_used) ? closest_edge_to : closest_edge_from);
+    SaveEdge(rows[other_segment_index], result_edges, result_geometries, endpoint_id, other_intersection, free_edge_id);
     ++free_edge_id;
     return std::make_pair(result_edges, result_geometries);
 }
 
 template <typename EdgeFactory>
-size_t EndpointEdgesCreator<EdgeFactory>::CalculateSelectedSegmentIndex(std::vector<database::DbRow>& rows) {
-    float tol = 0.001;
-
-    database::DbRow r0 = rows[0];
-    database::DbRow r1 = rows[1];
-    size_t selected_segment_index;
-    // Check which segment has the same length as the segment that intersects adjacent from sql.
-    // If lengths are the same it does not matter which one is picked.
-    float length = r0.get<float>(kLength);
-    float selected_segment_len = r0.get<float>(kSelectedSegmentLength);
-    if ((length - selected_segment_len) * (length - selected_segment_len) < tol) {
-        selected_segment_index = 0;
-    } else {
-        length = r1.get<float>(kLength);
-        selected_segment_len = r1.get<float>(kSelectedSegmentLength);
-        if ((length - selected_segment_len) * (length - selected_segment_len) < tol) {
-            selected_segment_index = 1;
-        } else {
-//                std::cout << "raise tol!! \n";
-            throw RouteNotFoundException{"Endpoint segments script error:No segment has the same length as the previous one."};
-        }
-    }
-    return selected_segment_index;
-}
-
-template <typename EdgeFactory>
-void EndpointEdgesCreator<EdgeFactory>::SaveEdge(database::DbRow r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
+void EndpointEdgesCreator<EdgeFactory>::SaveEdge(database::DbRow& r, std::vector<typename EdgeFactory::Edge>& result_edges, std::vector<std::pair<unsigned_id_type, std::string>>& result_geometries,
     unsigned_id_type endpoint_id, unsigned_id_type intersection_id, unsigned_id_type free_edge_id) {
-    float length = r.get<float>(kLength);
-    std::string geometry = r.get<std::string>(kGeometry);
+    float length = r.get<float>(kSegmentLength);
+    std::string geometry = r.get<std::string>(kSegmentGeometry);
     result_edges.push_back(edge_factory_.Create(EdgeInputData{free_edge_id, endpoint_id, intersection_id, length}));
     result_geometries.push_back(std::make_pair(free_edge_id, geometry));
 }

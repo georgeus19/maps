@@ -55,7 +55,6 @@ std::string DatabaseHelper::MakeGeographyPoint(utility::Point p) {
 WITH closest_candidates AS (
 SELECT e.osm_id, e.uid, e.geog, e.from_node, e.to_node, e.length
 FROM czedges as e
-WHERE shortcut = false
 ORDER BY
 e.geog <-> 'SRID=4326;POINT(13.394182 49.725673)'::geography
 LIMIT 100
@@ -88,17 +87,20 @@ SELECT st_transform(
 FROM closest_edge AS l,
 	blade_point AS blade
 	),
-max_uid AS (SELECT MAX(uid) AS uid FROM czedges),
 adjacent AS (
-SELECT czedges.from_node, czedges.to_node, ST_Length(segments.geog) as seg_len
+SELECT czedges.from_node, czedges.to_node, ST_Length(segments.geog) as seg_len, czedges.geog
 FROM czedges INNER JOIN segments ON (ST_Intersects(segments.geog, czedges.geog)),
 closest_edge AS ce
 WHERE not ((ce.from_node = czedges.from_node and ce.to_node = czedges.to_node) or
 	(ce.from_node = czedges.to_node and ce.to_node = czedges.from_node))
 LIMIT 1
-)
-SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(segments.geog), (segments.geog), adjacent.seg_len, max_uid.uid
-FROM segments, closest_edge as e, max_uid,  adjacent
+),
+segments_final as (
+SELECT segments.geog, ST_Intersects(adjacent.geog, segments.geog) as intersects_adjacent
+FROM adjacent, segments
+	)
+SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s.geog), s.intersects_adjacent, s.geog, adjacent.seg_len
+FROM segments_final as s, closest_edge as e, adjacent
 	*/
 vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::string& table_name, DbGraph* db_graph) {
 	string point = MakeGeographyPoint(p);
@@ -155,17 +157,20 @@ vector<DbRow> DatabaseHelper::GetClosestSegments(utility::Point p, const std::st
 					"  FROM closest_edge AS l, " \
 					"       blade_point AS blade " \
 					"       ), " \
-					"max_uid AS (SELECT MAX(uid) AS uid FROM " + table_name + "), " \
 					"adjacent AS ( " \
-					"SELECT e.from_node, e.to_node, ST_Length(segments.geog) as seg_len " \
+					"SELECT e.from_node, e.to_node, ST_Length(segments.geog) as seg_len, e.geog " \
 					"FROM " + table_name + " as e INNER JOIN segments ON (ST_Intersects(segments.geog, e.geog)), " \
 					"     closest_edge AS ce " \
 					"WHERE not ((ce.from_node = e.from_node and ce.to_node = e.to_node) or " \
 					"       (ce.from_node = e.to_node and ce.to_node = e.from_node)) " \
 					"LIMIT 1 " \
-					") " \
-					"SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(segments.geog), ST_AsGeoJSON(segments.geog), adjacent.seg_len, max_uid.uid  " \
-					"  FROM segments, closest_edge as e, max_uid,  adjacent " ;
+					"), " \
+					"segments_final as ( " \
+					"SELECT segments.geog, ST_Intersects(adjacent.geog, segments.geog) as intersects_adjacent " \
+					"FROM adjacent, segments " \
+					"	) " \
+					"SELECT adjacent.from_node, adjacent.to_node, e.from_node, e.to_node, ST_Length(s.geog), ST_AsGeoJSON(s.geog), s.intersects_adjacent, adjacent.seg_len " \
+					"  FROM segments_final as s, closest_edge as e, adjacent " ;
 
 	pqxx::nontransaction n{*connection_};
 	pqxx::result result{n.exec(sql)};

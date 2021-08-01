@@ -42,7 +42,7 @@ const std::string& Route<Edge>::get_geometry() const {
 template <typename Edge>
 float Route<Edge>::GetLength(profile::PreferenceIndex* index) const {
     assert(edges_.size() >= 2);
-    
+
     auto it = edges_.begin();
     float length = it->get_length();
     ++it;
