@@ -1,6 +1,6 @@
-# Maps - web application for finding route for cyclists per their custom preferences
+# Maps - web application for finding routes for cyclists per their custom preferences
 
-Many current routing editor supporting creating routes for cyclists. However, there are usually some predefined preference profiles (e.g. mountain bike on mapy.cz) that alter the routing algorithm to prefer and suggest different types of roads. Since the profiles preference might not fit the user, they have to alter found route themselves.
+Many current web routing editors supporting creating routes for cyclists. However, there are usually some predefined preference profiles (e.g. mountain bike on mapy.cz) that alter the routing algorithm to prefer and suggest different types of roads. Since the profiles preference might not fit the user, they have to alter found route themselves.
 
 The main idea of this application is to allow custom setting these profiles dynamically by user. For example, users can choose whether to they prefer to bike in green areas, preferred elevation (avoid/prefer hills, going uphill), what type of paths they prefer, ...
 
